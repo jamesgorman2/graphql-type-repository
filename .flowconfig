@@ -1,0 +1,9 @@
+[ignore]
+
+[include]
+
+[libs]
+flow_lib
+
+[options]
+suppress_comment=.*flow-disable-next-line.*

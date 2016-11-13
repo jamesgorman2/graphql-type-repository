@@ -1,0 +1,53 @@
+{
+  "name": "graphql-type-repository",
+  "version": "0.1.0",
+  "description": "A repository for assembling GraphQLNamedTypes from modules",
+  "main": "dist",
+  "repository": {
+    "url": "https://github.com/jamesgorman2/graphql-type-repository",
+    "type": "git"
+  },
+  "bugs": "https://github.com/jamesgorman2/graphql-type-repository/issues",
+  "keywords": [
+    "GraphQL"
+  ],
+  "author": "James Gorman <jamesgorman2@gmail.com>",
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "flow": "flow",
+    "lint": "eslint .",
+    "test": "jest",
+    "build": "babel src -d dist --ignore __tests__",
+    "prepublish": "npm run lint && npm run flow -- check && npm run test && npm run build"
+  },
+  "peerDependencies": {
+    "graphql": "^0.8.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.1.0",
+    "babel-jest": "^17.0.0",
+    "babel-plugin-transform-flow-strip-types": "^6.18.0",
+    "babel-polyfill": "^6.16.0",
+    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-es2017": "^6.16.0",
+    "babel-preset-latest": "^6.16.0",
+    "babel-preset-stage-0": "^6.16.0",
+    "coveralls": "^2.11.15",
+    "eslint": "^3.10.0",
+    "eslint-config-airbnb-base": "^10.0.1",
+    "eslint-plugin-babel": "^3.3.0",
+    "eslint-plugin-import": "^2.2.0",
+    "flow-bin": "^0.35.0",
+    "graphql": "^0.8.1",
+    "jest": "15.1.1"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/index.js",
+      "!src/**/__tests__/**"
+    ],
+    "testEnvironment": "node",
+    "testRegex": "__tests__/.*-test.js$"
+  }
+}
