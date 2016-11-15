@@ -7,5 +7,6 @@ module.exports = {
   rules: {
     "linebreak-style": 0,
     'babel/func-params-comma-dangle': ['error', 'always-multiline'],
+    'import/prefer-default-export': 0
   },
 };

@@ -2,6 +2,7 @@
 
 export {
   Module,
+  ModuleRepository,
   NamedDefinitionNode,
 } from './config';
 
