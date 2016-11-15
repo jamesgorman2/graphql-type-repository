@@ -2,7 +2,7 @@
   "name": "graphql-type-repository",
   "version": "0.1.0",
   "description": "A repository for assembling GraphQLNamedTypes from modules",
-  "main": "dist",
+  "main": "index.js",
   "repository": {
     "url": "https://github.com/jamesgorman2/graphql-type-repository",
     "type": "git"
@@ -17,13 +17,17 @@
     "flow": "flow",
     "lint": "eslint .",
     "test": "jest",
-    "build": "babel src -d dist --ignore __tests__",
+    "coverage": "jest --coverage",
+    "build": "babel src -d dist --ignore __tests__ && cp package.json dist/ && npm run build-dot-flow",
+    "build-dot-flow": "find ./src -name '*.js' -not -path '*/__tests__*' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/dist\\//g'`.flow; done",
     "prepublish": "npm run lint && npm run flow -- check && npm run test && npm run build"
   },
   "peerDependencies": {
     "graphql": "^0.8.1"
   },
   "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-cli": "^6.18.0",
     "babel-eslint": "^7.1.0",
     "babel-jest": "^17.0.0",
     "babel-plugin-transform-flow-strip-types": "^6.18.0",
