@@ -1,5 +1,5 @@
 **/.eslintrc.js
-lib
+dist
 coverage
 **/node_modules
 **/flow_lib

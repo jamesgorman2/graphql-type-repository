@@ -43,7 +43,8 @@
     "eslint-plugin-import": "^2.2.0",
     "flow-bin": "^0.35.0",
     "graphql": "^0.8.1",
-    "jest": "15.1.1"
+    "jest": "15.1.1",
+    "json-stable-stringify": "^1.0.1"
   },
   "jest": {
     "collectCoverageFrom": [

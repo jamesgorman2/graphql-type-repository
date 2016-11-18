@@ -26,10 +26,8 @@ import type {
   ValueNode,
 } from 'graphql';
 
-import {
-  assert,
-  assertNonEmptyString,
-} from '../util/assert';
+import assert from '../util/assert';
+import isNonEmptyString from '../util/isNonEmptyString';
 
 export type FieldResolverConfig = {
   [fieldName: string]: GraphQLFieldResolver<*>;
@@ -43,16 +41,16 @@ export type ScalarResolverConfig<TInternal, TExternal> = {
 
 export type ObjectResolverConfig = {
   fields: FieldResolverConfig;
-  isTypeOf?: ?GraphQLIsTypeOfFn;
+  isTypeOf?: ?GraphQLIsTypeOfFn<*, *>;
 };
 
 export type InterfaceResolverConfig = {
   fields: FieldResolverConfig;
-  resolveType?: ?GraphQLTypeResolver;
+  resolveType?: ?GraphQLTypeResolver<*, *>;
 };
 
 export type UnionResolverConfig = {
-  resolveType?: ?GraphQLTypeResolver;
+  resolveType?: ?GraphQLTypeResolver<*, *>;
 };
 
 export type TypeResolverConfig =
@@ -142,7 +140,7 @@ function nodeName(node: TypeDefinitionNode | DirectiveDefinitionNode): string {
 function assertNewNamedType(name: string, module: Module): void {
   assert(
     newNamedType(name, module),
-    `cannot add type with duplicate name '${name}'`,
+    `Cannot add type with duplicate name '${name}'.`,
   );
 }
 
@@ -150,7 +148,7 @@ function assertNewNamedType(name: string, module: Module): void {
 function assertNewDirective(name: string, module: Module): void {
   assert(
     newDirective(name, module),
-    `cannot add directive with duplicate name '${name}'`,
+    `Cannot add directive with duplicate name '${name}'.`,
   );
 }
 
@@ -210,12 +208,12 @@ function withDefinitionNode(module: Module, node: any, resolvers: ?TypeResolverC
       module.schemaDefinitionNode,
     );
   }
-  throw new Error('node must be a TypeSystemDefinitionNode');
+  throw new Error('Parameter node must be a TypeSystemDefinitionNode.');
 }
 
 // eslint-disable-next-line no-use-before-define
 function withDocumentNode(module: Module, node: any, resolvers: ?TypeResolverConfigMap): Module {
-  assert(node.kind === 'Document', 'node must be a DocumentNode');
+  assert(node.kind === 'Document', 'Parameter node must be a DocumentNode.');
   const matchedResolvers = [];
   const m = node.definitions
     .reduce(
@@ -239,7 +237,7 @@ function withDocumentNode(module: Module, node: any, resolvers: ?TypeResolverCon
       const unmatchedResolverNames = resolverNames.filter(n => !matchedResolvers.includes(n));
       const plural = unmatchedResolverNames.length > 1 ? 's' : '';
       const nameString = unmatchedResolverNames.map(n => `'${n}'`).join(', ');
-      throw new Error(`cannot add resolver${plural} ${nameString} with no matching type${plural}`);
+      throw new Error(`Cannot add resolver${plural} ${nameString} with no matching type${plural}.`);
     }
   }
   return m;
@@ -263,7 +261,7 @@ export class Module {
     directiveDefinitionNodes: NamedDefinitionNode<DirectiveDefinitionNode>[] = [],
     schemaDefinitionNode: ?SchemaDefinitionNode = null,
   ) {
-    assertNonEmptyString(name, 'name must be a non-empty string');
+    assert(isNonEmptyString(name), 'Parameter name must be a non-empty string.');
     this.name = name;
     this.types = types;
     this.typeDefinitionNodes = typeDefinitionNodes;
@@ -282,7 +280,7 @@ export class Module {
       !this.schemaDefinitionNode;
 
   withType: (type: GraphQLNamedType) => Module = (type) => {
-    assert(isNamedType(type), 'type must be a GraphQLNamedType');
+    assert(isNamedType(type), 'Parameter type must be a GraphQLNamedType.');
     assertNewNamedType(type.name, this);
     return new Module(
       this.name,
@@ -296,7 +294,7 @@ export class Module {
   }
 
   withDirective: (directive: GraphQLDirective) => Module = (directive) => {
-    assert(isDirective(directive), 'directive must be a GraphQLDirective');
+    assert(isDirective(directive), 'Parameter directive must be a GraphQLDirective.');
     assertNewDirective(directive.name, this);
     return new Module(
       this.name,
@@ -317,7 +315,7 @@ export class Module {
 
   withSchema: (schema: string, resolvers: ?TypeResolverConfigMap) => Module =
     (schema, resolvers) => {
-      assertNonEmptyString(schema, 'schema must be a non-empty string');
+      assert(isNonEmptyString(schema), 'Parameter schema must be a non-empty string.');
       return this.withDocumentNode(parse(schema), resolvers);
     };
 }

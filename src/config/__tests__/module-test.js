@@ -23,22 +23,22 @@ describe('module', () => {
     it('should require name', () => {
       // flow-disable-next-line
       expect(() => new Module())
-        .toThrowError(/name must be a non-empty string/);
+        .toThrowError(/Parameter name must be a non-empty string\./);
     });
     it('should reject undefined name', () => {
       // flow-disable-next-line
       expect(() => new Module(undefined))
-        .toThrowError(/name must be a non-empty string/);
+        .toThrowError(/Parameter name must be a non-empty string\./);
     });
     it('should reject null name', () => {
       // flow-disable-next-line
       expect(() => new Module(null))
-        .toThrowError(/name must be a non-empty string/);
+        .toThrowError(/Parameter name must be a non-empty string\./);
     });
     it('should reject non-string name', () => {
       // flow-disable-next-line
       expect(() => new Module(5))
-        .toThrowError(/name must be a non-empty string/);
+        .toThrowError(/Parameter name must be a non-empty string\./);
     });
     it('should be empty when no values added', () => {
       expect(() => new Module('foo').isEmpty()).toBeTruthy();
@@ -92,19 +92,19 @@ describe('module', () => {
       const m = new Module('foo');
       const t = null;
       // flow-disable-next-line
-      expect(() => m.withType(t)).toThrowError(/type must be a GraphQLNamedType/);
+      expect(() => m.withType(t)).toThrowError(/Parameter type must be a GraphQLNamedType\./);
     });
     it('should reject undefined type', () => {
       const m = new Module('foo');
       const t = undefined;
       // flow-disable-next-line
-      expect(() => m.withType(t)).toThrowError(/type must be a GraphQLNamedType/);
+      expect(() => m.withType(t)).toThrowError(/Parameter type must be a GraphQLNamedType\./);
     });
     it('should reject not a type', () => {
       const m = new Module('foo');
       const t = 'type';
       // flow-disable-next-line
-      expect(() => m.withType(t)).toThrowError(/type must be a GraphQLNamedType/);
+      expect(() => m.withType(t)).toThrowError(/Parameter type must be a GraphQLNamedType\./);
     });
     it('should reject unnamed type', () => {
       const m = new Module('foo');
@@ -118,7 +118,7 @@ describe('module', () => {
       );
       // flow-disable-next-line
       expect(() => m.withType(t))
-        .toThrowError(/type must be a GraphQLNamedType/);
+        .toThrowError(/Parameter type must be a GraphQLNamedType\./);
     });
     it('should throw duplicate type name', () => {
       const m = new Module('foo');
@@ -135,7 +135,7 @@ describe('module', () => {
         },
       });
       expect(() => m.withType(t1).withType(t2))
-        .toThrowError(/cannot add type with duplicate name 'Test'/);
+        .toThrowError(/Cannot add type with duplicate name 'Test'\./);
     });
   });
 
@@ -166,26 +166,26 @@ describe('module', () => {
       const m = new Module('foo');
       const d = null;
       // flow-disable-next-line
-      expect(() => m.withDirective(d)).toThrowError(/directive must be a GraphQLDirective/);
+      expect(() => m.withDirective(d)).toThrowError(/Parameter directive must be a GraphQLDirective\./);
     });
     it('should reject undefined directive', () => {
       const m = new Module('foo');
       const d = undefined;
       // flow-disable-next-line
-      expect(() => m.withDirective(d)).toThrowError(/directive must be a GraphQLDirective/);
+      expect(() => m.withDirective(d)).toThrowError(/Parameter directive must be a GraphQLDirective\./);
     });
     it('should reject not a directive', () => {
       const m = new Module('foo');
       const d = 'type';
       // flow-disable-next-line
-      expect(() => m.withDirective(d)).toThrowError(/directive must be a GraphQLDirective/);
+      expect(() => m.withDirective(d)).toThrowError(/Parameter directive must be a GraphQLDirective\./);
     });
     it('should throw duplicate directive name', () => {
       const m = new Module('foo');
       const d1 = new GraphQLDirective({ name: 'foo', locations: [DirectiveLocation.FIELD] });
       const d2 = new GraphQLDirective({ name: 'foo', locations: [DirectiveLocation.FRAGMENT_SPREAD] });
       expect(() => m.withDirective(d1).withDirective(d2))
-        .toThrowError(/cannot add directive with duplicate name 'foo'/);
+        .toThrowError(/Cannot add directive with duplicate name 'foo'\./);
     });
   });
 
@@ -225,7 +225,7 @@ describe('module', () => {
       const n1 = parse('type Foo { bar: Int }').definitions[0];
       const n2 = parse('type Foo { baz: Int }').definitions[0];
       expect(() => m.withDefinitionNode(n1).withDefinitionNode(n2))
-        .toThrowError(/cannot add type with duplicate name 'Foo'/);
+        .toThrowError(/Cannot add type with duplicate name 'Foo'\./);
     });
     it('should accept duplicate extension nodes', () => {
       const n1 = parse('type Foo { bar: Int }').definitions[0];
@@ -258,20 +258,20 @@ describe('module', () => {
       const n1 = parse('directive @skip(if: Boolean!) on FIELD').definitions[0];
       const n2 = parse('directive @skip(if: Boolean!) on FRAGMENT_SPREAD ').definitions[0];
       expect(() => m.withDefinitionNode(n1).withDefinitionNode(n2))
-        .toThrowError(/cannot add directive with duplicate name 'skip'/);
+        .toThrowError(/Cannot add directive with duplicate name 'skip'\./);
     });
     it('should reject non-TypeSystemDefinitionNode', () => {
       const m = new Module('foo');
       const n = parse('mutation likeStory { like(story: 123) @defer { story { id } } }').definitions[0];
       expect(() => m.withDefinitionNode(n))
-        .toThrowError(/node must be a TypeSystemDefinitionNode/);
+        .toThrowError(/Parameter node must be a TypeSystemDefinitionNode\./);
     });
     it('should reject non-DefinitionNode', () => {
       const m = new Module('foo');
       const n = 'foo';
       // flow-disable-next-line
       expect(() => m.withDefinitionNode(n))
-        .toThrowError(/node must be a TypeSystemDefinitionNode/);
+        .toThrowError(/Parameter node must be a TypeSystemDefinitionNode\./);
     });
   });
 
@@ -299,13 +299,13 @@ describe('module', () => {
       const m = new Module('foo');
       const n = parse('type Foo { bar: Int } type Foo { baz: Int }');
       expect(() => m.withDocumentNode(n))
-        .toThrowError(/cannot add type with duplicate name 'Foo'/);
+        .toThrowError(/Cannot add type with duplicate name 'Foo'\./);
     });
     it('should reject unnamed types', () => {
       const m = new Module('foo');
       const n = parse('mutation likeStory { like(story: 123) @defer { story { id } } }');
       expect(() => m.withDocumentNode(n))
-        .toThrowError(/node must be a TypeSystemDefinitionNode/);
+        .toThrowError(/Parameter node must be a TypeSystemDefinitionNode\./);
     });
     it('should accept schema', () => {
       const n = parse('schema { query: Query }');
@@ -317,7 +317,7 @@ describe('module', () => {
       const m = new Module('foo');
       // flow-disable-next-line
       expect(() => m.withDocumentNode('foo'))
-        .toThrowError(/node must be a DocumentNode/);
+        .toThrowError(/Parameter node must be a DocumentNode\./);
     });
     it('should reject resolvers with no matching type', () => {
       const m = new Module('foo');
@@ -325,7 +325,7 @@ describe('module', () => {
       const r = { fields: {} };
       const rs = { Foo: r, Baz: r };
       expect(() => m.withDocumentNode(n, rs).typeDefinitionNodes[0].resolvers)
-        .toThrowError(/cannot add resolver 'Baz' with no matching type/);
+        .toThrowError(/Cannot add resolver 'Baz' with no matching type\./);
     });
     it('should reject resolvers with no matching type', () => {
       const m = new Module('foo');
@@ -333,7 +333,7 @@ describe('module', () => {
       const r = { fields: {} };
       const rs = { Foo: r, Baz: r, Bim: r };
       expect(() => m.withDocumentNode(n, rs).typeDefinitionNodes[0].resolvers)
-        .toThrowError(/cannot add resolvers 'Baz', 'Bim' with no matching types/);
+        .toThrowError(/Cannot add resolvers 'Baz', 'Bim' with no matching types\./);
     });
   });
 
@@ -366,7 +366,7 @@ describe('module', () => {
       const m = new Module('foo');
       const n = 'type Foo { bar: Int } type Foo { baz: Int }';
       expect(() => m.withSchema(n))
-        .toThrowError(/cannot add type with duplicate name 'Foo'/);
+        .toThrowError(/Cannot add type with duplicate name 'Foo'\./);
     });
     it('should reject resolvers with no matching type', () => {
       const m = new Module('foo');
@@ -374,7 +374,7 @@ describe('module', () => {
       const r = { fields: {} };
       const rs = { Foo: r, Baz: r };
       expect(() => m.withSchema(n, rs).typeDefinitionNodes[0].resolvers)
-        .toThrowError(/cannot add resolver 'Baz' with no matching type/);
+        .toThrowError(/Cannot add resolver 'Baz' with no matching type\./);
     });
     it('should reject resolvers with no matching type', () => {
       const m = new Module('foo');
@@ -382,7 +382,7 @@ describe('module', () => {
       const r = { fields: {} };
       const rs = { Foo: r, Baz: r, Bim: r };
       expect(() => m.withSchema(n, rs).typeDefinitionNodes[0].resolvers)
-        .toThrowError(/cannot add resolvers 'Baz', 'Bim' with no matching types/);
+        .toThrowError(/Cannot add resolvers 'Baz', 'Bim' with no matching types\./);
     });
     it('should reject empty string', () => {
       expect(() => new Module('foo').withSchema(''))

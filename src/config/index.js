@@ -5,7 +5,7 @@ export {
   NamedDefinitionNode,
 } from './module';
 
-export { ModuleRepository } from './modulerepository';
+export { ModuleRepository } from './moduleRepository';
 
 export type {
   FieldResolverConfig,

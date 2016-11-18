@@ -2,9 +2,7 @@
 
 import { Module } from './module';
 
-import {
-  assert,
-} from '../util/assert';
+import assert from '../util/assert';
 
 
 function isNewModule(module: Module, existingModules: Module[]): boolean {
