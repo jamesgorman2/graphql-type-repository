@@ -33,6 +33,9 @@ export class TypeDefinition {
 
   withType: (type: GraphQLNamedType) => TypeDefinition =
     type => new TypeDefinition(this.module, this.definition, type);
+
+  withDefinition: (definition: NamedDefinitionNode<TypeDefinitionNode>) => TypeDefinition =
+    definition => new TypeDefinition(this.module, definition, this.type);
 }
 
 export class ExtensionDefinition {
@@ -103,6 +106,25 @@ export function extractTypes(module: Module): FlattenedTypeGraph {
   return module.types
     .reduce(
       (graph, type) => graph.append(extractType(module, type)),
+      new FlattenedTypeGraph(),
+    );
+}
+
+
+export function extractTypeDefinition(
+  module: Module, type: NamedDefinitionNode<TypeDefinitionNode>,
+): FlattenedTypeGraph {  // eslint-disable-line no-use-before-define
+  return new FlattenedTypeGraph()
+    .withType(
+      new TypeNode(type.name).withDefinition(new TypeDefinition(module).withDefinition(type)),
+    );
+}
+
+// eslint-disable-next-line no-use-before-define
+export function extractTypeDefinitions(module: Module): FlattenedTypeGraph {
+  return module.typeDefinitionNodes
+    .reduce(
+      (graph, type) => graph.append(extractTypeDefinition(module, type)),
       new FlattenedTypeGraph(),
     );
 }
