@@ -62,10 +62,10 @@ describe('extractTypes', () => {
   });
 
   describe('extractTypeDefinitions', () => {
-    it('should get type', () => {
+    it('should get type and refs', () => {
       const t = parse('type Test {id: ID}').definitions[0];
       const m = new Module('foo').withSchema('type Test {id: ID}');
-      expect(stringify(extractTypeDefinitions(m)))
+      expect(stringify(extractTypeDefinitions(m, t)))
         .toEqual(
           stringify(
             new FlattenedTypeGraph(
@@ -77,8 +77,10 @@ describe('extractTypes', () => {
                       new TypeDefinition(m).withDefinition(
                         new NamedDefinitionNode('Test', t, null),
                       ),
-                    ),
-                ),
+                    )
+                    .withTypeRef('ID'),
+                )
+                .put('ID', new TypeNode('ID')),
             ),
           ),
         );

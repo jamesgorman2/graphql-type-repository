@@ -51,7 +51,7 @@ export class DirectiveDefinition {
 export class TypeNode extends Appendable<TypeNode> {
   name: string;
   typeRefs: string[];
-  directives: string[];
+  directiveRefs: string[];
   definitions: TypeDefinition[];
   extensions: ExtensionDefinition[];
   isSystem: boolean;
@@ -59,7 +59,7 @@ export class TypeNode extends Appendable<TypeNode> {
   constructor(
     name: string,
     typeRefs: string[] = [],
-    directives: string[] = [],
+    directiveRefs: string[] = [],
     definitions: TypeDefinition[] = [],
     extensions: ExtensionDefinition[] = [],
     isSystem: boolean = false,
@@ -67,7 +67,7 @@ export class TypeNode extends Appendable<TypeNode> {
     super();
     this.name = name;
     this.typeRefs = typeRefs;
-    this.directives = directives;
+    this.directiveRefs = directiveRefs;
     this.definitions = definitions;
     this.extensions = extensions;
     this.isSystem = isSystem;
@@ -81,14 +81,37 @@ export class TypeNode extends Appendable<TypeNode> {
       new TypeNode(
         this.name,
         this.typeRefs,
-        this.directives,
+        this.directiveRefs,
         [...this.definitions, definition],
+        this.extensions,
+        this.isSystem,
+      );
+
+  withTypeRef: (typeRef: string) => TypeNode =
+    typeRef =>
+      new TypeNode(
+        this.name,
+        [...this.typeRefs, typeRef],
+        this.directiveRefs,
+        this.definitions,
+        this.extensions,
+        this.isSystem,
+      );
+
+  withDirectiveRef: (directiveRef: string) => TypeNode =
+    directiveRef =>
+      new TypeNode(
+        this.name,
+        this.typeRefs,
+        [...this.directiveRefs, directiveRef],
+        this.definitions,
         this.extensions,
         this.isSystem,
       );
 }
 
 export class DirectiveNode extends Appendable<DirectiveNode> {
+  name: string;
   declarations: DirectiveDefinition[];
   isSystem: boolean;
 }
@@ -110,14 +133,39 @@ export function extractTypes(module: Module): FlattenedTypeGraph {
     );
 }
 
+function getTypeRefs(type: any): string[] {
+  const interfaceRefs: string[] = type.interfaces ? type.interfaces.map(i => i.name.value) : [];
+  const fieldRefs: string[] = type.fields ? type.fields.map(f => f.type.name.value) : [];
+  return interfaceRefs.concat(fieldRefs);
+}
+
+function getDirectivesRefs(type: any): string[] {
+  return type.directives ? type.directives.map(i => i.name.value) : [];
+}
 
 export function extractTypeDefinition(
   module: Module, type: NamedDefinitionNode<TypeDefinitionNode>,
 ): FlattenedTypeGraph {  // eslint-disable-line no-use-before-define
-  return new FlattenedTypeGraph()
-    .withType(
-      new TypeNode(type.name).withDefinition(new TypeDefinition(module).withDefinition(type)),
-    );
+  const typeRefs = getTypeRefs(type.definition);
+  const directiveRefs = getDirectivesRefs(type.definition);
+  const baseTypeNode = new TypeNode(type.name)
+    .withDefinition(new TypeDefinition(module).withDefinition(type));
+  const typeNodeWithRefs = typeRefs.reduce(
+    (typeNode, ref) => typeNode.withTypeRef(ref),
+    baseTypeNode,
+  );
+  const typeNodeWithDirectiveRefs = directiveRefs.reduce(
+    (typeNode, ref) => typeNode.withDirectiveRef(ref),
+    typeNodeWithRefs,
+  );
+  const graphWithRefs = typeRefs.reduce(
+    (graph, ref) => graph.withType(new TypeNode(ref)),
+    new FlattenedTypeGraph().withType(typeNodeWithDirectiveRefs),
+  );
+  return directiveRefs.reduce(
+    (graph, ref) => graph.withDirective(new DirectiveNode(ref)),
+    graphWithRefs,
+  );
 }
 
 // eslint-disable-next-line no-use-before-define
@@ -131,7 +179,8 @@ export function extractTypeDefinitions(module: Module): FlattenedTypeGraph {
 
 // eslint-disable-next-line no-use-before-define
 function fromModule(module: Module): FlattenedTypeGraph {
-  return extractTypes(module);
+  return extractTypes(module)
+    .append(extractTypeDefinitions(module));
 }
 
 // eslint-disable-next-line no-use-before-define
@@ -176,6 +225,14 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
       new FlattenedTypeGraph(
         this.types.put(typeNode.name, typeNode),
         this.directives,
+        this.schema,
+      );
+
+  withDirective: (directiveNode: DirectiveNode) => FlattenedTypeGraph =
+    directiveNode =>
+      new FlattenedTypeGraph(
+        this.types,
+        this.directives.put(directiveNode.name, directiveNode),
         this.schema,
       );
 }
