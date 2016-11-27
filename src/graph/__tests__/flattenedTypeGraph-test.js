@@ -7,6 +7,11 @@ import {
   parse,
 } from 'graphql';
 
+// eslint-disable-next-line no-duplicate-imports
+import type {
+  ObjectTypeDefinitionNode,
+} from 'graphql';
+
 import stringify from 'json-stable-stringify';
 
 import AppendableMap from '../../util/AppendableMap';
@@ -17,9 +22,11 @@ import {
 } from '../../config';
 
 import {
+  ExtensionDefinition,
   FlattenedTypeGraph,
   TypeDefinition,
   TypeNode,
+  extractTypeExtensions,
   extractTypes,
   extractTypeDefinitions,
 } from '../flattenedTypeGraph';
@@ -88,6 +95,26 @@ describe('extractTypes', () => {
   });
 
   describe('extractTypeExtensions', () => {
-    //
+    it('should get type and refs', () => {
+      const t: ObjectTypeDefinitionNode = (parse('extend type Test {id: ID}').definitions[0] : any).definition;
+      const m = new Module('foo').withSchema('extend type Test {id: ID}');
+      expect(stringify(extractTypeExtensions(m, t)))
+        .toEqual(
+          stringify(
+            new FlattenedTypeGraph(
+              new AppendableMap()
+                .put(
+                  'Test',
+                  new TypeNode('Test')
+                    .withExtension(
+                      new ExtensionDefinition(m, new NamedDefinitionNode('Test', t)),
+                    )
+                    .withTypeRef('ID'),
+                )
+                .put('ID', new TypeNode('ID')),
+            ),
+          ),
+        );
+    });
   });
 });

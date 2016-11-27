@@ -40,7 +40,15 @@ export class TypeDefinition {
 
 export class ExtensionDefinition {
   module: Module;
-  definition: ?NamedDefinitionNode<ObjectTypeDefinitionNode>;
+  definition: NamedDefinitionNode<ObjectTypeDefinitionNode>;
+
+  constructor(
+    module: Module,
+    definition: NamedDefinitionNode<ObjectTypeDefinitionNode>,
+  ) {
+    this.module = module;
+    this.definition = definition;
+  }
 }
 
 export class DirectiveDefinition {
@@ -84,6 +92,17 @@ export class TypeNode extends Appendable<TypeNode> {
         this.directiveRefs,
         [...this.definitions, definition],
         this.extensions,
+        this.isSystem,
+      );
+
+  withExtension: (extension: ExtensionDefinition) => TypeNode =
+    extension =>
+      new TypeNode(
+        this.name,
+        this.typeRefs,
+        this.directiveRefs,
+        this.definitions,
+        [...this.extensions, extension],
         this.isSystem,
       );
 
@@ -144,7 +163,8 @@ function getDirectivesRefs(type: any): string[] {
 }
 
 export function extractTypeDefinition(
-  module: Module, type: NamedDefinitionNode<TypeDefinitionNode>,
+  module: Module,
+  type: NamedDefinitionNode<TypeDefinitionNode>,
 ): FlattenedTypeGraph {  // eslint-disable-line no-use-before-define
   const typeRefs = getTypeRefs(type.definition);
   const directiveRefs = getDirectivesRefs(type.definition);
@@ -173,6 +193,41 @@ export function extractTypeDefinitions(module: Module): FlattenedTypeGraph {
   return module.typeDefinitionNodes
     .reduce(
       (graph, type) => graph.append(extractTypeDefinition(module, type)),
+      new FlattenedTypeGraph(),
+    );
+}
+
+export function extractTypeExtension(
+  module: Module,
+  type: NamedDefinitionNode<ObjectTypeDefinitionNode>,
+): FlattenedTypeGraph { // eslint-disable-line no-use-before-define
+  const typeRefs = getTypeRefs(type.definition);
+  const directiveRefs = getDirectivesRefs(type.definition);
+  const baseTypeNode = new TypeNode(type.name)
+    .withExtension(new ExtensionDefinition(module, type));
+  const typeNodeWithRefs = typeRefs.reduce(
+    (typeNode, ref) => typeNode.withTypeRef(ref),
+    baseTypeNode,
+  );
+  const typeNodeWithDirectiveRefs = directiveRefs.reduce(
+    (typeNode, ref) => typeNode.withDirectiveRef(ref),
+    typeNodeWithRefs,
+  );
+  const graphWithRefs = typeRefs.reduce(
+    (graph, ref) => graph.withType(new TypeNode(ref)),
+    new FlattenedTypeGraph().withType(typeNodeWithDirectiveRefs),
+  );
+  return directiveRefs.reduce(
+    (graph, ref) => graph.withDirective(new DirectiveNode(ref)),
+    graphWithRefs,
+  );
+}
+
+// eslint-disable-next-line no-use-before-define
+export function extractTypeExtensions(module: Module): FlattenedTypeGraph {
+  return module.extensionDefinitionNodes
+    .reduce(
+      (graph, type) => graph.append(extractTypeExtension(module, type)),
       new FlattenedTypeGraph(),
     );
 }
