@@ -6,7 +6,6 @@ import type {
   GraphQLDirective,
   GraphQLNamedType,
   ObjectTypeDefinitionNode,
-  SchemaDefinitionNode,
   TypeDefinitionNode,
 } from 'graphql';
 
@@ -260,7 +259,7 @@ function getDirectivesRefs(type: any): string[] {
   return type.directives ? type.directives.map(i => i.name.value) : [];
 }
 
-function getTypeDefintionBaseGraph(
+function getTypeBaseGraph(
   module: Module,
   type: Type,
 ): FlattenedTypeGraph { // eslint-disable-line no-use-before-define
@@ -299,7 +298,7 @@ export function extractTypeDefinition(
     (type, ref) => type.withDirectiveRef(ref),
     typeWithRefs,
   );
-  const baseGraph = getTypeDefintionBaseGraph(module, typeWithDirectiveRefs);
+  const baseGraph = getTypeBaseGraph(module, typeWithDirectiveRefs);
   const graphWithRefs = typeRefs.reduce(
     (graph, ref) => graph.withType(new Type(ref)),
     baseGraph,
@@ -336,9 +335,10 @@ export function extractTypeExtension(
     (type, ref) => type.withDirectiveRef(ref),
     typeWithRefs,
   );
+  const baseGraph = getTypeBaseGraph(module, typeWithDirectiveRefs);
   const graphWithRefs = typeRefs.reduce(
     (graph, ref) => graph.withType(new Type(ref)),
-    new FlattenedTypeGraph().withType(typeWithDirectiveRefs),
+    baseGraph,
   );
   return directiveRefs.reduce(
     (graph, ref) => graph.withDirective(new Directive(ref)),

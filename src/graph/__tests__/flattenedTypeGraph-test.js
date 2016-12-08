@@ -2,6 +2,8 @@
 /* eslint-env jest */
 
 import {
+  DirectiveLocation,
+  GraphQLDirective,
   GraphQLID,
   GraphQLObjectType,
   parse,
@@ -22,13 +24,16 @@ import {
 } from '../../config';
 
 import {
+  DirectiveDefinition,
   ExtensionDefinition,
   FlattenedTypeGraph,
-  TypeDefinition,
   Type,
+  TypeDefinition,
+  extractDirectiveDefinitions,
+  extractDirectives,
+  extractTypeDefinitions,
   extractTypeExtensions,
   extractTypes,
-  extractTypeDefinitions,
 } from '../flattenedTypeGraph';
 
 describe('FlattenedTypeGraph', () => {
@@ -129,6 +134,52 @@ describe('FlattenedTypeGraph', () => {
                     .withTypeRef('ID'),
                 )
                 .put('ID', new Type('ID')),
+            ),
+          ),
+        );
+    });
+    it('should extract schema type extensions to schema', () => {
+      const m = new Module('foo')
+        .withSchema(
+          `extend type Foo { bar: Int }
+           extend type Bar { bar: Int }
+           extend type Baz { bar: Int }
+           extend type Bim { bar: Int }
+           schema { query: Foo mutation: Bar subscription: Baz }`,
+        );
+      expect(Object.keys(extractTypeExtensions(m).types.data)).toEqual(['Int', 'Bim']);
+      // flow-disable-next-line
+      expect(extractTypeExtensions(m).schema.query.name).toEqual('Foo');
+      // flow-disable-next-line
+      expect(extractTypeExtensions(m).schema.mutation.name).toEqual('Bar');
+      // flow-disable-next-line
+      expect(extractTypeExtensions(m).schema.subscription.name).toEqual('Baz');
+    });
+  });
+
+  describe('extractDirectives', () => {
+    it('should get directive', () => {
+      const d = new GraphQLDirective({ name: 'bar', locations: [DirectiveLocation.FIELD] });
+      const m = new Module('foo')
+        .withDirective(d);
+      expect(extractDirectives(m).directives.data.bar.name).toEqual('bar');
+      expect(extractDirectives(m).directives.data.bar.definitions[0].module).toBe(m);
+      expect(extractDirectives(m).directives.data.bar.definitions[0].directive).toBe(d);
+    });
+  });
+
+  describe('extractDirectiveDefinitionss', () => {
+    it('should get directive', () => {
+      const d = parse('directive @bar(baz: Boolean!) on FIELD').definitions[0];
+      const m = new Module('foo')
+        .withSchema('directive @bar(baz: Boolean!) on FIELD');
+      expect(extractDirectiveDefinitions(m).directives.data.bar.name).toEqual('bar');
+      expect(extractDirectiveDefinitions(m).directives.data.bar.definitions[0].module).toBe(m);
+      expect(stringify(extractDirectiveDefinitions(m).directives.data.bar.definitions[0]))
+        .toEqual(
+          stringify(
+            new DirectiveDefinition(m).withDefinition(
+              new NamedDefinitionNode('bar', d, null),
             ),
           ),
         );
