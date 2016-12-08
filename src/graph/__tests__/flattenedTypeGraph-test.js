@@ -25,7 +25,7 @@ import {
   ExtensionDefinition,
   FlattenedTypeGraph,
   TypeDefinition,
-  TypeNode,
+  Type,
   extractTypeExtensions,
   extractTypes,
   extractTypeDefinitions,
@@ -43,43 +43,43 @@ describe('FlattenedTypeGraph', () => {
 
     });
   });
-});
 
-describe('extractTypes', () => {
-  it('should get type', () => {
-    const t = new GraphQLObjectType({
-      name: 'Test',
-      fields: {
-        id: { type: GraphQLID },
-      },
-    });
-    const m = new Module('foo').withType(t);
-    expect(stringify(extractTypes(m)))
-      .toEqual(
-        stringify(
-          new FlattenedTypeGraph(
-            new AppendableMap()
-              .put(
-                'Test',
-                new TypeNode('Test').withDefinition(new TypeDefinition(m).withType(t)),
-              ),
-          ),
-        ),
-      );
-  });
-
-  describe('extractTypeDefinitions', () => {
-    it('should get type and refs', () => {
-      const t = parse('type Test {id: ID}').definitions[0];
-      const m = new Module('foo').withSchema('type Test {id: ID}');
-      expect(stringify(extractTypeDefinitions(m, t)))
+  describe('extractTypes', () => {
+    it('should get type', () => {
+      const t = new GraphQLObjectType({
+        name: 'Test',
+        fields: {
+          id: { type: GraphQLID },
+        },
+      });
+      const m = new Module('foo').withType(t);
+      expect(stringify(extractTypes(m)))
         .toEqual(
           stringify(
             new FlattenedTypeGraph(
               new AppendableMap()
                 .put(
                   'Test',
-                  new TypeNode('Test')
+                  new Type('Test').withDefinition(new TypeDefinition(m).withType(t)),
+                ),
+            ),
+          ),
+        );
+    });
+  });
+
+  describe('extractTypeDefinitions', () => {
+    it('should get type and refs', () => {
+      const t = parse('type Test {id: ID}').definitions[0];
+      const m = new Module('foo').withSchema('type Test {id: ID}');
+      expect(stringify(extractTypeDefinitions(m)))
+        .toEqual(
+          stringify(
+            new FlattenedTypeGraph(
+              new AppendableMap()
+                .put(
+                  'Test',
+                  new Type('Test')
                     .withDefinition(
                       new TypeDefinition(m).withDefinition(
                         new NamedDefinitionNode('Test', t, null),
@@ -87,10 +87,27 @@ describe('extractTypes', () => {
                     )
                     .withTypeRef('ID'),
                 )
-                .put('ID', new TypeNode('ID')),
+                .put('ID', new Type('ID')),
             ),
           ),
         );
+    });
+    it('should extract schema types to schema', () => {
+      const m = new Module('foo')
+        .withSchema(
+          `type Foo { bar: Int }
+           type Bar { bar: Int }
+           type Baz { bar: Int }
+           type Bim { bar: Int }
+           schema { query: Foo mutation: Bar subscription: Baz }`,
+        );
+      expect(Object.keys(extractTypeDefinitions(m).types.data)).toEqual(['Int', 'Bim']);
+      // flow-disable-next-line
+      expect(extractTypeDefinitions(m).schema.query.name).toEqual('Foo');
+      // flow-disable-next-line
+      expect(extractTypeDefinitions(m).schema.mutation.name).toEqual('Bar');
+      // flow-disable-next-line
+      expect(extractTypeDefinitions(m).schema.subscription.name).toEqual('Baz');
     });
   });
 
@@ -98,20 +115,20 @@ describe('extractTypes', () => {
     it('should get type and refs', () => {
       const t: ObjectTypeDefinitionNode = (parse('extend type Test {id: ID}').definitions[0] : any).definition;
       const m = new Module('foo').withSchema('extend type Test {id: ID}');
-      expect(stringify(extractTypeExtensions(m, t)))
+      expect(stringify(extractTypeExtensions(m)))
         .toEqual(
           stringify(
             new FlattenedTypeGraph(
               new AppendableMap()
                 .put(
                   'Test',
-                  new TypeNode('Test')
+                  new Type('Test')
                     .withExtension(
                       new ExtensionDefinition(m, new NamedDefinitionNode('Test', t)),
                     )
                     .withTypeRef('ID'),
                 )
-                .put('ID', new TypeNode('ID')),
+                .put('ID', new Type('ID')),
             ),
           ),
         );

@@ -24,8 +24,7 @@ type PersonQuery {
 }
 schema {
   query PersonQuery
-}
-`,
+}`,
   personResolvers,
 );
 ```
@@ -67,8 +66,7 @@ type PropertyQuery {
 }
 schema {
   query PropertyQuery
-}
-`,
+}`,
   propertyResolvers,
 );
 ```
