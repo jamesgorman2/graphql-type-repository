@@ -15,3 +15,7 @@ export type {
   TypeResolverConfig,
   TypeResolverConfigMap,
 } from './config';
+
+export {
+  FlattenedTypeGraph,
+} from './graph';

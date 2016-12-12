@@ -27,10 +27,13 @@ import {
   DirectiveDefinition,
   ExtensionDefinition,
   FlattenedTypeGraph,
+  Schema,
+  SchemaDefinition,
   Type,
   TypeDefinition,
   extractDirectiveDefinitions,
   extractDirectives,
+  extractSchema,
   extractTypeDefinitions,
   extractTypeExtensions,
   extractTypes,
@@ -181,6 +184,22 @@ describe('FlattenedTypeGraph', () => {
             new DirectiveDefinition(m).withDefinition(
               new NamedDefinitionNode('bar', d, null),
             ),
+          ),
+        );
+    });
+  });
+
+  describe('extractSchema', () => {
+    it('should get definition', () => {
+      const d: any = parse('schema @foo { query: bar }').definitions[0];
+      const m = new Module('foo').withSchema('schema @foo { query: bar }');
+      expect(stringify(extractSchema(m).schema))
+        .toEqual(
+          stringify(
+            new Schema()
+              .withDefinition(
+                new SchemaDefinition(m, d),
+              ),
           ),
         );
     });

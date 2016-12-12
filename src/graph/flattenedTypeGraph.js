@@ -2,10 +2,10 @@
 
 import type {
   DirectiveDefinitionNode,
-  DirectiveNode,
   GraphQLDirective,
   GraphQLNamedType,
   ObjectTypeDefinitionNode,
+  SchemaDefinitionNode,
   TypeDefinitionNode,
 } from 'graphql';
 
@@ -75,6 +75,19 @@ export class DirectiveDefinition {
     definition: NamedDefinitionNode<DirectiveDefinitionNode>
   ) => DirectiveDefinition =
     definition => new DirectiveDefinition(this.module, definition, this.directive);
+}
+
+export class SchemaDefinition {
+  module: Module;
+  definition: SchemaDefinitionNode;
+
+  constructor(
+    module: Module,
+    definition: SchemaDefinitionNode,
+  ) {
+    this.module = module;
+    this.definition = definition;
+  }
 }
 
 export class Type extends Appendable<Type> {
@@ -161,37 +174,37 @@ export class Schema extends Appendable<Schema> {
   query: ?Type;
   mutation: ?Type;
   subscription: ?Type;
-  directives: DirectiveNode[];
+  definitions: SchemaDefinition[];
 
   constructor(
     query: ?Type,
     mutation: ?Type,
     subscription: ?Type,
-    directives: DirectiveNode[] = [],
+    definitions: SchemaDefinition[] = [],
   ) {
     super();
     this.query = query;
     this.mutation = mutation;
     this.subscription = subscription;
-    this.directives = directives;
+    this.definitions = definitions;
   }
 
   withQuery: (query: Type) => Schema =
-    query => new Schema(query, this.mutation, this.subscription, this.directives)
+    query => new Schema(query, this.mutation, this.subscription, this.definitions)
 
   withMutation: (mutation: Type) => Schema =
-    mutation => new Schema(this.query, mutation, this.subscription, this.directives);
+    mutation => new Schema(this.query, mutation, this.subscription, this.definitions);
 
   withSubscription: (subscription: Type) => Schema =
-    subscription => new Schema(this.query, this.mutation, subscription, this.directives);
+    subscription => new Schema(this.query, this.mutation, subscription, this.definitions);
 
-  withDirective: (directive: DirectiveNode) => Schema =
-    directive =>
+  withDefinition: (definition: SchemaDefinition) => Schema =
+    definition =>
       new Schema(
         this.query,
         this.mutation,
         this.subscription,
-        [...this.directives, directive],
+        [...this.definitions, definition],
       );
 
   append: (other: Schema) => Schema =
@@ -199,7 +212,7 @@ export class Schema extends Appendable<Schema> {
       const query = maybeAppendTypes(this.query, other.query);
       const mutation = maybeAppendTypes(this.mutation, other.mutation);
       const subscription = maybeAppendTypes(this.subscription, other.subscription);
-      const directives = [...this.directives, ...other.directives];
+      const directives = [...this.definitions, ...other.definitions];
       return new Schema(
         query,
         mutation,
@@ -391,12 +404,14 @@ export function extractDirectiveDefinitions(module: Module): FlattenedTypeGraph 
 
 // eslint-disable-next-line no-use-before-define
 export function extractSchema(module: Module): FlattenedTypeGraph {
-  if (!module.schema) {
+  if (!module.schemaDefinitionNode) {
     return new FlattenedTypeGraph();
   }
-  // TODO - get bits
+  const schema: SchemaDefinitionNode = module.schemaDefinitionNode;
   return new FlattenedTypeGraph()
-    .withSchema(new Schema());
+    .withSchema(
+      new Schema().withDefinition(new SchemaDefinition(module, schema)),
+    );
 }
 
 // eslint-disable-next-line no-use-before-define
