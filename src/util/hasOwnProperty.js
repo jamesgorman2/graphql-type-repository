@@ -1,5 +1,5 @@
 // @flow
 
-export default function hasOwnProperty(o: any, p: string): boolean {
+export function hasOwnProperty(o: any, p: string): boolean {
   return Object.prototype.hasOwnProperty.call(o, p);
 }

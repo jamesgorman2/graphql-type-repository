@@ -16,7 +16,7 @@ import type {
 
 import stringify from 'json-stable-stringify';
 
-import AppendableMap from '../../util/AppendableMap';
+import { AppendableMap } from '../../util';
 
 import {
   Module,
@@ -24,13 +24,7 @@ import {
 } from '../../config';
 
 import {
-  DirectiveDefinition,
-  ExtensionDefinition,
   FlattenedTypeGraph,
-  Schema,
-  SchemaDefinition,
-  Type,
-  TypeDefinition,
   extractDirectiveDefinitions,
   extractDirectives,
   extractSchema,
@@ -38,6 +32,13 @@ import {
   extractTypeExtensions,
   extractTypes,
 } from '../flattenedTypeGraph';
+
+import { DirectiveDefinition } from '../DirectiveDefinition';
+import { ExtensionDefinition } from '../ExtensionDefinition';
+import { SchemaDefinition } from '../SchemaDefinition';
+import { Schema } from '../Schema';
+import { Type } from '../Type';
+import { TypeDefinition } from '../TypeDefinition';
 
 describe('FlattenedTypeGraph', () => {
   describe('append', () => {
@@ -78,7 +79,7 @@ describe('FlattenedTypeGraph', () => {
 
   describe('extractTypeDefinitions', () => {
     it('should get type and refs', () => {
-      const t = parse('type Test {id: ID}').definitions[0];
+      const t: any = parse('type Test {id: ID}').definitions[0];
       const m = new Module('foo').withSchema('type Test {id: ID}');
       expect(stringify(extractTypeDefinitions(m)))
         .toEqual(
@@ -173,7 +174,7 @@ describe('FlattenedTypeGraph', () => {
 
   describe('extractDirectiveDefinitionss', () => {
     it('should get directive', () => {
-      const d = parse('directive @bar(baz: Boolean!) on FIELD').definitions[0];
+      const d: any = parse('directive @bar(baz: Boolean!) on FIELD').definitions[0];
       const m = new Module('foo')
         .withSchema('directive @bar(baz: Boolean!) on FIELD');
       expect(extractDirectiveDefinitions(m).directives.data.bar.name).toEqual('bar');

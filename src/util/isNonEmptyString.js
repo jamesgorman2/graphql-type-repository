@@ -1,4 +1,4 @@
 
-export default function isNonEmptyString(o: any): void {
+export function isNonEmptyString(o: any): void {
   return o && typeof o === 'string';
 }

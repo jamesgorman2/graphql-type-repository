@@ -2,9 +2,10 @@
 
 import { Module } from './module';
 
-import assert from '../util/assert';
-
-import Appendable from '../util/Appendable';
+import {
+  Appendable,
+  assert,
+} from '../util';
 
 function isNewModule(module: Module, existingModules: Module[]): boolean {
   return !existingModules.find(m => m.name === module.name);

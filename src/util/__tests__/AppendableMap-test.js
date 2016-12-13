@@ -1,8 +1,10 @@
 // @flow
 /* eslint-env jest */
 
-import Appendable from '../Appendable';
-import AppendableMap from '../AppendableMap';
+import {
+  Appendable,
+  AppendableMap,
+} from '../';
 
 class AppendableList extends Appendable<AppendableList> {
   l: number[];

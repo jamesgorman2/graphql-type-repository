@@ -16,68 +16,23 @@ import type {
   DocumentNode,
   DefinitionNode,
   DirectiveDefinitionNode,
-  GraphQLFieldResolver,
-  GraphQLIsTypeOfFn,
   GraphQLNamedType,
-  GraphQLTypeResolver,
   ObjectTypeDefinitionNode,
   TypeDefinitionNode,
   SchemaDefinitionNode,
-  ValueNode,
 } from 'graphql';
 
-import assert from '../util/assert';
-import isNonEmptyString from '../util/isNonEmptyString';
+import {
+  assert,
+  isNonEmptyString,
+} from '../util';
 
-export type FieldResolverConfig = {
-  [fieldName: string]: GraphQLFieldResolver<*>;
-};
+import type {
+  TypeResolverConfig,
+  TypeResolverConfigMap,
+} from './types';
 
-export type ScalarResolverConfig<TInternal, TExternal> = {
-  serialize: (value: mixed) => ?TExternal;
-  parseValue?: (value: mixed) => ?TInternal;
-  parseLiteral?: (valueNode: ValueNode) => ?TInternal;
-};
-
-export type ObjectResolverConfig = {
-  fields: FieldResolverConfig;
-  isTypeOf?: ?GraphQLIsTypeOfFn<*, *>;
-};
-
-export type InterfaceResolverConfig = {
-  fields: FieldResolverConfig;
-  resolveType?: ?GraphQLTypeResolver<*, *>;
-};
-
-export type UnionResolverConfig = {
-  resolveType?: ?GraphQLTypeResolver<*, *>;
-};
-
-export type TypeResolverConfig =
-  ObjectResolverConfig |
-  InterfaceResolverConfig |
-  UnionResolverConfig |
-  ScalarResolverConfig<*, *>;
-
-export type TypeResolverConfigMap = {
-  [typeName: string]: TypeResolverConfig;
-};
-
-export class NamedDefinitionNode<T> {
-  name: string;
-  definition: T;
-  resolvers: ?TypeResolverConfig;
-
-  constructor(
-    name: string,
-    definition: T,
-    resolvers: ?TypeResolverConfig,
-  ) {
-    this.name = name;
-    this.definition = definition;
-    this.resolvers = resolvers;
-  }
-}
+import { NamedDefinitionNode } from './NamedDefinitionNode';
 
 function isDirective(directive: any): boolean {
   return directive instanceof GraphQLDirective;

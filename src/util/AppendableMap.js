@@ -1,11 +1,11 @@
 // @flow
 
-import hasOwnProperty from './hasOwnProperty';
+import { hasOwnProperty } from './hasOwnProperty';
 
 // eslint-disable-next-line no-unused-vars
-import type Appendable from './Appendable';
+import type { Appendable } from './Appendable';
 
-export default class AppendableMap<T: Appendable<any>> {
+export class AppendableMap<T: Appendable<any>> {
   data: {
     [key: string]: T
   };

@@ -1,9 +1,8 @@
 // @flow
 
-export {
-  Module,
-  NamedDefinitionNode,
-} from './module';
+export { Module } from './module';
+
+export { NamedDefinitionNode } from './NamedDefinitionNode';
 
 export { ModuleRepository } from './moduleRepository';
 
@@ -15,4 +14,4 @@ export type {
   UnionResolverConfig,
   TypeResolverConfig,
   TypeResolverConfigMap,
-} from './module';
+} from './types';

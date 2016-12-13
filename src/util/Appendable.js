@@ -1,6 +1,6 @@
 // @flow
 
-export default class Appendable<T> {
+export class Appendable<T> {
   // eslint-disable-next-line
   append: (other: T) => T;
 }
