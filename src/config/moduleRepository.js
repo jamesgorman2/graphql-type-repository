@@ -4,6 +4,7 @@ import { Module } from './module';
 
 import assert from '../util/assert';
 
+import Appendable from '../util/Appendable';
 
 function isNewModule(module: Module, existingModules: Module[]): boolean {
   return !existingModules.find(m => m.name === module.name);
@@ -23,10 +24,11 @@ function assertNonEmptyModule(module: Module): void {
   );
 }
 
-export class ModuleRepository {
+export class ModuleRepository extends Appendable<ModuleRepository> {
   modules: Module[];
 
   constructor(modules: Module[] = []) {
+    super();
     this.modules = modules;
   }
 
@@ -37,4 +39,7 @@ export class ModuleRepository {
     assertNonEmptyModule(module);
     return new ModuleRepository([...this.modules, module]);
   };
+
+  append: (other: ModuleRepository) => ModuleRepository =
+    other => new ModuleRepository([...this.modules, ...other.modules]);
 }
