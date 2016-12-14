@@ -58,6 +58,7 @@ type JestExpectType = {
   toMatchSnapshot(): void;
   toThrow(): void;
   toThrowError(error: any): void;
+  toBeInstanceOf(c: any): void;
 }
 
 type JestSpyType = {

@@ -121,6 +121,7 @@ function withDefinitionNode(module: Module, node: any, resolvers: ?TypeResolverC
       module.directives,
       module.directiveDefinitionNodes,
       module.schemaDefinitionNode,
+      module.errors,
     );
   } else if (isTypeDefinition(node)) {
     const n: TypeDefinitionNode = node;
@@ -135,6 +136,7 @@ function withDefinitionNode(module: Module, node: any, resolvers: ?TypeResolverC
       module.directives,
       module.directiveDefinitionNodes,
       module.schemaDefinitionNode,
+      module.errors,
     );
   } else if (isSchemaDefinition(node)) {
     const n: SchemaDefinitionNode = node;
@@ -147,6 +149,7 @@ function withDefinitionNode(module: Module, node: any, resolvers: ?TypeResolverC
       module.directives,
       module.directiveDefinitionNodes,
       n,
+      module.errors,
     );
   } else if (isDirectiveDefinition(node)) {
     const n: DirectiveDefinitionNode = node;
@@ -161,6 +164,7 @@ function withDefinitionNode(module: Module, node: any, resolvers: ?TypeResolverC
       module.directives,
       [...module.directiveDefinitionNodes, new NamedDefinitionNode(name, n, resolvers)],
       module.schemaDefinitionNode,
+      module.errors,
     );
   }
   throw new Error('Parameter node must be a TypeSystemDefinitionNode.');
@@ -170,19 +174,19 @@ function withDefinitionNode(module: Module, node: any, resolvers: ?TypeResolverC
 function withDocumentNode(module: Module, node: any, resolvers: ?TypeResolverConfigMap): Module {
   assert(node.kind === 'Document', 'Parameter node must be a DocumentNode.');
   const matchedResolvers = [];
-  const m = node.definitions
+  const newModule = node.definitions
     .reduce(
       // eslint-disable-next-line no-use-before-define
-      (newModule: Module, childNode: DefinitionNode) => {
+      (m: Module, childNode: DefinitionNode) => {
         const name = maybeName(childNode);
         if (name) {
           const r = resolvers ? resolvers[name] : null;
           if (r) {
             matchedResolvers.push(name);
           }
-          return newModule.withDefinitionNode(childNode, r);
+          return m.withDefinitionNode(childNode, r);
         }
-        return newModule.withDefinitionNode(childNode);
+        return m.withDefinitionNode(childNode);
       },
       module,
     );
@@ -195,7 +199,7 @@ function withDocumentNode(module: Module, node: any, resolvers: ?TypeResolverCon
       throw new Error(`Cannot add resolver${plural} ${nameString} with no matching type${plural}.`);
     }
   }
-  return m;
+  return newModule;
 }
 
 export class Module {
@@ -206,6 +210,7 @@ export class Module {
   directives: GraphQLDirective[];
   directiveDefinitionNodes: NamedDefinitionNode<DirectiveDefinitionNode>[];
   schemaDefinitionNode: ?SchemaDefinitionNode;
+  errors: Error[];
 
   constructor(
     name: string,
@@ -215,6 +220,7 @@ export class Module {
     directives: GraphQLDirective[] = [],
     directiveDefinitionNodes: NamedDefinitionNode<DirectiveDefinitionNode>[] = [],
     schemaDefinitionNode: ?SchemaDefinitionNode = null,
+    errors: Error[] = [],
   ) {
     assert(isNonEmptyString(name), 'Parameter name must be a non-empty string.');
     this.name = name;
@@ -224,53 +230,85 @@ export class Module {
     this.directives = directives;
     this.directiveDefinitionNodes = directiveDefinitionNodes;
     this.schemaDefinitionNode = schemaDefinitionNode;
+    this.errors = errors;
   }
 
-  isEmpty: () => boolean = () =>
-    this.types.length === 0 &&
-      this.directives.length === 0 &&
-      this.typeDefinitionNodes.length === 0 &&
-      this.extensionDefinitionNodes.length === 0 &&
-      this.directiveDefinitionNodes.length === 0 &&
-      !this.schemaDefinitionNode;
+  isEmpty: () => boolean =
+    () =>
+      this.types.length === 0 &&
+        this.directives.length === 0 &&
+        this.typeDefinitionNodes.length === 0 &&
+        this.extensionDefinitionNodes.length === 0 &&
+        this.directiveDefinitionNodes.length === 0 &&
+        !this.schemaDefinitionNode;
 
-  withType: (type: GraphQLNamedType) => Module = (type) => {
-    assert(isNamedType(type), 'Parameter type must be a GraphQLNamedType.');
-    assertNewNamedType(type.name, this);
-    return new Module(
-      this.name,
-      [...this.types, type],
-      this.typeDefinitionNodes,
-      this.extensionDefinitionNodes,
-      this.directives,
-      this.directiveDefinitionNodes,
-      this.schemaDefinitionNode,
-    );
-  }
+  withError: (error: Error) => Module =
+    error =>
+      new Module(
+        this.name,
+        this.types,
+        this.typeDefinitionNodes,
+        this.extensionDefinitionNodes,
+        this.directives,
+        this.directiveDefinitionNodes,
+        this.schemaDefinitionNode,
+        [...this.errors, error],
+      );
 
-  withDirective: (directive: GraphQLDirective) => Module = (directive) => {
-    assert(isDirective(directive), 'Parameter directive must be a GraphQLDirective.');
-    assertNewDirective(directive.name, this);
-    return new Module(
-      this.name,
-      this.types,
-      this.typeDefinitionNodes,
-      this.extensionDefinitionNodes,
-      [...this.directives, directive],
-      this.directiveDefinitionNodes,
-      this.schemaDefinitionNode,
-    );
-  };
+  withType: (type: GraphQLNamedType) => Module =
+    type =>
+      this.captureError(() => {
+        assert(isNamedType(type), 'Parameter type must be a GraphQLNamedType.');
+        assertNewNamedType(type.name, this);
+        return new Module(
+          this.name,
+          [...this.types, type],
+          this.typeDefinitionNodes,
+          this.extensionDefinitionNodes,
+          this.directives,
+          this.directiveDefinitionNodes,
+          this.schemaDefinitionNode,
+          this.errors,
+        );
+      });
+
+  withDirective: (directive: GraphQLDirective) => Module =
+    directive =>
+      this.captureError(() => {
+        assert(isDirective(directive), 'Parameter directive must be a GraphQLDirective.');
+        assertNewDirective(directive.name, this);
+        return new Module(
+          this.name,
+          this.types,
+          this.typeDefinitionNodes,
+          this.extensionDefinitionNodes,
+          [...this.directives, directive],
+          this.directiveDefinitionNodes,
+          this.schemaDefinitionNode,
+          this.errors,
+        );
+      });
 
   withDefinitionNode: (node: DefinitionNode, resolvers: ?TypeResolverConfig) => Module =
-    (node, resolvers) => withDefinitionNode(this, node, resolvers);
+    (node, resolvers) => this.captureError(() => withDefinitionNode(this, node, resolvers));
 
   withDocumentNode: (node: DocumentNode, resolvers: ?TypeResolverConfigMap) => Module =
-    (node, resolvers) => withDocumentNode(this, node, resolvers);
+    (node, resolvers) =>
+      this.captureError(() => withDocumentNode(this, node, resolvers));
 
   withSchema: (schema: string, resolvers: ?TypeResolverConfigMap) => Module =
-    (schema, resolvers) => {
-      assert(isNonEmptyString(schema), 'Parameter schema must be a non-empty string.');
-      return this.withDocumentNode(parse(schema), resolvers);
-    };
+    (schema, resolvers) =>
+      this.captureError(() => {
+        assert(isNonEmptyString(schema), 'Parameter schema must be a non-empty string.');
+        return this.withDocumentNode(parse(schema), resolvers);
+      });
+
+  captureError: (f: () => Module) => Module =
+    (f) => {
+      try {
+        return f();
+      } catch (e) {
+        return this.withError(e);
+      }
+    }
 }
