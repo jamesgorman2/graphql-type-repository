@@ -6,8 +6,8 @@ import {
   GraphQLObjectType,
 } from 'graphql';
 
-import { ModuleRepository } from '../moduleRepository';
-import { Module } from '../module';
+import { ModuleRepository } from '../ModuleRepository';
+import { Module } from '../Module';
 
 const type = new GraphQLObjectType({
   name: 'Test',

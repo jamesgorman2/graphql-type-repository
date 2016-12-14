@@ -16,7 +16,7 @@ import type {
   SchemaDefinitionNode,
 } from 'graphql';
 
-import { Module } from '../module';
+import { Module } from '../Module';
 
 describe('module', () => {
   describe('constructor', () => {

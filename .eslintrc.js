@@ -5,6 +5,7 @@ module.exports = {
     'babel',
   ],
   rules: {
+    "no-await-in-loop": 0,
     "linebreak-style": 0,
     'comma-dangle': ['error', 'always-multiline'],
     'import/prefer-default-export': 0,

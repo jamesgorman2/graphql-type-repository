@@ -1,10 +1,10 @@
 // @flow
 
-export { Module } from './module';
+export { Module } from './Module';
 
 export { NamedDefinitionNode } from './NamedDefinitionNode';
 
-export { ModuleRepository } from './moduleRepository';
+export { ModuleRepository } from './ModuleRepository';
 
 export type {
   FieldResolverConfig,

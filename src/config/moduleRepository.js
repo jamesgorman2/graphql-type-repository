@@ -1,6 +1,6 @@
 // @flow
 
-import { Module } from './module';
+import { Module } from './Module';
 
 import {
   Appendable,
