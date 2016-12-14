@@ -30,6 +30,9 @@ export class AppendableMap<T: Appendable<any>> {
       return new AppendableMap(newData);
     }
 
+  values: () => T[] =
+    () => Object.keys(this.data).map(key => this.data[key]);
+
   append: (other: AppendableMap<T>) => AppendableMap<T> =
     (other) => {
       if (this === other) {

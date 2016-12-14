@@ -15,7 +15,7 @@ export class Type extends Appendable<Type> {
   definitions: TypeDefinition[];
   extensions: ExtensionDefinition[];
   type: ?GraphQLNamedType;
-  _isSystem: boolean;
+  isSystem: boolean;
 
   constructor(
     name: string,
@@ -33,13 +33,13 @@ export class Type extends Appendable<Type> {
     this.definitions = definitions;
     this.extensions = extensions;
     this.type = type;
-    this._isSystem = isSystem;
+    this.isSystem = isSystem;
   }
 
   append: (other: Type) => Type =
     other => other;
 
-  isSystem: (newIsSystem: ?boolean) => Type =
+  setIsSystem: (newIsSystem: ?boolean) => Type =
     newIsSystem =>
       new Type(
         this.name,
@@ -60,7 +60,7 @@ export class Type extends Appendable<Type> {
         [...this.definitions, definition],
         this.extensions,
         this.type,
-        this._isSystem,
+        this.isSystem,
       );
 
   withDirectiveRef: (directiveRef: string) => Type =
@@ -72,7 +72,7 @@ export class Type extends Appendable<Type> {
         this.definitions,
         this.extensions,
         this.type,
-        this._isSystem,
+        this.isSystem,
       );
 
   withExtension: (extension: ExtensionDefinition) => Type =
@@ -84,7 +84,7 @@ export class Type extends Appendable<Type> {
         this.definitions,
         [...this.extensions, extension],
         this.type,
-        this._isSystem,
+        this.isSystem,
       );
 
   withType: (type: GraphQLNamedType) => Type =
@@ -96,7 +96,7 @@ export class Type extends Appendable<Type> {
         this.definitions,
         this.extensions,
         type,
-        this._isSystem,
+        this.isSystem,
       );
 
   withTypeRef: (typeRef: string) => Type =
@@ -108,6 +108,6 @@ export class Type extends Appendable<Type> {
         this.definitions,
         this.extensions,
         this.type,
-        this._isSystem,
+        this.isSystem,
       );
 }

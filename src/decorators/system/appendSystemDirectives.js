@@ -13,15 +13,15 @@ import {
  * Append all system directives used in the FlattenedTypeGraph.
  * Unused system directives will be ignored.
  */
-export function appendSystemDirectives(graph: FlattenedTypeGraph): FlattenedTypeGraph {
+export function appendSystemDirectives(graphIn: FlattenedTypeGraph): FlattenedTypeGraph {
   return specifiedDirectives.reduce(
-    (g, directive) => {
+    (graph, directive) => {
       const name = directive.name;
-      if (g.containsDirective(name)) {
-        return g.withDirective(new Directive(name).isSystem().withDirective(directive));
+      if (graph.containsDirective(name)) {
+        return graph.withDirective(new Directive(name).setIsSystem().withDirective(directive));
       }
-      return g;
+      return graph;
     },
-    graph,
+    graphIn,
   );
 }

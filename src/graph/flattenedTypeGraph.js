@@ -295,4 +295,13 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
         this.schema,
         [...this.errors, error],
       );
+
+  withErrors: (errors: Error[]) => FlattenedTypeGraph =
+    errors =>
+      new FlattenedTypeGraph(
+        this.types,
+        this.directives,
+        this.schema,
+        [...this.errors, ...errors],
+      );
 }

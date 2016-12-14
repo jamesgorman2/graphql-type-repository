@@ -25,15 +25,15 @@ const scalars = [
  * Append all system types used in the FlattenedTypeGraph.
  * Unused system types will be ignored.
  */
-export function appendSystemTypes(graph: FlattenedTypeGraph): FlattenedTypeGraph {
+export function appendSystemTypes(graphIn: FlattenedTypeGraph): FlattenedTypeGraph {
   return scalars.reduce(
-    (g, scalar) => {
+    (graph, scalar) => {
       const name = scalar.name;
-      if (g.containsType(name)) {
-        return g.withType(new Type(name).isSystem().withType(scalar));
+      if (graph.containsType(name)) {
+        return graph.withType(new Type(name).setIsSystem().withType(scalar));
       }
-      return g;
+      return graph;
     },
-    graph,
+    graphIn,
   );
 }

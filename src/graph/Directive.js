@@ -11,21 +11,21 @@ export class Directive extends Appendable<Directive> {
   name: string;
   definitions: DirectiveDefinition[];
   directive: ?GraphQLDirective;
-  _isSystem: boolean;
+  isSystem: boolean;
 
   constructor(
     name: string,
     definitions: DirectiveDefinition[] = [],
     directive: ?GraphQLDirective = null,
-    _isSystem: boolean = false,
+    isSystem: boolean = false,
   ) {
     super();
     this.name = name;
     this.definitions = definitions;
-    this._isSystem = _isSystem;
+    this.isSystem = isSystem;
   }
 
-  isSystem: (newIsSystem: ?boolean) => Directive =
+  setIsSystem: (newIsSystem: ?boolean) => Directive =
     newIsSystem =>
       new Directive(
         this.name,
@@ -40,7 +40,7 @@ export class Directive extends Appendable<Directive> {
         this.name,
         [...this.definitions, directive],
         this.directive,
-        this._isSystem,
+        this.isSystem,
       );
 
   withDirective: (directive: GraphQLDirective) => Directive =
@@ -49,6 +49,6 @@ export class Directive extends Appendable<Directive> {
         this.name,
         this.definitions,
         directive,
-        this._isSystem,
+        this.isSystem,
       );
 }
