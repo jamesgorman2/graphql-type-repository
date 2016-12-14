@@ -1,6 +1,6 @@
 // @flow
 
-export { FlattenedTypeGraph } from './flattenedTypeGraph';
+export { FlattenedTypeGraph } from './FlattenedTypeGraph';
 
 export { Directive } from './Directive';
 

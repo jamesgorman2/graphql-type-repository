@@ -31,7 +31,7 @@ import {
   extractTypeDefinitions,
   extractTypeExtensions,
   extractTypes,
-} from '../flattenedTypeGraph';
+} from '../FlattenedTypeGraph';
 
 import { DirectiveDefinition } from '../DirectiveDefinition';
 import { ExtensionDefinition } from '../ExtensionDefinition';
