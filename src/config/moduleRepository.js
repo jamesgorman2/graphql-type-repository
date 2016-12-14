@@ -27,20 +27,40 @@ function assertNonEmptyModule(module: Module): void {
 
 export class ModuleRepository extends Appendable<ModuleRepository> {
   modules: Module[];
+  errors: Error[];
 
-  constructor(modules: Module[] = []) {
+  constructor(modules: Module[] = [], errors: Error[] = []) {
     super();
     this.modules = modules;
+    this.errors = errors;
   }
 
   isEmpty: () => boolean = () => this.modules.length === 0;
 
-  withModule: (module: Module) => ModuleRepository = (module) => {
-    assertNewModule(module, this.modules);
-    assertNonEmptyModule(module);
-    return new ModuleRepository([...this.modules, module]);
-  };
+  withModule: (module: Module) => ModuleRepository =
+    module =>
+      this.captureError(() => {
+        assertNewModule(module, this.modules);
+        assertNonEmptyModule(module);
+        return new ModuleRepository([...this.modules, module], this.errors);
+      });
+
+  withError: (error: Error) => ModuleRepository =
+    error => new ModuleRepository(this.modules, [...this.errors, error]);
 
   append: (other: ModuleRepository) => ModuleRepository =
-    other => new ModuleRepository([...this.modules, ...other.modules]);
+    other =>
+      new ModuleRepository(
+        [...this.modules, ...other.modules],
+        [...this.errors, ...other.errors],
+      );
+
+  captureError: (f: () => ModuleRepository) => ModuleRepository =
+    (f) => {
+      try {
+        return f();
+      } catch (e) {
+        return this.withError(e);
+      }
+    }
 }
