@@ -9,6 +9,7 @@ module.exports = {
     "linebreak-style": 0,
     'comma-dangle': ['error', 'always-multiline'],
     'import/prefer-default-export': 0,
-    "no-use-before-define": ["error", { "functions": false, "classes": false }]
+    "no-use-before-define": ["error", { "functions": false, "classes": false }],
+    'no-underscore-dangle': ["error", { "allowAfterThis": true }]
   },
 };

@@ -1,4 +1,7 @@
 // @flow
+import type {
+  GraphQLNamedType,
+} from 'graphql';
 
 import { Appendable } from '../util';
 
@@ -11,7 +14,8 @@ export class Type extends Appendable<Type> {
   directiveRefs: string[];
   definitions: TypeDefinition[];
   extensions: ExtensionDefinition[];
-  isSystem: boolean;
+  type: ?GraphQLNamedType;
+  _isSystem: boolean;
 
   constructor(
     name: string,
@@ -19,6 +23,7 @@ export class Type extends Appendable<Type> {
     directiveRefs: string[] = [],
     definitions: TypeDefinition[] = [],
     extensions: ExtensionDefinition[] = [],
+    type: ?GraphQLNamedType = null,
     isSystem: boolean = false,
   ) {
     super();
@@ -27,11 +32,24 @@ export class Type extends Appendable<Type> {
     this.directiveRefs = directiveRefs;
     this.definitions = definitions;
     this.extensions = extensions;
-    this.isSystem = isSystem;
+    this.type = type;
+    this._isSystem = isSystem;
   }
 
   append: (other: Type) => Type =
     other => other;
+
+  isSystem: (newIsSystem: ?boolean) => Type =
+    newIsSystem =>
+      new Type(
+        this.name,
+        this.typeRefs,
+        this.directiveRefs,
+        this.definitions,
+        this.extensions,
+        this.type,
+        newIsSystem === undefined || newIsSystem === null ? true : newIsSystem,
+      );
 
   withDefinition: (definition: TypeDefinition) => Type =
     definition =>
@@ -41,29 +59,8 @@ export class Type extends Appendable<Type> {
         this.directiveRefs,
         [...this.definitions, definition],
         this.extensions,
-        this.isSystem,
-      );
-
-  withExtension: (extension: ExtensionDefinition) => Type =
-    extension =>
-      new Type(
-        this.name,
-        this.typeRefs,
-        this.directiveRefs,
-        this.definitions,
-        [...this.extensions, extension],
-        this.isSystem,
-      );
-
-  withTypeRef: (typeRef: string) => Type =
-    typeRef =>
-      new Type(
-        this.name,
-        [...this.typeRefs, typeRef],
-        this.directiveRefs,
-        this.definitions,
-        this.extensions,
-        this.isSystem,
+        this.type,
+        this._isSystem,
       );
 
   withDirectiveRef: (directiveRef: string) => Type =
@@ -74,6 +71,43 @@ export class Type extends Appendable<Type> {
         [...this.directiveRefs, directiveRef],
         this.definitions,
         this.extensions,
-        this.isSystem,
+        this.type,
+        this._isSystem,
+      );
+
+  withExtension: (extension: ExtensionDefinition) => Type =
+    extension =>
+      new Type(
+        this.name,
+        this.typeRefs,
+        this.directiveRefs,
+        this.definitions,
+        [...this.extensions, extension],
+        this.type,
+        this._isSystem,
+      );
+
+  withType: (type: GraphQLNamedType) => Type =
+    type =>
+      new Type(
+        this.name,
+        this.typeRefs,
+        this.directiveRefs,
+        this.definitions,
+        this.extensions,
+        type,
+        this._isSystem,
+      );
+
+  withTypeRef: (typeRef: string) => Type =
+    typeRef =>
+      new Type(
+        this.name,
+        [...this.typeRefs, typeRef],
+        this.directiveRefs,
+        this.definitions,
+        this.extensions,
+        this.type,
+        this._isSystem,
       );
 }

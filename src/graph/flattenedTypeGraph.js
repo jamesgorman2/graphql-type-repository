@@ -218,6 +218,7 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
   types: AppendableMap<Type>;
   directives: AppendableMap<Directive>;
   schema: Schema;
+  errors: Error[];
 
   static from(moduleRepository: ModuleRepository): FlattenedTypeGraph {
     return fromModuleRepository(moduleRepository);
@@ -227,11 +228,13 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
     types: AppendableMap<Type> = new AppendableMap(),
     directives: AppendableMap<Directive> = new AppendableMap(),
     schema: Schema = new Schema(),
+    errors: Error[] = [],
   ) {
     super();
     this.types = types;
     this.directives = directives;
     this.schema = schema;
+    this.errors = errors;
   }
 
   append: (other: FlattenedTypeGraph) => FlattenedTypeGraph =
@@ -240,7 +243,23 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
         this.types.append(other.types),
         this.directives.append(other.directives),
         this.schema.append(other.schema),
+        [...this.errors, ...other.errors],
       );
+
+  containsDirective: (name: string) => boolean =
+    name => this.directives.contains(name);
+
+  containsType: (name: string) => boolean =
+    name => this.types.contains(name);
+
+  getDirective: (name: string) => Directive =
+    name => this.directives.get(name);
+
+  getType: (name: string) => Type =
+    name => this.types.get(name);
+
+  map: (decorator: (FlattenedTypeGraph) => FlattenedTypeGraph) => FlattenedTypeGraph =
+    decorator => decorator(this);
 
   withType: (type: Type) => FlattenedTypeGraph =
     type =>
@@ -248,6 +267,7 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
         this.types.put(type.name, type),
         this.directives,
         this.schema,
+        this.errors,
       );
 
   withDirective: (directive: Directive) => FlattenedTypeGraph =
@@ -256,6 +276,7 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
         this.types,
         this.directives.put(directive.name, directive),
         this.schema,
+        this.errors,
       );
   withSchema: (schema: Schema) => FlattenedTypeGraph =
     schema =>
@@ -263,5 +284,15 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
         this.types,
         this.directives,
         this.schema.append(schema),
+        this.errors,
+      );
+
+  withError: (error: Error) => FlattenedTypeGraph =
+    error =>
+      new FlattenedTypeGraph(
+        this.types,
+        this.directives,
+        this.schema,
+        [...this.errors, error],
       );
 }

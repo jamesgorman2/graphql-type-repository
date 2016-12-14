@@ -1,29 +1,54 @@
 // @flow
 
+import type {
+  GraphQLDirective,
+} from 'graphql';
+
 import { Appendable } from '../util';
 import { DirectiveDefinition } from './DirectiveDefinition';
 
 export class Directive extends Appendable<Directive> {
   name: string;
   definitions: DirectiveDefinition[];
-  isSystem: boolean;
+  directive: ?GraphQLDirective;
+  _isSystem: boolean;
 
   constructor(
     name: string,
     definitions: DirectiveDefinition[] = [],
-    isSystem: boolean = false,
+    directive: ?GraphQLDirective = null,
+    _isSystem: boolean = false,
   ) {
     super();
     this.name = name;
     this.definitions = definitions;
-    this.isSystem = isSystem;
+    this._isSystem = _isSystem;
   }
+
+  isSystem: (newIsSystem: ?boolean) => Directive =
+    newIsSystem =>
+      new Directive(
+        this.name,
+        this.definitions,
+        this.directive,
+        newIsSystem === undefined || newIsSystem === null ? true : newIsSystem,
+      );
 
   withDefinition: (directive: DirectiveDefinition) => Directive =
     directive =>
       new Directive(
         this.name,
         [...this.definitions, directive],
-        this.isSystem,
+        this.directive,
+        this._isSystem,
+      );
+
+  withDirective: (directive: GraphQLDirective) => Directive =
+    directive =>
+      new Directive(
+        this.name,
+        this.definitions,
+        directive,
+        this._isSystem,
       );
 }

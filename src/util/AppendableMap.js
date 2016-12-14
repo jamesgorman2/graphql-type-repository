@@ -14,11 +14,14 @@ export class AppendableMap<T: Appendable<any>> {
     this.data = data;
   }
 
-  isEmpty: () => boolean =
-    () => Object.keys(this.data).length === 0;
+  contains: (key: string) => boolean =
+    key => hasOwnProperty(this, key);
 
   get: (key: string) => T =
     key => this.data[key];
+
+  isEmpty: () => boolean =
+    () => Object.keys(this.data).length === 0;
 
   put: (key: string, value: T) => AppendableMap<T> =
     (key, value) => {
