@@ -6,6 +6,11 @@ import {
 
 import { errorInModules } from './errorInModules';
 
+/**
+ * Assert that no Types flagged as system types also
+ * have user definitions. This include both raw and
+ * schema-defined types.
+ */
 export function assertNoSystemTypesDefinedByUser(graphIn: FlattenedTypeGraph): FlattenedTypeGraph {
   return graphIn.types.values()
     .filter(t => t.isSystem)
