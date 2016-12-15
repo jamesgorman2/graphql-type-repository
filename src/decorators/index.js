@@ -1,6 +1,11 @@
 // @flow
 
 export {
+  AssertionError,
+  NestedAssertionError,
+  assertNoModuleErrors,
+  assertNoModuleRepositoryErrors,
+  assertNoSystemDirectivesDefinedByUser,
   assertNoSystemTypesDefinedByUser,
 } from './assert';
 

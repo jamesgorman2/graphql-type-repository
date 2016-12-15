@@ -218,7 +218,8 @@ function fromModuleRepository(moduleRepository: ModuleRepository): FlattenedType
     .reduce(
       (map, module) => map.append(fromModule(module)),
       new FlattenedTypeGraph(),
-    );
+    )
+    .withRepository(moduleRepository);
 }
 
 export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
@@ -226,6 +227,7 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
   directives: AppendableMap<Directive>;
   schema: Schema;
   errors: Error[];
+  moduleRepositories: ModuleRepository[];
 
   static from(moduleRepository: ModuleRepository): FlattenedTypeGraph {
     return fromModuleRepository(moduleRepository);
@@ -236,12 +238,14 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
     directives: AppendableMap<Directive> = new AppendableMap(),
     schema: Schema = new Schema(),
     errors: Error[] = [],
+    moduleRepositories: ModuleRepository[] = []
   ) {
     super();
     this.types = types;
     this.directives = directives;
     this.schema = schema;
     this.errors = errors;
+    this.moduleRepositories = moduleRepositories;
   }
 
   append: (other: FlattenedTypeGraph) => FlattenedTypeGraph =
@@ -251,6 +255,7 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
         this.directives.append(other.directives),
         this.schema.append(other.schema),
         [...this.errors, ...other.errors],
+        [...this.moduleRepositories, ...other.moduleRepositories]
       );
 
   containsDirective: (name: string) => boolean =
@@ -275,6 +280,7 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
         this.directives,
         this.schema,
         this.errors,
+        this.moduleRepositories
       );
 
   withDirective: (directive: Directive) => FlattenedTypeGraph =
@@ -284,6 +290,17 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
         this.directives.put(directive.name, directive),
         this.schema,
         this.errors,
+        this.moduleRepositories
+      );
+
+  withRepository: (moduleRepository: ModuleRepository) => FlattenedTypeGraph =
+    moduleRepository =>
+      new FlattenedTypeGraph(
+        this.types,
+        this.directives,
+        this.schema,
+        this.errors,
+        [...this.moduleRepositories, moduleRepository]
       );
 
   withSchema: (schema: Schema) => FlattenedTypeGraph =
@@ -293,6 +310,7 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
         this.directives,
         this.schema.append(schema),
         this.errors,
+        this.moduleRepositories
       );
 
   withError: (error: Error) => FlattenedTypeGraph =
@@ -302,6 +320,7 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
         this.directives,
         this.schema,
         [...this.errors, error],
+        this.moduleRepositories
       );
 
   withErrors: (errors: Error[]) => FlattenedTypeGraph =
@@ -311,5 +330,6 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
         this.directives,
         this.schema,
         [...this.errors, ...errors],
+        this.moduleRepositories
       );
 }

@@ -1,6 +1,10 @@
 // @flow
 
 export {
+  NestedAssertionError,
+} from './decorators';
+
+export {
   Module,
   ModuleRepository,
   NamedDefinitionNode,

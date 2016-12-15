@@ -5,7 +5,7 @@ import {
 } from '../../graph';
 
 import { errorInModules } from './errorInModules';
-
+import { AssertionError } from './AssertionError';
 /**
  * Assert that no Types flagged as system types also
  * have user definitions. This include both raw and
@@ -19,17 +19,21 @@ export function assertNoSystemTypesDefinedByUser(graphIn: FlattenedTypeGraph): F
         const errors = [];
         if (type.definitions.length > 0) {
           errors.push(
-            errorInModules(
-              `System type ${type.name} cannot be defined by user`,
-              type.definitions.map(d => d.module),
+            new AssertionError(
+              errorInModules(
+                `System type ${type.name} cannot be defined by user`,
+                type.definitions.map(d => d.module),
+              )
             )
           );
         }
         if (type.extensions.length > 0) {
           errors.push(
-            errorInModules(
-              `System type ${type.name} cannot be extended by user`,
-              type.definitions.map(d => d.module),
+            new AssertionError(
+              errorInModules(
+                `System type ${type.name} cannot be extended by user`,
+                type.definitions.map(d => d.module),
+              )
             )
           );
         }

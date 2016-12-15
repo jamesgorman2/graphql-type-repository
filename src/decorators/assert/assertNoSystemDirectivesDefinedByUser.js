@@ -5,7 +5,7 @@ import {
 } from '../../graph';
 
 import { errorInModules } from './errorInModules';
-
+import { AssertionError } from './AssertionError';
 /**
  * Assert that no Directives flagged as system directives also
  * have user definitions. This include both raw and
@@ -21,9 +21,11 @@ export function assertNoSystemDirectivesDefinedByUser(
         const errors = [];
         if (directive.definitions.length > 0) {
           errors.push(
-            errorInModules(
-              `System directive ${directive.name} cannot be defined by user`,
-              directive.definitions.map(d => d.module),
+            new AssertionError(
+              errorInModules(
+                `System directive ${directive.name} cannot be defined by user`,
+                directive.definitions.map(d => d.module),
+              )
             )
           );
         }
