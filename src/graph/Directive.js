@@ -22,8 +22,18 @@ export class Directive extends Appendable<Directive> {
     super();
     this.name = name;
     this.definitions = definitions;
+    this.directive = directive;
     this.isSystem = isSystem;
   }
+
+  append: (other: Directive) => Directive =
+    other =>
+      new Directive(
+        this.name,
+        [...this.definitions, ...other.definitions],
+        this.directive ? this.directive : other.directive,
+        this.isSystem || other.isSystem
+      );
 
   setIsSystem: (newIsSystem: ?boolean) => Directive =
     newIsSystem =>
@@ -31,7 +41,7 @@ export class Directive extends Appendable<Directive> {
         this.name,
         this.definitions,
         this.directive,
-        newIsSystem === undefined || newIsSystem === null ? true : newIsSystem,
+        newIsSystem === undefined || newIsSystem === null ? true : newIsSystem
       );
 
   withDefinition: (directive: DirectiveDefinition) => Directive =
@@ -40,7 +50,7 @@ export class Directive extends Appendable<Directive> {
         this.name,
         [...this.definitions, directive],
         this.directive,
-        this.isSystem,
+        this.isSystem
       );
 
   withDirective: (directive: GraphQLDirective) => Directive =
@@ -49,6 +59,6 @@ export class Directive extends Appendable<Directive> {
         this.name,
         this.definitions,
         directive,
-        this.isSystem,
+        this.isSystem
       );
 }

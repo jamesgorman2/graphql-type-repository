@@ -5,3 +5,4 @@ export { AppendableMap } from './AppendableMap';
 export { assert } from './assert';
 export { hasOwnProperty } from './hasOwnProperty';
 export { isNonEmptyString } from './isNonEmptyString';
+export { flatMap } from './flatMap';

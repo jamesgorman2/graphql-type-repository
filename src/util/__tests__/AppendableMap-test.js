@@ -78,4 +78,14 @@ describe('AppendableMap', () => {
       expect(m2.append(m1).get('c').l).toEqual([4]);
     });
   });
+  describe('conatins', () => {
+    it('should return true for matching key', () => {
+      const m = new AppendableMap().put('a', new AppendableList());
+      expect(m.contains('a')).toBeTruthy();
+    });
+    it('should return false for non-matching key', () => {
+      const m = new AppendableMap().put('a', new AppendableList());
+      expect(m.contains('b')).toBeFalsy();
+    });
+  });
 });

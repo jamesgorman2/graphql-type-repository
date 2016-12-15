@@ -18,6 +18,7 @@ import {
 import {
   Appendable,
   AppendableMap,
+  flatMap,
 } from '../util';
 
 import { TypeDefinition } from './TypeDefinition';
@@ -50,7 +51,13 @@ function getTypeRefs(type: any): string[] {
 }
 
 function getDirectivesRefs(type: any): string[] {
-  return type.directives ? type.directives.map(i => i.name.value) : [];
+  return (type.directives ? type.directives.map(i => i.name.value) : [])
+    .concat(
+      flatMap(
+        type.fields,
+        f => f.directives.map(d => d.name.value)
+      )
+    );
 }
 
 function getTypeBaseGraph(
@@ -278,6 +285,7 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
         this.schema,
         this.errors,
       );
+
   withSchema: (schema: Schema) => FlattenedTypeGraph =
     schema =>
       new FlattenedTypeGraph(

@@ -15,7 +15,7 @@ export class AppendableMap<T: Appendable<any>> {
   }
 
   contains: (key: string) => boolean =
-    key => hasOwnProperty(this, key);
+    key => hasOwnProperty(this.data, key);
 
   get: (key: string) => T =
     key => this.data[key];

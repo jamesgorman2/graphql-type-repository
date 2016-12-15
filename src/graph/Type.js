@@ -37,7 +37,16 @@ export class Type extends Appendable<Type> {
   }
 
   append: (other: Type) => Type =
-    other => other;
+    other =>
+      new Type(
+        this.name,
+        [...this.typeRefs, ...other.typeRefs],
+        [...this.directiveRefs, ...other.directiveRefs],
+        [...this.definitions, ...other.definitions],
+        [...this.extensions, ...other.extensions],
+        this.type ? this.type : other.type,
+        this.isSystem || other.isSystem
+      );
 
   setIsSystem: (newIsSystem: ?boolean) => Type =
     newIsSystem =>

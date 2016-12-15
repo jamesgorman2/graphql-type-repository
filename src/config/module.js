@@ -240,7 +240,8 @@ export class Module {
         this.typeDefinitionNodes.length === 0 &&
         this.extensionDefinitionNodes.length === 0 &&
         this.directiveDefinitionNodes.length === 0 &&
-        !this.schemaDefinitionNode;
+        !this.schemaDefinitionNode &&
+        this.errors.length === 0;
 
   withError: (error: Error) => Module =
     error =>
