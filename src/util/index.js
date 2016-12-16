@@ -1,6 +1,7 @@
 // @flow
 
 export { Appendable } from './Appendable';
+export { AppendableList } from './AppendableList';
 export { AppendableMap } from './AppendableMap';
 export { assert } from './assert';
 export { hasOwnProperty } from './hasOwnProperty';

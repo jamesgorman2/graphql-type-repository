@@ -92,7 +92,7 @@ export function extractTypeDefinition(
   const baseType = new Type(typeDefinition.name)
     .withDefinition(new TypeDefinition(module).withDefinition(typeDefinition));
   const typeWithRefs = typeRefs.reduce(
-    (type, ref) => type.withTypeRef(ref),
+    (type, ref) => type.withTypeRef(ref, module),
     baseType,
   );
   const typeWithDirectiveRefs = directiveRefs.reduce(
@@ -129,7 +129,7 @@ export function extractTypeExtension(
   const baseType = new Type(extensionDefinition.name)
     .withExtension(new ExtensionDefinition(module, extensionDefinition));
   const typeWithRefs = typeRefs.reduce(
-    (type, ref) => type.withTypeRef(ref),
+    (type, ref) => type.withTypeRef(ref, module),
     baseType,
   );
   const typeWithDirectiveRefs = directiveRefs.reduce(

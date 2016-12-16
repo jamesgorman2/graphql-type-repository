@@ -3,14 +3,20 @@ import type {
   GraphQLNamedType,
 } from 'graphql';
 
-import { Appendable } from '../util';
+import {
+  Appendable,
+  AppendableList,
+  AppendableMap,
+} from '../util';
+
+import { Module } from '../config';
 
 import { TypeDefinition } from './TypeDefinition';
 import { ExtensionDefinition } from './ExtensionDefinition';
 
 export class Type extends Appendable<Type> {
   name: string;
-  typeRefs: string[];
+  typeRefs: AppendableMap<AppendableList<Module>>;
   directiveRefs: string[];
   definitions: TypeDefinition[];
   extensions: ExtensionDefinition[];
@@ -19,7 +25,7 @@ export class Type extends Appendable<Type> {
 
   constructor(
     name: string,
-    typeRefs: string[] = [],
+    typeRefs: AppendableMap<AppendableList<Module>> = new AppendableMap(),
     directiveRefs: string[] = [],
     definitions: TypeDefinition[] = [],
     extensions: ExtensionDefinition[] = [],
@@ -40,7 +46,7 @@ export class Type extends Appendable<Type> {
     other =>
       new Type(
         this.name,
-        [...this.typeRefs, ...other.typeRefs],
+        this.typeRefs.append(other.typeRefs),
         [...this.directiveRefs, ...other.directiveRefs],
         [...this.definitions, ...other.definitions],
         [...this.extensions, ...other.extensions],
@@ -108,11 +114,11 @@ export class Type extends Appendable<Type> {
         this.isSystem,
       );
 
-  withTypeRef: (typeRef: string) => Type =
-    typeRef =>
+  withTypeRef: (typeRef: string, module: Module) => Type =
+    (typeRef, module) =>
       new Type(
         this.name,
-        [...this.typeRefs, typeRef],
+        this.typeRefs.put(typeRef, new AppendableList([module])),
         this.directiveRefs,
         this.definitions,
         this.extensions,

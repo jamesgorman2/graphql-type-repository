@@ -94,7 +94,7 @@ describe('FlattenedTypeGraph', () => {
                         new NamedDefinitionNode('Test', t, null),
                       ),
                     )
-                    .withTypeRef('ID'),
+                    .withTypeRef('ID', m),
                 )
                 .put('ID', new Type('ID')),
             ),
@@ -135,7 +135,7 @@ describe('FlattenedTypeGraph', () => {
                     .withExtension(
                       new ExtensionDefinition(m, new NamedDefinitionNode('Test', t)),
                     )
-                    .withTypeRef('ID'),
+                    .withTypeRef('ID', m),
                 )
                 .put('ID', new Type('ID')),
             ),
