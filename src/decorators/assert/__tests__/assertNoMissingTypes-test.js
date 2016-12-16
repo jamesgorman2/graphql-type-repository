@@ -31,11 +31,14 @@ describe('assertNoMissingTypes', () => {
         .withModule(
           new Module('bar').withSchema('type Bim { id: ID } extend type Baz { name: Bar }')
         )
+        .withModule(
+          new Module('baz').withSchema('extend type Bar { name: Baz }')
+        )
     );
     expect(assertNoMissingTypes(g).errors.map(e => e.message))
       .toEqual([
         'Undefined type ID referenced from type Foo in module foo, type Baz in module foo, type Bim in module bar.',
-        'Undefined type Bar referenced from type Foo in module foo, type Baz in module bar.',
+        'Undefined type Bar referenced from type Foo in module foo, type Baz in module bar, extended in module baz.',
       ]);
   });
 });

@@ -3,6 +3,7 @@
 export {
   AssertionError,
   NestedAssertionError,
+  assertNoMissingTypes,
   assertNoModuleErrors,
   assertNoModuleRepositoryErrors,
   assertNoSystemDirectivesDefinedByUser,
