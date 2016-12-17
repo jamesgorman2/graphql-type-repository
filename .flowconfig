@@ -1,5 +1,7 @@
 [ignore]
 .*/dist/.*
+.*/resources/.*
+.*/npm/.*
 
 [include]
 

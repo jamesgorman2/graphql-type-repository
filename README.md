@@ -1,3 +1,4 @@
+[![npm version](https://badge.fury.io/js/graphql-type-repository.svg)](https://badge.fury.io/js/graphql-type-repository) [![Build Status](https://travis-ci.org/jamesgorman2/graphql-type-repository.svg?branch=master)](https://travis-ci.org/jamesgorman2/graphql-type-repository) [![Coverage Status](https://coveralls.io/repos/github/jamesgorman2/graphql-type-repository/badge.svg?branch=master)](https://coveralls.io/github/jamesgorman2/graphql-type-repository?branch=master)
 
 ## Code example
 ### `personModule.js`
