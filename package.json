@@ -22,6 +22,7 @@
     "lint": "eslint src",
     "test": "npm run lint && npm run check && npm run testonly",
     "testonly": "jest",
+    "watch": "jest --watchAll",
     "coverage": "jest --coverage",
     "build": "babel src --optional runtime -d dist --ignore __tests__ && cp package.json dist/ && npm run build-dot-flow",
     "build-dot-flow": "find ./src -name '*.js' -not -path '*/__tests__*' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/dist\\//g'`.flow; done",
