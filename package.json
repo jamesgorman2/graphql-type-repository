@@ -18,16 +18,15 @@
   "scripts": {
     "flow": "flow",
     "check": "flow check",
-    "check-cover": "for file in {src/*.js,src/**/*.js}; do echo $file; flow coverage $file; done",
+    "check-cover": "flow-coverage-report -i 'src/**/*.js' -x 'src/test/**' -t html -t json -t text",
     "lint": "eslint src",
     "test": "npm run lint && npm run check && npm run testonly",
     "testonly": "jest",
     "coverage": "jest --coverage",
     "build": "babel src --optional runtime -d dist --ignore __tests__ && cp package.json dist/ && npm run build-dot-flow",
     "build-dot-flow": "find ./src -name '*.js' -not -path '*/__tests__*' | while read filepath; do cp $filepath `echo $filepath | sed 's/\\/src\\//\\/dist\\//g'`.flow; done",
-    "prepublish": "npm run lint && npm run flow -- check && npm run test && npm run build",
-    "preversion": ". ./resources/checkgit.sh && npm test",
-    "prepublish": ". ./resources/prepublish.sh"
+    "prepublish": ". ./resources/prepublish.sh",
+    "preversion": ". ./resources/checkgit.sh && npm test"
   },
   "peerDependencies": {
     "graphql": "^0.8.1"
@@ -50,6 +49,7 @@
     "eslint-plugin-babel": "^4.0.0",
     "eslint-plugin-import": "^2.2.0",
     "flow-bin": "^0.37.0",
+    "flow-coverage-report": "^0.2.0",
     "graphql": "^0.8.1",
     "jest": "^17.0.3",
     "json-stable-stringify": "^1.0.1"
@@ -57,7 +57,7 @@
   "jest": {
     "collectCoverageFrom": [
       "src/**/*.js",
-      "!src/index.js",
+      "!src/**/index.js",
       "!src/**/__tests__/**"
     ],
     "testEnvironment": "node",

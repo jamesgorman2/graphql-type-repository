@@ -11,6 +11,7 @@ npm-debug.log
 CONTRIBUTING.md
 node_modules
 coverage
+flow-coverage
 resources
 src
 dist

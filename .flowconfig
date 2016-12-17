@@ -2,6 +2,7 @@
 .*/dist/.*
 .*/resources/.*
 .*/npm/.*
+.*/node_modules/flow-coverage-report/.*
 
 [include]
 
