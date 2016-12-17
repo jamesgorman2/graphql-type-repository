@@ -12,7 +12,12 @@ import { assertNoDuplicateTypes } from '../assertNoDuplicateTypes';
 
 describe('assertNoDuplicateTypes', () => {
   it('should do nothing when no duplicate types', () => {
-    const g = new FlattenedTypeGraph();
+    const g = FlattenedTypeGraph.from(
+      new ModuleRepository()
+        .withModule(
+          new Module('foo').withSchema('type Foo { id: ID name: Bar }')
+        )
+    );
     expect(assertNoDuplicateTypes(g)).toBe(g);
   });
   it('should ignore multiple extends', () => {

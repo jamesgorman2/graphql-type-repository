@@ -202,7 +202,7 @@ const parsedTypeGraph: FlattenedTypeGraph = FlattenedTypeGraph.from(internalRepo
   .map(assertNoModuleErrors)
   .map(assertNoMissingTypes)
   .map(assertNoDuplicateTypes)
-  .map(assertNoDuplicateResolvers)
+  .map(assertNoDuplicateExtensionFields)
   .map(assertNoDuplicateSchemaFields)
   .map(assertNoMissingSchemaResolvers)
   .map(assertNoMissingDirectives)

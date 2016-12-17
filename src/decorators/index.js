@@ -3,6 +3,7 @@
 export {
   AssertionError,
   NestedAssertionError,
+  assertNoDuplicateExtensionFields,
   assertNoMissingTypes,
   assertNoModuleErrors,
   assertNoModuleRepositoryErrors,
