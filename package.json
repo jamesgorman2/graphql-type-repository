@@ -36,7 +36,7 @@
     "babel": "^6.5.2",
     "babel-cli": "^6.18.0",
     "babel-eslint": "^7.1.0",
-    "babel-jest": "^17.0.0",
+    "babel-jest": "^18.0.0",
     "babel-plugin-transform-builtin-extend": "^1.1.0",
     "babel-plugin-transform-flow-strip-types": "^6.18.0",
     "babel-polyfill": "^6.16.0",
@@ -52,7 +52,7 @@
     "flow-bin": "^0.37.0",
     "flow-coverage-report": "^0.2.0",
     "graphql": "^0.8.1",
-    "jest": "^17.0.3",
+    "jest": "^18.0.0",
     "json-stable-stringify": "^1.0.1"
   },
   "jest": {
