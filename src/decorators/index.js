@@ -4,6 +4,7 @@ export {
   AssertionError,
   NestedAssertionError,
   assertNoDuplicateExtensionFields,
+  assertNoDuplicateSchemaFields,
   assertNoMissingTypes,
   assertNoModuleErrors,
   assertNoModuleRepositoryErrors,
