@@ -54,7 +54,7 @@ function getDirectivesRefs(type: any): string[] {
   return (type.directives ? type.directives.map(i => i.name.value) : [])
     .concat(
       flatMap(
-        type.fields,
+        type.fields ? type.fields : [],
         f => f.directives.map(d => d.name.value)
       )
     );

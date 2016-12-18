@@ -4,6 +4,7 @@ export { AssertionError } from './AssertionError';
 export { NestedAssertionError } from './NestedAssertionError';
 export { assertNoDuplicateExtensionFields } from './assertNoDuplicateExtensionFields';
 export { assertNoDuplicateSchemaFields } from './assertNoDuplicateSchemaFields';
+export { assertNoMissingSchemaResolvers } from './assertNoMissingSchemaResolvers';
 export { assertNoMissingTypes } from './assertNoMissingTypes';
 export { assertNoModuleErrors } from './assertNoModuleErrors';
 export { assertNoModuleRepositoryErrors } from './assertNoModuleRepositoryErrors';

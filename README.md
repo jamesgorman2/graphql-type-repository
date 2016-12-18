@@ -198,15 +198,21 @@ const parsedTypeGraph: FlattenedTypeGraph = FlattenedTypeGraph.from(internalRepo
   .map(appendSystemDirectives)
   .map(assertNoSystemTypesDefinedByUser)
   .map(assertNoSystemDirectivesDefinedByUser)
+
   .map(assertNoModuleRepositoryErrors)
   .map(assertNoModuleErrors)
+
   .map(assertNoMissingTypes)
   .map(assertNoDuplicateTypes)
   .map(assertNoDuplicateExtensionFields)
   .map(assertNoDuplicateSchemaFields)
+
   .map(assertNoMissingSchemaResolvers)
-  .map(assertNoMissingDirectives)
   .map(assertNoTypesWithRawAndSchemaDefinitions)
+
+  .map(assertNoDuplicateDirectives)
+  .map(assertNoMissingDirectives)
+
   .map(assertNoDisconnectedSubgraphs)
   .map(assertNoUnusedDirectives)
   .map(generateFinalTypes);
