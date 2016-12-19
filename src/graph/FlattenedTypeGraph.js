@@ -258,18 +258,6 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
         [...this.moduleRepositories, ...other.moduleRepositories]
       );
 
-  containsDirective: (name: string) => boolean =
-    name => this.directives.contains(name);
-
-  containsType: (name: string) => boolean =
-    name => this.types.contains(name);
-
-  getDirective: (name: string) => Directive =
-    name => this.directives.get(name);
-
-  getType: (name: string) => Type =
-    name => this.types.get(name);
-
   map: (decorator: (FlattenedTypeGraph) => FlattenedTypeGraph) => FlattenedTypeGraph =
     decorator => decorator(this);
 

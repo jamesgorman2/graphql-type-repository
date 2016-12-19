@@ -149,7 +149,7 @@ describe('module', () => {
       const d = new GraphQLDirective({ name: 'foo', locations: [DirectiveLocation.FIELD] });
       expect(m.withDirective(d).directives[0]).toBe(d);
     });
-    it('should not mmodify orignal directives list', () => {
+    it('should not modify orignal directives list', () => {
       const m = new Module('foo');
       const d = new GraphQLDirective({ name: 'foo', locations: [DirectiveLocation.FIELD] });
       const mNew = m.withDirective(d);

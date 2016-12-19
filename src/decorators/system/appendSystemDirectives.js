@@ -17,7 +17,7 @@ export function appendSystemDirectives(graphIn: FlattenedTypeGraph): FlattenedTy
   return specifiedDirectives.reduce(
     (graph, directive) => {
       const name = directive.name;
-      if (graph.containsDirective(name)) {
+      if (graph.directives.contains(name)) {
         return graph.withDirective(new Directive(name).setIsSystem().withDirective(directive));
       }
       return graph;

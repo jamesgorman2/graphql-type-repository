@@ -18,6 +18,9 @@ schema specified in the GraphQL schema language.
 - [ ] wiki with more detail on why this exists
 - [ ] wiki with more detail on how to build things
 - [ ] wiki with more detail on the internal details
+- [ ] use Module to get type so we can register refs from raw types
+- [ ] panic checking for unexpected state
+- [ ] extend raw types
 
 ## Getting Started
 
@@ -206,15 +209,14 @@ const parsedTypeGraph: FlattenedTypeGraph = FlattenedTypeGraph.from(internalRepo
   .map(assertNoDuplicateTypes)
   .map(assertNoDuplicateExtensionFields)
   .map(assertNoDuplicateSchemaFields)
-
   .map(assertNoMissingSchemaResolvers)
-  .map(assertNoTypesWithRawAndSchemaDefinitions)
+
+  .map(assertNoDisconnectedSubgraphs)
 
   .map(assertNoDuplicateDirectives)
   .map(assertNoMissingDirectives)
-
-  .map(assertNoDisconnectedSubgraphs)
   .map(assertNoUnusedDirectives)
+
   .map(generateFinalTypes);
 
 const schema: GraphQLSchema = parsedTypeGraph.getSchema({ query: 'Query' });
