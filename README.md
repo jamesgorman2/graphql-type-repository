@@ -210,7 +210,6 @@ const parsedTypeGraph: FlattenedTypeGraph = FlattenedTypeGraph.from(internalRepo
   .map(assertNoDuplicateExtensionFields)
   .map(assertNoDuplicateSchemaFields)
   .map(assertNoMissingSchemaResolvers)
-
   .map(assertNoDisconnectedSubgraphs)
 
   .map(assertNoDuplicateDirectives)
