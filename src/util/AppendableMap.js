@@ -14,28 +14,6 @@ export class AppendableMap<T: Appendable<any>> {
     this.data = data;
   }
 
-  contains: (key: string) => boolean =
-    key => hasOwnProperty(this.data, key);
-
-  get: (key: string) => T =
-    key => this.data[key];
-
-  isEmpty: () => boolean =
-    () => Object.keys(this.data).length === 0;
-
-  put: (key: string, value: T) => AppendableMap<T> =
-    (key, value) => {
-      const newData = { ...this.data };
-      newData[key] = hasOwnProperty(newData, key) ? newData[key].append(value) : value;
-      return new AppendableMap(newData);
-    }
-
-  keys: () => string[] =
-    () => Object.keys(this.data);
-
-  values: () => T[] =
-    () => this.keys().map(key => this.data[key]);
-
   append: (other: AppendableMap<T>) => AppendableMap<T> =
     (other) => {
       if (this === other) {
@@ -50,4 +28,36 @@ export class AppendableMap<T: Appendable<any>> {
           this,
         );
     }
+
+  contains: (key: string) => boolean =
+    key => hasOwnProperty(this.data, key);
+
+  get: (key: string) => T =
+    key => this.data[key];
+
+  isEmpty: () => boolean =
+    () => Object.keys(this.data).length === 0;
+
+  keys: () => string[] =
+    () => Object.keys(this.data);
+
+  put: (key: string, value: T) => AppendableMap<T> =
+    (key, value) => {
+      const newData = { ...this.data };
+      newData[key] = hasOwnProperty(newData, key) ? newData[key].append(value) : value;
+      return new AppendableMap(newData);
+    }
+
+  remove: (key: string) => AppendableMap<T> =
+    (key) => {
+      if (hasOwnProperty(this.data, key)) {
+        const newData = { ...this.data };
+        delete newData[key];
+        return new AppendableMap(newData);
+      }
+      return this;
+    }
+
+  values: () => T[] =
+    () => this.keys().map(key => this.data[key]);
 }
