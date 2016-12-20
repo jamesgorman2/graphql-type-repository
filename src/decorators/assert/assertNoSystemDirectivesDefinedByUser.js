@@ -23,7 +23,7 @@ export function assertNoSystemDirectivesDefinedByUser(
           errors.push(
             new AssertionError(
               errorInModules(
-                `System directive ${directive.name} cannot be defined by user`,
+                `System directive @${directive.name} cannot be defined by user`,
                 directive.definitions.map(d => d.module),
               )
             )

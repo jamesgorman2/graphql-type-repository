@@ -17,7 +17,7 @@ import { ExtensionDefinition } from './ExtensionDefinition';
 export class Type extends Appendable<Type> {
   name: string;
   typeRefs: AppendableMap<AppendableList<Module>>;
-  directiveRefs: string[];
+  directiveRefs: AppendableMap<AppendableList<Module>>;
   definitions: TypeDefinition[];
   extensions: ExtensionDefinition[];
   type: ?GraphQLNamedType;
@@ -26,7 +26,7 @@ export class Type extends Appendable<Type> {
   constructor(
     name: string,
     typeRefs: AppendableMap<AppendableList<Module>> = new AppendableMap(),
-    directiveRefs: string[] = [],
+    directiveRefs: AppendableMap<AppendableList<Module>> = new AppendableMap(),
     definitions: TypeDefinition[] = [],
     extensions: ExtensionDefinition[] = [],
     type: ?GraphQLNamedType = null,
@@ -47,7 +47,7 @@ export class Type extends Appendable<Type> {
       new Type(
         this.name,
         this.typeRefs.append(other.typeRefs),
-        [...this.directiveRefs, ...other.directiveRefs],
+        this.directiveRefs.append(other.directiveRefs),
         [...this.definitions, ...other.definitions],
         [...this.extensions, ...other.extensions],
         this.type ? this.type : other.type,
@@ -78,12 +78,12 @@ export class Type extends Appendable<Type> {
         this.isSystem,
       );
 
-  withDirectiveRef: (directiveRef: string) => Type =
-    directiveRef =>
+  withDirectiveRef: (directiveRef: string, module: Module) => Type =
+    (directiveRef, module) =>
       new Type(
         this.name,
         this.typeRefs,
-        [...this.directiveRefs, directiveRef],
+        this.directiveRefs.put(directiveRef, new AppendableList([module])),
         this.definitions,
         this.extensions,
         this.type,

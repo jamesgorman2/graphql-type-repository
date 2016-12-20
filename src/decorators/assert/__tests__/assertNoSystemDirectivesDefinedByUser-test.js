@@ -45,7 +45,7 @@ describe('assertNoSystemDirectivesDefinedByUser', () => {
       );
     expect(assertNoSystemDirectivesDefinedByUser(g).errors.map(e => e.message))
       .toEqual([
-        'System directive skip cannot be defined by user in module foo.',
+        'System directive @skip cannot be defined by user in module foo.',
       ]);
   });
 });

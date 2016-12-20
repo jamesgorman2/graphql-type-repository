@@ -96,7 +96,7 @@ export function extractTypeDefinition(
     baseType,
   );
   const typeWithDirectiveRefs = directiveRefs.reduce(
-    (type, ref) => type.withDirectiveRef(ref),
+    (type, ref) => type.withDirectiveRef(ref, module),
     typeWithRefs,
   );
   const baseGraph = getTypeBaseGraph(module, typeWithDirectiveRefs);
@@ -133,7 +133,7 @@ export function extractTypeExtension(
     baseType,
   );
   const typeWithDirectiveRefs = directiveRefs.reduce(
-    (type, ref) => type.withDirectiveRef(ref),
+    (type, ref) => type.withDirectiveRef(ref, module),
     typeWithRefs,
   );
   const baseGraph = getTypeBaseGraph(module, typeWithDirectiveRefs);
@@ -198,7 +198,12 @@ export function extractSchema(module: Module): FlattenedTypeGraph {
   const schema: SchemaDefinitionNode = module.schemaDefinitionNode;
   return new FlattenedTypeGraph()
     .withSchema(
-      new Schema().withDefinition(new SchemaDefinition(module, schema)),
+      schema.directives
+        .map(directive => directive.name.value)
+        .reduce(
+          (s, directive) => s.withDirectiveRef(directive, module),
+          new Schema().withDefinition(new SchemaDefinition(module, schema))
+        )
     );
 }
 

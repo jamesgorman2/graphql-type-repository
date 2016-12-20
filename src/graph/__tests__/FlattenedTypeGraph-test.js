@@ -16,7 +16,10 @@ import type {
 
 import stringify from 'json-stable-stringify';
 
-import { AppendableMap } from '../../util';
+import {
+  AppendableList,
+  AppendableMap,
+} from '../../util';
 
 import {
   Module,
@@ -36,7 +39,6 @@ import {
 import { DirectiveDefinition } from '../DirectiveDefinition';
 import { ExtensionDefinition } from '../ExtensionDefinition';
 import { SchemaDefinition } from '../SchemaDefinition';
-import { Schema } from '../Schema';
 import { Type } from '../Type';
 import { TypeDefinition } from '../TypeDefinition';
 
@@ -194,14 +196,14 @@ describe('FlattenedTypeGraph', () => {
     it('should get definition', () => {
       const d: any = parse('schema @foo { query: bar }').definitions[0];
       const m = new Module('foo').withSchema('schema @foo { query: bar }');
-      expect(stringify(extractSchema(m).schema))
+      expect(extractSchema(m).schema.definitions)
+        .toEqual([new SchemaDefinition(m, d)]);
+    });
+    it('should get directive refs', () => {
+      const m = new Module('foo').withSchema('schema @foo { query: bar }');
+      expect(stringify(extractSchema(m).schema.directiveRefs))
         .toEqual(
-          stringify(
-            new Schema()
-              .withDefinition(
-                new SchemaDefinition(m, d),
-              ),
-          ),
+          stringify(new AppendableMap().put('foo', new AppendableList().push(m)))
         );
     });
   });

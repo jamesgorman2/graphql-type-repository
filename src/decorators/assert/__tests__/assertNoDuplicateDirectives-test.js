@@ -27,7 +27,7 @@ describe('assertNoDisconnectedSubgraphs', () => {
     );
     expect(assertNoDuplicateDirectives(g).errors.map(error => error.message))
       .toEqual([
-        'Directive foo declared more than once in modules foo, bar, baz.',
+        'Directive @foo declared more than once in modules foo, bar, baz.',
       ]);
   });
 });

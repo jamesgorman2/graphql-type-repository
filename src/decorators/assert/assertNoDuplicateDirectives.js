@@ -13,7 +13,7 @@ export function assertNoDuplicateDirectives(graphIn: FlattenedTypeGraph): Flatte
         graph.withError(
           new AssertionError(
             errorInModules(
-              `Directive ${directive.name} declared more than once`,
+              `Directive @${directive.name} declared more than once`,
               directive.definitions.map(d => d.module)
             )
           )
