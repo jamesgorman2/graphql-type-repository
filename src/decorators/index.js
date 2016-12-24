@@ -20,3 +20,5 @@ export {
   appendSystemDirectives,
   appendSystemTypes,
 } from './system';
+
+export { generateTypes } from './type';
