@@ -10,15 +10,21 @@ import {
   NamedDefinitionNode,
 } from '../config';
 
+import {
+  Option,
+  some,
+  none,
+} from '../util';
+
 export class DirectiveDefinition {
   module: Module;
-  definition: ?NamedDefinitionNode<DirectiveDefinitionNode>;
-  directive: ?GraphQLDirective;
+  definition: Option<NamedDefinitionNode<DirectiveDefinitionNode>>;
+  directive: Option<GraphQLDirective>;
 
   constructor(
     module: Module,
-    definition: ?NamedDefinitionNode<DirectiveDefinitionNode> = null,
-    directive: ?GraphQLDirective = null,
+    definition: Option<NamedDefinitionNode<DirectiveDefinitionNode>> = none,
+    directive: Option<GraphQLDirective> = none,
   ) {
     this.module = module;
     this.definition = definition;
@@ -26,10 +32,12 @@ export class DirectiveDefinition {
   }
 
   withDirective: (type: GraphQLDirective) => DirectiveDefinition =
-    directive => new DirectiveDefinition(this.module, this.definition, directive);
+    directive =>
+      new DirectiveDefinition(this.module, this.definition, some(directive));
 
   withDefinition: (
     definition: NamedDefinitionNode<DirectiveDefinitionNode>
   ) => DirectiveDefinition =
-    definition => new DirectiveDefinition(this.module, definition, this.directive);
+    definition =>
+      new DirectiveDefinition(this.module, some(definition), this.directive);
 }

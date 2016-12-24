@@ -1,8 +1,13 @@
 // @flow
 
+import type {
+  ObjectTypeDefinitionNode,
+} from 'graphql';
+
 import {
   flatMap,
   hasOwnProperty,
+  someOrNone,
 } from '../../util';
 
 import { Module } from '../../config';
@@ -14,17 +19,20 @@ import {
 export function extractFieldsAndModules(type: Type): { [fieldName: string]: Module[] } {
   return flatMap(
     type.definitions,
-    definition => (
-      definition.definition &&
-      definition.definition.definition &&
-      definition.definition.definition.kind === 'ObjectTypeDefinition' ?
-        definition.definition.definition.fields
-          .map(
-            field =>
-              [field.name.value, definition.module]
-          ) :
-        []
-    )
+    typeDefinition =>
+      typeDefinition.definition
+        .map(namedDefintionNode => namedDefintionNode.definition)
+        .filter(d => d.kind === 'ObjectTypeDefinition')
+        .map(d => ((d: any): ObjectTypeDefinitionNode))
+        .flatMap(
+          d =>
+            someOrNone(d.fields)
+              .map(
+                fs =>
+                  fs.map(field => [field.name.value, typeDefinition.module])
+              )
+        )
+        .getOrElse([])
   )
     .concat(
       flatMap(

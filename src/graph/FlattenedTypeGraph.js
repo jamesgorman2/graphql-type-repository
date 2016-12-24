@@ -5,7 +5,6 @@ import type {
   GraphQLDirective,
   GraphQLNamedType,
   ObjectTypeDefinitionNode,
-  SchemaDefinitionNode,
   TypeDefinitionNode,
 } from 'graphql';
 
@@ -19,6 +18,7 @@ import {
   Appendable,
   AppendableMap,
   flatMap,
+  someOrNone,
 } from '../util';
 
 import { TypeDefinition } from './TypeDefinition';
@@ -64,11 +64,16 @@ function getTypeBaseGraph(
   module: Module,
   type: Type,
 ): FlattenedTypeGraph { // eslint-disable-line no-use-before-define
-  const operation = module.schemaDefinitionNode ?
-    module.schemaDefinitionNode.operationTypes
-      .filter(t => t.type.name.value === type.name)
-      .map(t => t.operation)[0] :
-    '';
+  const operation = module.schemaDefinitionNode
+    .flatMap(
+      s =>
+        someOrNone(
+          s.operationTypes
+            .filter(t => t.type.name.value === type.name)
+            .map(t => t.operation)[0]
+        )
+    )
+    .getOrElse('');
   if (operation === 'query') {
     return new FlattenedTypeGraph().withSchema(new Schema().withQuery(type));
   }
@@ -192,19 +197,20 @@ export function extractDirectiveDefinitions(module: Module): FlattenedTypeGraph 
 
 // eslint-disable-next-line no-use-before-define
 export function extractSchema(module: Module): FlattenedTypeGraph {
-  if (!module.schemaDefinitionNode) {
-    return new FlattenedTypeGraph();
-  }
-  const schema: SchemaDefinitionNode = module.schemaDefinitionNode;
-  return new FlattenedTypeGraph()
-    .withSchema(
-      schema.directives
-        .map(directive => directive.name.value)
-        .reduce(
-          (s, directive) => s.withDirectiveRef(directive, module),
-          new Schema().withDefinition(new SchemaDefinition(module, schema))
-        )
-    );
+  return module.schemaDefinitionNode
+    .map(
+      schema =>
+        new FlattenedTypeGraph()
+          .withSchema(
+            schema.directives
+              .map(directive => directive.name.value)
+              .reduce(
+                (s, directive) => s.withDirectiveRef(directive, module),
+                new Schema().withDefinition(new SchemaDefinition(module, schema))
+              )
+          )
+    )
+    .getOrElse(new FlattenedTypeGraph());
 }
 
 // eslint-disable-next-line no-use-before-define
@@ -265,6 +271,16 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
 
   map: (decorator: (FlattenedTypeGraph) => FlattenedTypeGraph) => FlattenedTypeGraph =
     decorator => decorator(this);
+
+  replaceType: (type: Type) => FlattenedTypeGraph =
+    type =>
+      new FlattenedTypeGraph(
+        this.types.replace(type.name, type),
+        this.directives,
+        this.schema,
+        this.errors,
+        this.moduleRepositories
+      );
 
   withType: (type: Type) => FlattenedTypeGraph =
     type =>

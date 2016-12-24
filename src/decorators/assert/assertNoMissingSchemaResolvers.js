@@ -5,6 +5,7 @@ import type {
 } from 'graphql';
 
 import {
+  Option,
   flatMap,
   hasOwnProperty,
 } from '../../util';
@@ -35,33 +36,41 @@ function assertMissingResolversForDefinition(
     .filter(
       field =>
         !(
-          definition.resolvers &&
-          hasOwnProperty(definition.resolvers, 'fields') &&
-          // flow-disable-next-line
-          hasOwnProperty(definition.resolvers.fields, field)
+          definition.resolvers
+            .map(
+              resolvers =>
+                hasOwnProperty(resolvers, 'fields') &&
+                // flow-disable-next-line
+                hasOwnProperty(resolvers.fields, field)
+            )
+            .getOrElse(false)
         )
     )
     .map(field => new AssertionError(`Missing resolver for ${label}.${field} in module ${module.name}.`));
 }
 
-function assertMissingResolvers(type: ?Type, label: string): AssertionError[] {
-  return type ?
-    flatMap(
-      type.definitions,
-      definition => (
-        definition.definition ?
-          assertMissingResolversForDefinition(definition.definition, definition.module, label) :
-          [new AssertionError(`Missing definition for ${label} in module ${definition.module.name}.`)]
-      )
-    )
-      .concat(
-        flatMap(
-          type.extensions,
-          extension =>
-            assertMissingResolversForDefinition(extension.definition, extension.module, label)
+function assertMissingResolvers(type: Option<Type>, label: string): AssertionError[] {
+  return type.map(
+    t =>
+      flatMap(
+        t.definitions,
+        typeDefinition => (
+          typeDefinition.definition
+            .map(d => assertMissingResolversForDefinition(d, typeDefinition.module, label))
+            .getOrElse(
+              [new AssertionError(`Missing definition for ${label} in module ${typeDefinition.module.name}.`)]
+            )
         )
-      ) :
-    [];
+      )
+        .concat(
+          flatMap(
+            t.extensions,
+            extension =>
+              assertMissingResolversForDefinition(extension.definition, extension.module, label)
+          )
+        )
+  )
+   .getOrElse([]);
 }
 
 export function assertNoMissingSchemaResolvers(graphIn: FlattenedTypeGraph): FlattenedTypeGraph {

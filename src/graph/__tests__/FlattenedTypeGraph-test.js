@@ -93,7 +93,7 @@ describe('FlattenedTypeGraph', () => {
                   new Type('Test')
                     .withDefinition(
                       new TypeDefinition(m).withDefinition(
-                        new NamedDefinitionNode('Test', t, null),
+                        new NamedDefinitionNode('Test', t),
                       ),
                     )
                     .withTypeRef('ID', m),
@@ -113,12 +113,9 @@ describe('FlattenedTypeGraph', () => {
            schema { query: Foo mutation: Bar subscription: Baz }`,
         );
       expect(Object.keys(extractTypeDefinitions(m).types.data)).toEqual(['Int', 'Bim']);
-      // flow-disable-next-line
-      expect(extractTypeDefinitions(m).schema.query.name).toEqual('Foo');
-      // flow-disable-next-line
-      expect(extractTypeDefinitions(m).schema.mutation.name).toEqual('Bar');
-      // flow-disable-next-line
-      expect(extractTypeDefinitions(m).schema.subscription.name).toEqual('Baz');
+      expect(extractTypeDefinitions(m).schema.query.get().name).toEqual('Foo');
+      expect(extractTypeDefinitions(m).schema.mutation.get().name).toEqual('Bar');
+      expect(extractTypeDefinitions(m).schema.subscription.get().name).toEqual('Baz');
     });
   });
 
@@ -154,12 +151,9 @@ describe('FlattenedTypeGraph', () => {
            schema { query: Foo mutation: Bar subscription: Baz }`,
         );
       expect(Object.keys(extractTypeExtensions(m).types.data)).toEqual(['Int', 'Bim']);
-      // flow-disable-next-line
-      expect(extractTypeExtensions(m).schema.query.name).toEqual('Foo');
-      // flow-disable-next-line
-      expect(extractTypeExtensions(m).schema.mutation.name).toEqual('Bar');
-      // flow-disable-next-line
-      expect(extractTypeExtensions(m).schema.subscription.name).toEqual('Baz');
+      expect(extractTypeExtensions(m).schema.query.get().name).toEqual('Foo');
+      expect(extractTypeExtensions(m).schema.mutation.get().name).toEqual('Bar');
+      expect(extractTypeExtensions(m).schema.subscription.get().name).toEqual('Baz');
     });
   });
 
@@ -170,7 +164,7 @@ describe('FlattenedTypeGraph', () => {
         .withDirective(d);
       expect(extractDirectives(m).directives.data.bar.name).toEqual('bar');
       expect(extractDirectives(m).directives.data.bar.definitions[0].module).toBe(m);
-      expect(extractDirectives(m).directives.data.bar.definitions[0].directive).toBe(d);
+      expect(extractDirectives(m).directives.data.bar.definitions[0].directive.get()).toBe(d);
     });
   });
 
@@ -185,7 +179,7 @@ describe('FlattenedTypeGraph', () => {
         .toEqual(
           stringify(
             new DirectiveDefinition(m).withDefinition(
-              new NamedDefinitionNode('bar', d, null),
+              new NamedDefinitionNode('bar', d),
             ),
           ),
         );

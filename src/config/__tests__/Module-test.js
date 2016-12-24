@@ -13,6 +13,9 @@ import {
 
 // eslint-disable-next-line no-duplicate-imports
 import type {
+  DefinitionNode,
+  DocumentNode,
+  GraphQLNamedType,
   SchemaDefinitionNode,
 } from 'graphql';
 
@@ -90,25 +93,22 @@ describe('module', () => {
     });
     it('should reject null type', () => {
       const m = new Module('foo');
-      const t = null;
-      // flow-disable-next-line
+      const t: GraphQLNamedType = (null: any);
       expect(m.withType(t).errors[0].message).toMatch(/Parameter type must be a GraphQLNamedType\./);
     });
     it('should reject undefined type', () => {
       const m = new Module('foo');
-      const t = undefined;
-      // flow-disable-next-line
+      const t: GraphQLNamedType = (undefined: any);
       expect(m.withType(t).errors[0].message).toMatch(/Parameter type must be a GraphQLNamedType\./);
     });
     it('should reject not a type', () => {
       const m = new Module('foo');
-      const t = 'type';
-      // flow-disable-next-line
+      const t: GraphQLNamedType = ('type': any);
       expect(m.withType(t).errors[0].message).toMatch(/Parameter type must be a GraphQLNamedType\./);
     });
     it('should reject unnamed type', () => {
       const m = new Module('foo');
-      const t: GraphQLList<*> = new GraphQLList(
+      const t: GraphQLNamedType = new GraphQLList(
         new GraphQLObjectType({
           name: 'Test',
           fields: {
@@ -116,7 +116,6 @@ describe('module', () => {
           },
         }),
       );
-      // flow-disable-next-line
       expect(m.withType(t).errors[0].message).toMatch(/Parameter type must be a GraphQLNamedType\./);
     });
     it('should throw duplicate type name', () => {
@@ -163,20 +162,17 @@ describe('module', () => {
     });
     it('should reject null directive', () => {
       const m = new Module('foo');
-      const d = null;
-      // flow-disable-next-line
+      const d: GraphQLDirective = (null: any);
       expect(m.withDirective(d).errors[0].message).toMatch(/Parameter directive must be a GraphQLDirective\./);
     });
     it('should reject undefined directive', () => {
       const m = new Module('foo');
-      const d = undefined;
-      // flow-disable-next-line
+      const d: GraphQLDirective = (undefined : any);
       expect(m.withDirective(d).errors[0].message).toMatch(/Parameter directive must be a GraphQLDirective\./);
     });
     it('should reject not a directive', () => {
       const m = new Module('foo');
-      const d = 'type';
-      // flow-disable-next-line
+      const d: GraphQLDirective = ('type' : any);
       expect(m.withDirective(d).errors[0].message).toMatch(/Parameter directive must be a GraphQLDirective\./);
     });
     it('should throw duplicate directive name', () => {
@@ -239,12 +235,11 @@ describe('module', () => {
       const m = new Module('foo');
       const n = parse('type Foo { bar: Int }').definitions[0];
       const r = { fields: {} };
-      expect(m.withDefinitionNode(n, r).typeDefinitionNodes[0].resolvers).toBe(r);
+      expect(m.withDefinitionNode(n, r).typeDefinitionNodes[0].resolvers.get()).toBe(r);
     });
     it('should accept schema', () => {
       const n = parse('schema { query: Query }').definitions[0];
-      // flow-disable-next-line
-      const t: SchemaDefinitionNode = new Module('foo').withDefinitionNode(n).schemaDefinitionNode;
+      const t: SchemaDefinitionNode = new Module('foo').withDefinitionNode(n).schemaDefinitionNode.get();
       expect(t.operationTypes[0].type.name.value).toEqual('Query');
     });
     it('should accept directive', () => {
@@ -267,8 +262,7 @@ describe('module', () => {
     });
     it('should reject non-DefinitionNode', () => {
       const m = new Module('foo');
-      const n = 'foo';
-      // flow-disable-next-line
+      const n: DefinitionNode = ('foo': any);
       expect(m.withDefinitionNode(n).errors[0].message)
         .toMatch(/Parameter node must be a TypeSystemDefinitionNode\./);
     });
@@ -291,8 +285,8 @@ describe('module', () => {
       const n = parse('type Foo { bar: Int } type Bar { bar: Int }');
       const r = { fields: {} };
       const rs = { Foo: r };
-      expect(m.withDocumentNode(n, rs).typeDefinitionNodes[0].resolvers).toBe(r);
-      expect(m.withDocumentNode(n, rs).typeDefinitionNodes[1].resolvers).toBeUndefined();
+      expect(m.withDocumentNode(n, rs).typeDefinitionNodes[0].resolvers.get()).toBe(r);
+      expect(m.withDocumentNode(n, rs).typeDefinitionNodes[1].resolvers.isNone()).toBeTruthy();
     });
     it('should reject duplicate names', () => {
       const m = new Module('foo');
@@ -308,14 +302,13 @@ describe('module', () => {
     });
     it('should accept schema', () => {
       const n = parse('schema { query: Query }');
-      // flow-disable-next-line
-      const t: SchemaDefinitionNode = new Module('foo').withDocumentNode(n).schemaDefinitionNode;
+      const t: SchemaDefinitionNode = new Module('foo').withDocumentNode(n).schemaDefinitionNode.get();
       expect(t.operationTypes[0].type.name.value).toEqual('Query');
     });
     it('should reject non-DocumentNote', () => {
       const m = new Module('foo');
-      // flow-disable-next-line
-      expect(m.withDocumentNode('foo').errors[0].message)
+      const n: DocumentNode = ('foo': any);
+      expect(m.withDocumentNode(n).errors[0].message)
         .toMatch(/Parameter node must be a DocumentNode\./);
     });
     it('should reject resolvers with no matching type', () => {
@@ -353,8 +346,8 @@ describe('module', () => {
       const n = 'type Foo { bar: Int } type Bar { bar: Int }';
       const r = { fields: {} };
       const rs = { Foo: r };
-      expect(m.withSchema(n, rs).typeDefinitionNodes[0].resolvers).toBe(r);
-      expect(m.withSchema(n, rs).typeDefinitionNodes[1].resolvers).toBeUndefined();
+      expect(m.withSchema(n, rs).typeDefinitionNodes[0].resolvers.get()).toBe(r);
+      expect(m.withSchema(n, rs).typeDefinitionNodes[1].resolvers.isNone()).toBeTruthy();
     });
     it('should reject malformed schema', () => {
       const m = new Module('foo');
@@ -388,8 +381,8 @@ describe('module', () => {
         .toMatch(/schema must be a non-empty string/);
     });
     it('should reject null string', () => {
-      // flow-disable-next-line
-      expect(new Module('foo').withSchema(null).errors[0].message)
+      const s: string = (null: any);
+      expect(new Module('foo').withSchema(s).errors[0].message)
         .toMatch(/schema must be a non-empty string/);
     });
   });

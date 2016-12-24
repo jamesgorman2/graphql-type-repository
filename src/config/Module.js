@@ -23,6 +23,10 @@ import type {
 } from 'graphql';
 
 import {
+  Option,
+  some,
+  someOrNone,
+  none,
   assert,
   isNonEmptyString,
 } from '../util';
@@ -70,9 +74,10 @@ function isTypeDefinition(node: any): boolean {
     node.kind === 'InputObjectTypeDefinition';
 }
 
-function maybeName(node: any): ?string {
-  const n = node && node.definition ? node.definition : node;
-  return n && node.name ? n.name.value : null;
+function maybeName(node: any): Option<string> {
+  return someOrNone(node)
+    .map(n => someOrNone(n.definition).getOrElse(n))
+    .flatMap(n => someOrNone(n.name).map(name => name.value));
 }
 
 // eslint-disable-next-line no-use-before-define
@@ -107,8 +112,11 @@ function assertNewDirective(name: string, module: Module): void {
   );
 }
 
-// eslint-disable-next-line no-use-before-define
-function withDefinitionNode(module: Module, node: any, resolvers: ?TypeResolverConfig): Module {
+function withDefinitionNode(
+  module: Module, // eslint-disable-line no-use-before-define
+  node: any,
+  resolvers: Option<TypeResolverConfig>
+): Module { // eslint-disable-line no-use-before-define
   if (isExtensionNode(node)) {
     const n: ObjectTypeDefinitionNode = node.definition;
     const name = nodeName(n);
@@ -148,7 +156,7 @@ function withDefinitionNode(module: Module, node: any, resolvers: ?TypeResolverC
       module.extensionDefinitionNodes,
       module.directives,
       module.directiveDefinitionNodes,
-      n,
+      some(n),
       module.errors,
     );
   } else if (isDirectiveDefinition(node)) {
@@ -170,35 +178,44 @@ function withDefinitionNode(module: Module, node: any, resolvers: ?TypeResolverC
   throw new Error('Parameter node must be a TypeSystemDefinitionNode.');
 }
 
-// eslint-disable-next-line no-use-before-define
-function withDocumentNode(module: Module, node: any, resolvers: ?TypeResolverConfigMap): Module {
+function withDocumentNode(
+  module: Module, // eslint-disable-line no-use-before-define
+  node: any,
+  resolvers: Option<TypeResolverConfigMap>
+): Module {  // eslint-disable-line no-use-before-define
   assert(node.kind === 'Document', 'Parameter node must be a DocumentNode.');
   const matchedResolvers = [];
-  const newModule = node.definitions
+  const definitions: DefinitionNode[] = node.definitions;
+  const newModule = definitions
     .reduce(
       // eslint-disable-next-line no-use-before-define
-      (m: Module, childNode: DefinitionNode) => {
-        const name = maybeName(childNode);
-        if (name) {
-          const r = resolvers ? resolvers[name] : null;
-          if (r) {
-            matchedResolvers.push(name);
-          }
-          return m.withDefinitionNode(childNode, r);
-        }
-        return m.withDefinitionNode(childNode);
-      },
+      (m: Module, childNode: DefinitionNode) =>
+        maybeName(childNode)
+          .flatMap(
+            (name) => {
+              const matchedResolver = resolvers.flatMap(r => someOrNone(r[name]));
+              matchedResolver.forEach((_) => { matchedResolvers.push(name); });
+              return matchedResolver;
+            }
+          )
+          .map(
+            (matchedResolver: TypeResolverConfig) =>
+              m.withDefinitionNode(childNode, matchedResolver)
+          )
+          .getOrElse(m.withDefinitionNode(childNode)),
       module,
     );
-  if (resolvers) {
-    const resolverNames = Object.keys(resolvers);
-    if (matchedResolvers.length < resolverNames.length) {
-      const unmatchedResolverNames = resolverNames.filter(n => !matchedResolvers.includes(n));
-      const plural = unmatchedResolverNames.length > 1 ? 's' : '';
-      const nameString = unmatchedResolverNames.map(n => `'${n}'`).join(', ');
-      throw new Error(`Cannot add resolver${plural} ${nameString} with no matching type${plural}.`);
+  resolvers.forEach(
+    (rs) => {
+      const resolverNames = Object.keys(rs);
+      if (matchedResolvers.length < resolverNames.length) {
+        const unmatchedResolverNames = resolverNames.filter(n => !matchedResolvers.includes(n));
+        const plural = unmatchedResolverNames.length > 1 ? 's' : '';
+        const nameString = unmatchedResolverNames.map(n => `'${n}'`).join(', ');
+        throw new Error(`Cannot add resolver${plural} ${nameString} with no matching type${plural}.`);
+      }
     }
-  }
+  );
   return newModule;
 }
 
@@ -209,7 +226,7 @@ export class Module {
   extensionDefinitionNodes: NamedDefinitionNode<ObjectTypeDefinitionNode>[];
   directives: GraphQLDirective[];
   directiveDefinitionNodes: NamedDefinitionNode<DirectiveDefinitionNode>[];
-  schemaDefinitionNode: ?SchemaDefinitionNode;
+  schemaDefinitionNode: Option<SchemaDefinitionNode>;
   errors: Error[];
 
   constructor(
@@ -219,7 +236,7 @@ export class Module {
     extensionDefinitionNodes: NamedDefinitionNode<ObjectTypeDefinitionNode>[] = [],
     directives: GraphQLDirective[] = [],
     directiveDefinitionNodes: NamedDefinitionNode<DirectiveDefinitionNode>[] = [],
-    schemaDefinitionNode: ?SchemaDefinitionNode = null,
+    schemaDefinitionNode: Option<SchemaDefinitionNode> = none,
     errors: Error[] = [],
   ) {
     assert(isNonEmptyString(name), 'Parameter name must be a non-empty string.');
@@ -240,7 +257,7 @@ export class Module {
         this.typeDefinitionNodes.length === 0 &&
         this.extensionDefinitionNodes.length === 0 &&
         this.directiveDefinitionNodes.length === 0 &&
-        !this.schemaDefinitionNode &&
+        this.schemaDefinitionNode.isNone() &&
         this.errors.length === 0;
 
   withError: (error: Error) => Module =
@@ -291,11 +308,12 @@ export class Module {
       });
 
   withDefinitionNode: (node: DefinitionNode, resolvers: ?TypeResolverConfig) => Module =
-    (node, resolvers) => this.captureError(() => withDefinitionNode(this, node, resolvers));
+    (node, resolvers) =>
+      this.captureError(() => withDefinitionNode(this, node, someOrNone(resolvers)));
 
   withDocumentNode: (node: DocumentNode, resolvers: ?TypeResolverConfigMap) => Module =
     (node, resolvers) =>
-      this.captureError(() => withDocumentNode(this, node, resolvers));
+      this.captureError(() => withDocumentNode(this, node, someOrNone(resolvers)));
 
   withSchema: (schema: string, resolvers: ?TypeResolverConfigMap) => Module =
     (schema, resolvers) =>

@@ -7,22 +7,32 @@ import {
   Type,
  } from '../../graph';
 
+import { Option } from '../../util';
+
 import { AssertionError } from './AssertionError';
 import { inModules } from './errorInModules';
 
 function notDefined(type: Type): boolean {
-  return !type.type && type.definitions.length === 0;
+  return type.type.isNone() && type.definitions.length === 0;
 }
 
-function findSchemaTypes(typeName: string, schemaType: ?Type, label: string): string[] {
-  return schemaType ?
-    [schemaType]
-      .filter(referrant => referrant && referrant.typeRefs.keys().includes(typeName))
-      .map(referrant => `${label} ${inModules(referrant.typeRefs.get(typeName).asArray())}`) :
-    [];
+function findSchemaTypes(typeName: string, schemaType: Option<Type>, label: string): string[] {
+  return schemaType
+      .filter(referrant => referrant.typeRefs.keys().includes(typeName))
+      .map(
+        referrant =>
+          `${label} ${
+            inModules(
+              referrant.typeRefs.get(typeName)
+                .map(ms => ms.toArray())
+                .getOrElse([])
+            )
+          }`
+      )
+      .toArray();
 }
 
-function findReferrants(
+function findErrorsFromReferents(
   typeName: string,
   extensions: ExtensionDefinition[],
   allTypes: Type[],
@@ -35,7 +45,13 @@ function findReferrants(
         .reduce(
           (acc, referrant) =>
             acc.concat(
-              `type ${referrant.name} ${inModules(referrant.typeRefs.get(typeName).asArray())}`
+              `type ${referrant.name} ${
+                inModules(
+                  referrant.typeRefs.get(typeName)
+                    .map(ms => ms.toArray())
+                    .getOrElse([])
+                )
+              }`
             ),
           []
         )
@@ -55,7 +71,10 @@ function findReferrants(
 export function assertNoMissingTypes(graphIn: FlattenedTypeGraph): FlattenedTypeGraph {
   return graphIn.types.values()
     .filter(notDefined)
-    .map(type => findReferrants(type.name, type.extensions, graphIn.types.values(), graphIn.schema))
+    .map(
+      type =>
+        findErrorsFromReferents(type.name, type.extensions, graphIn.types.values(), graphIn.schema)
+    )
     .reduce(
       (graph, error) => graph.withError(error),
       graphIn

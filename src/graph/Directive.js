@@ -4,19 +4,24 @@ import type {
   GraphQLDirective,
 } from 'graphql';
 
-import { Appendable } from '../util';
+import {
+  Appendable,
+  Option,
+  some,
+  none,
+} from '../util';
 import { DirectiveDefinition } from './DirectiveDefinition';
 
 export class Directive extends Appendable<Directive> {
   name: string;
   definitions: DirectiveDefinition[];
-  directive: ?GraphQLDirective;
+  directive: Option<GraphQLDirective>;
   isSystem: boolean;
 
   constructor(
     name: string,
     definitions: DirectiveDefinition[] = [],
-    directive: ?GraphQLDirective = null,
+    directive: Option<GraphQLDirective> = none,
     isSystem: boolean = false,
   ) {
     super();
@@ -31,7 +36,7 @@ export class Directive extends Appendable<Directive> {
       new Directive(
         this.name,
         [...this.definitions, ...other.definitions],
-        this.directive ? this.directive : other.directive,
+        this.directive.or(other.directive),
         this.isSystem || other.isSystem
       );
 
@@ -58,7 +63,7 @@ export class Directive extends Appendable<Directive> {
       new Directive(
         this.name,
         this.definitions,
-        directive,
+        some(directive),
         this.isSystem
       );
 }

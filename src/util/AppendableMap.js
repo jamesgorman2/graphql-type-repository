@@ -2,6 +2,11 @@
 
 import { hasOwnProperty } from './hasOwnProperty';
 
+import {
+  Option,
+  someOrNone,
+} from './option';
+
 // eslint-disable-next-line no-unused-vars
 import type { Appendable } from './Appendable';
 
@@ -32,8 +37,8 @@ export class AppendableMap<T: Appendable<any>> {
   contains: (key: string) => boolean =
     key => hasOwnProperty(this.data, key);
 
-  get: (key: string) => T =
-    key => this.data[key];
+  get: (key: string) => Option<T> =
+    key => someOrNone(this.data[key]);
 
   isEmpty: () => boolean =
     () => Object.keys(this.data).length === 0;
@@ -57,6 +62,13 @@ export class AppendableMap<T: Appendable<any>> {
       }
       return this;
     }
+
+  replace: (key: string, value: T) => AppendableMap<T> =
+    (key, value) =>
+      this.get(key)
+        .filter(v => v === value)
+        .map(_ => this)
+        .getOrElse(() => new AppendableMap({ ...this.data, [key]: value }))
 
   values: () => T[] =
     () => this.keys().map(key => this.data[key]);

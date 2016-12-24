@@ -14,7 +14,7 @@ export class AppendableList<T> extends Appendable<AppendableList<T>> {
     other =>
       new AppendableList([...this.ts, ...other.ts]);
 
-  asArray: () => T[] =
+  toArray: () => T[] =
     () => this.ts;
 
   push: (t: T) => AppendableList<T> =

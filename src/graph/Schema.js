@@ -4,6 +4,9 @@ import {
   Appendable,
   AppendableList,
   AppendableMap,
+  Option,
+  some,
+  none,
 } from '../util';
 
 import { Module } from '../config';
@@ -12,24 +15,27 @@ import { SchemaDefinition } from './SchemaDefinition';
 
 import { Type } from './Type';
 
-function maybeAppendTypes(t1: ?Type, t2: ?Type): ?Type {
-  if (t1 && t2) {
-    return t1.append(t2);
-  }
-  return t1 || t2;
+function maybeAppendTypes(o1: Option<Type>, o2: Option<Type>): Option<Type> {
+  return o1
+    .flatMap(
+      t1 =>
+        o2.map(t2 => t1.append(t2))
+          .orSome(t1)
+    )
+    .or(o2);
 }
 
 export class Schema extends Appendable<Schema> {
-  query: ?Type;
-  mutation: ?Type;
-  subscription: ?Type;
+  query: Option<Type>;
+  mutation: Option<Type>;
+  subscription: Option<Type>;
   directiveRefs: AppendableMap<AppendableList<Module>>;
   definitions: SchemaDefinition[];
 
   constructor(
-    query: ?Type,
-    mutation: ?Type,
-    subscription: ?Type,
+    query: Option<Type> = none,
+    mutation: Option<Type> = none,
+    subscription: Option<Type> = none,
     directiveRefs: AppendableMap<AppendableList<Module>> = new AppendableMap(),
     definitions: SchemaDefinition[] = [],
   ) {
@@ -43,15 +49,33 @@ export class Schema extends Appendable<Schema> {
 
   withQuery: (query: Type) => Schema =
     query =>
-      new Schema(query, this.mutation, this.subscription, this.directiveRefs, this.definitions)
+      new Schema(
+        some(query),
+        this.mutation,
+        this.subscription,
+        this.directiveRefs,
+        this.definitions
+      );
 
   withMutation: (mutation: Type) => Schema =
     mutation =>
-      new Schema(this.query, mutation, this.subscription, this.directiveRefs, this.definitions);
+      new Schema(
+        this.query,
+        some(mutation),
+        this.subscription,
+        this.directiveRefs,
+        this.definitions
+      );
 
   withSubscription: (subscription: Type) => Schema =
     subscription =>
-      new Schema(this.query, this.mutation, subscription, this.directiveRefs, this.definitions);
+      new Schema(
+        this.query,
+        this.mutation,
+        some(subscription),
+        this.directiveRefs,
+        this.definitions
+      );
 
   withDefinition: (definition: SchemaDefinition) => Schema =
     definition =>

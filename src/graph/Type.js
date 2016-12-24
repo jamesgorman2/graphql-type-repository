@@ -7,6 +7,9 @@ import {
   Appendable,
   AppendableList,
   AppendableMap,
+  Option,
+  some,
+  none,
 } from '../util';
 
 import { Module } from '../config';
@@ -20,7 +23,7 @@ export class Type extends Appendable<Type> {
   directiveRefs: AppendableMap<AppendableList<Module>>;
   definitions: TypeDefinition[];
   extensions: ExtensionDefinition[];
-  type: ?GraphQLNamedType;
+  type: Option<GraphQLNamedType>;
   isSystem: boolean;
 
   constructor(
@@ -29,7 +32,7 @@ export class Type extends Appendable<Type> {
     directiveRefs: AppendableMap<AppendableList<Module>> = new AppendableMap(),
     definitions: TypeDefinition[] = [],
     extensions: ExtensionDefinition[] = [],
-    type: ?GraphQLNamedType = null,
+    type: Option<GraphQLNamedType> = none,
     isSystem: boolean = false,
   ) {
     super();
@@ -50,7 +53,7 @@ export class Type extends Appendable<Type> {
         this.directiveRefs.append(other.directiveRefs),
         [...this.definitions, ...other.definitions],
         [...this.extensions, ...other.extensions],
-        this.type ? this.type : other.type,
+        this.type.or(other.type),
         this.isSystem || other.isSystem
       );
 
@@ -110,7 +113,7 @@ export class Type extends Appendable<Type> {
         this.directiveRefs,
         this.definitions,
         this.extensions,
-        type,
+        some(type),
         this.isSystem,
       );
 

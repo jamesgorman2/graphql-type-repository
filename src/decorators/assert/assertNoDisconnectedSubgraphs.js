@@ -5,11 +5,13 @@ import {
   Type,
 } from '../../graph';
 
+import { Option } from '../../util';
+
 import { AssertionError } from './AssertionError';
 import { errorInModules } from './errorInModules';
 
-function getRefs(type: ?Type): string[] {
-  return type ? type.typeRefs.keys() : [];
+function getRefs(type: Option<Type>): string[] {
+  return type.map(t => t.typeRefs.keys()).getOrElse([]);
 }
 
 export function assertNoDisconnectedSubgraphs(graphIn: FlattenedTypeGraph): FlattenedTypeGraph {

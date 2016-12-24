@@ -7,19 +7,29 @@ import {
   Type,
  } from '../../graph';
 
+import { Option } from '../../util';
+
 import { AssertionError } from './AssertionError';
 import { inModules } from './errorInModules';
 
 function notDefined(directive: Directive): boolean {
-  return !directive.directive && directive.definitions.length === 0;
+  return directive.directive.isNone() && directive.definitions.length === 0;
 }
 
-function findSchemaTypes(directiveName: string, schemaType: ?Type, label: string): string[] {
-  return schemaType ?
-    [schemaType]
-      .filter(referrant => referrant && referrant.directiveRefs.keys().includes(directiveName))
-      .map(referrant => `${label} ${inModules(referrant.directiveRefs.get(directiveName).asArray())}`) :
-    [];
+function findSchemaTypes(directiveName: string, schemaType: Option<Type>, label: string): string[] {
+  return schemaType
+      .filter(referrant => referrant.directiveRefs.keys().includes(directiveName))
+      .map(
+        referrant =>
+          `${label} ${
+            inModules(
+              referrant.directiveRefs.get(directiveName)
+                .map(ms => ms.toArray())
+                .getOrElse([])
+            )
+          }`
+      )
+      .toArray();
 }
 
 function findReferrants(
@@ -34,13 +44,25 @@ function findReferrants(
         .reduce(
           (acc, referrant) =>
             acc.concat(
-              `type ${referrant.name} ${inModules(referrant.directiveRefs.get(directiveName).asArray())}`
+              `type ${referrant.name} ${
+                inModules(
+                  referrant.directiveRefs.get(directiveName)
+                    .map(ms => ms.toArray())
+                    .getOrElse([])
+                )
+              }`
             ),
           []
         )
         .concat(
           schema.directiveRefs.keys().includes(directiveName) ?
-            `schema ${inModules(schema.directiveRefs.get(directiveName).asArray())}` :
+            `schema ${
+              inModules(
+                schema.directiveRefs.get(directiveName)
+                  .map(ms => ms.toArray())
+                  .getOrElse([])
+              )
+            }` :
             []
         )
         .concat(findSchemaTypes(directiveName, schema.query, 'schema.query'))

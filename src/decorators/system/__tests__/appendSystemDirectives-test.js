@@ -25,7 +25,12 @@ describe('appendSystemDirectives', () => {
     );
     expect(appendSystemDirectives(g).directives.values().map(d => d.name))
       .toEqual(['bar', 'deprecated']);
-    expect(appendSystemDirectives(g).directives.values().map(d => d.directive).filter(d => d))
+    expect(
+      appendSystemDirectives(g).directives.values()
+        .map(d => d.directive)
+        .filter(d => d.isSome())
+        .map(d => d.get())
+      )
       .toEqual([GraphQLDeprecatedDirective]);
   });
 });

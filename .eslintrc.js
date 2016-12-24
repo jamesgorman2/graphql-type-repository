@@ -10,6 +10,7 @@ module.exports = {
     'comma-dangle': ['error', 'always-multiline'],
     'import/prefer-default-export': 0,
     "no-use-before-define": ["error", { "functions": false, "classes": false }],
-    'no-underscore-dangle': ["error", { "allowAfterThis": true }]
+    'no-underscore-dangle': ["error", { "allowAfterThis": true }],
+    'no-unused-vars': ["error", { "argsIgnorePattern": "^_$" }]
   },
 };

@@ -216,7 +216,7 @@ const parsedTypeGraph: FlattenedTypeGraph = FlattenedTypeGraph.from(internalRepo
   .map(assertNoMissingDirectives)
   .map(assertNoUnusedDirectives)
 
-  .map(generateFinalTypes);
+  .map(generateTypes);
 
 const schema: GraphQLSchema = parsedTypeGraph.getSchema({ query: 'Query' });
 ```

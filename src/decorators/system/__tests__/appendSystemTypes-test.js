@@ -26,7 +26,12 @@ describe('appendSystemTypes', () => {
     );
     expect(appendSystemTypes(g).types.values().map(t => t.name))
       .toEqual(['foo', 'ID', 'String']);
-    expect(appendSystemTypes(g).types.values().map(t => t.type).filter(t => t))
+    expect(
+      appendSystemTypes(g).types.values()
+        .map(t => t.type)
+        .filter(t => t.isSome())
+        .map(t => t.get())
+    )
       .toEqual([GraphQLID, GraphQLString]);
   });
 });

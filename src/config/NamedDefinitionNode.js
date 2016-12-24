@@ -1,5 +1,10 @@
 // @flow
 
+import {
+  Option,
+  none,
+} from '../util';
+
 import type {
   TypeResolverConfig,
 } from './types';
@@ -7,12 +12,12 @@ import type {
 export class NamedDefinitionNode<T> {
   name: string;
   definition: T;
-  resolvers: ?TypeResolverConfig;
+  resolvers: Option<TypeResolverConfig>;
 
   constructor(
     name: string,
     definition: T,
-    resolvers: ?TypeResolverConfig,
+    resolvers: Option<TypeResolverConfig> = none,
   ) {
     this.name = name;
     this.definition = definition;

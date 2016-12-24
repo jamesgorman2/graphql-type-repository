@@ -20,16 +20,16 @@ export type ScalarResolverConfig<TInternal, TExternal> = {
 
 export type ObjectResolverConfig = {
   fields: FieldResolverConfig;
-  isTypeOf?: ?GraphQLIsTypeOfFn<*, *>;
+  isTypeOf?: GraphQLIsTypeOfFn<*, *>;
 };
 
 export type InterfaceResolverConfig = {
   fields: FieldResolverConfig;
-  resolveType?: ?GraphQLTypeResolver<*, *>;
+  resolveType?: GraphQLTypeResolver<*, *>;
 };
 
 export type UnionResolverConfig = {
-  resolveType?: ?GraphQLTypeResolver<*, *>;
+  resolveType?: GraphQLTypeResolver<*, *>;
 };
 
 export type TypeResolverConfig =
