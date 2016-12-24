@@ -14,8 +14,17 @@ import {
   none,
 } from '../../util';
 
-function buildType(_: Type): Option<GraphQLNamedType> {
-  return none;
+import { generateScalar } from './generateScalar';
+
+const builders: ((type: Type) => Option<GraphQLNamedType>)[] = [
+  generateScalar,
+];
+
+function buildType(type: Type): Option<GraphQLNamedType> {
+  return builders.reduce(
+    (acc, builder) => acc.or(() => builder(type)),
+    none
+  );
 }
 
 function getRawType(type: Type): Option<GraphQLNamedType> {
@@ -31,11 +40,26 @@ function generateType(type: Type): Type {
     .getOrElse(type);
 }
 
+function captureError(
+  f: () => FlattenedTypeGraph,
+  originalGraph: FlattenedTypeGraph
+): FlattenedTypeGraph {
+  try {
+    return f();
+  } catch (e) {
+    return originalGraph.withError(e);
+  }
+}
+
 export function generateTypes(graphIn: FlattenedTypeGraph): FlattenedTypeGraph {
-  return graphIn.types.values()
-    .filter(type => type.type.isNone())
-    .reduce(
-      (graph, type) => graph.replaceType(generateType(type)),
-      graphIn
-    );
+  return captureError(
+    () =>
+      graphIn.types.values()
+        .filter(type => type.type.isNone())
+        .reduce(
+          (graph, type) => graph.replaceType(generateType(type)),
+          graphIn
+        ),
+    graphIn
+  );
 }

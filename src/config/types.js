@@ -13,6 +13,7 @@ export type FieldResolverConfig = {
 };
 
 export type ScalarResolverConfig<TInternal, TExternal> = {
+  description?: string;
   serialize: (value: mixed) => ?TExternal;
   parseValue?: (value: mixed) => ?TInternal;
   parseLiteral?: (valueNode: ValueNode) => ?TInternal;
