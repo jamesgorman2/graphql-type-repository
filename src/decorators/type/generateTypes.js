@@ -14,9 +14,11 @@ import {
   none,
 } from '../../util';
 
+import { generateEnum } from './generateEnum';
 import { generateScalar } from './generateScalar';
 
 const builders: ((type: Type) => Option<GraphQLNamedType>)[] = [
+  generateEnum,
   generateScalar,
 ];
 

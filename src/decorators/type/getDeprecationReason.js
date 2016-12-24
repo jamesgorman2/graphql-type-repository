@@ -1,0 +1,45 @@
+// @flow
+
+import { GraphQLDeprecatedDirective } from 'graphql';
+
+import type {
+  DirectiveNode,
+  ValueNode,
+} from 'graphql';
+
+import {
+  Option,
+  some,
+  someOrNone,
+  none,
+} from '../../util';
+
+function valueAsString(value: ValueNode): string {
+  return value.value && typeof value.value === 'string' ?
+    value.value : '';
+}
+
+function getReason(directive: DirectiveNode): Option<string> {
+  return someOrNone(directive.arguments)
+    .flatMap(
+      args =>
+        args.filter(argument => argument.name.value === 'reason')
+          .map(argument => valueAsString(argument.value))
+          .reduce(
+            (acc, value) => acc.or(some(value)),
+            none
+          )
+    );
+}
+
+export function getDeprecationReason(directives: Option<DirectiveNode[]>): Option<string> {
+  return directives
+    .flatMap(
+      ds =>
+        ds.filter(d => d.name.value === GraphQLDeprecatedDirective.name)
+          .reduce(
+            (acc, directive) => acc.or(() => getReason(directive)),
+            none
+          )
+    );
+}
