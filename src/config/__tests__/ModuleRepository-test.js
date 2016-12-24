@@ -9,7 +9,7 @@ import {
 import { ModuleRepository } from '../ModuleRepository';
 import { Module } from '../Module';
 
-const type = new GraphQLObjectType({
+const type: GraphQLObjectType = new GraphQLObjectType({
   name: 'Test',
   fields: {
     id: { type: GraphQLID },

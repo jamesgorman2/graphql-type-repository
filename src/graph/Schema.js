@@ -38,7 +38,7 @@ export class Schema extends Appendable<Schema> {
     subscription: Option<Type> = none,
     directiveRefs: AppendableMap<AppendableList<Module>> = new AppendableMap(),
     definitions: SchemaDefinition[] = [],
-  ) {
+  ): void {
     super();
     this.query = query;
     this.mutation = mutation;

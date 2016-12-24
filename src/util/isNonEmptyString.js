@@ -1,4 +1,4 @@
 
-export function isNonEmptyString(o: any): boolean {
+export function isNonEmptyString(o: ?string): boolean {
   return o && typeof o === 'string';
 }

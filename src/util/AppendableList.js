@@ -5,7 +5,7 @@ import { Appendable } from './Appendable';
 export class AppendableList<T> extends Appendable<AppendableList<T>> {
   ts: T[];
 
-  constructor(ts: T[] = []) {
+  constructor(ts: T[] = []): void {
     super();
     this.ts = ts;
   }

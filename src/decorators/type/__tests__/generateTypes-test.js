@@ -17,7 +17,7 @@ import { generateTypes } from '../generateTypes';
 
 describe('generateTypes', () => {
   it('should copy raw type def to type', () => {
-    const t = new GraphQLObjectType({
+    const t: GraphQLObjectType = new GraphQLObjectType({
       name: 'Test',
       fields: {
         id: { type: GraphQLID },
@@ -26,7 +26,7 @@ describe('generateTypes', () => {
     const g = FlattenedTypeGraph.from(
       new ModuleRepository()
         .withModule(
-          new Module('foo').withType(t).withType('')
+          new Module('foo').withType(t)
         )
     );
     expect(generateTypes(g).types.get('Test').get().type.get()).toBe(t);

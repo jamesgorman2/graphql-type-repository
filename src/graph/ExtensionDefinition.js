@@ -16,7 +16,7 @@ export class ExtensionDefinition {
   constructor(
     module: Module,
     definition: NamedDefinitionNode<ObjectTypeDefinitionNode>,
-  ) {
+  ): void {
     this.module = module;
     this.definition = definition;
   }

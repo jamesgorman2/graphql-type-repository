@@ -29,7 +29,7 @@ export class ModuleRepository extends Appendable<ModuleRepository> {
   modules: Module[];
   errors: Error[];
 
-  constructor(modules: Module[] = [], errors: Error[] = []) {
+  constructor(modules: Module[] = [], errors: Error[] = []): void {
     super();
     this.modules = modules;
     this.errors = errors;

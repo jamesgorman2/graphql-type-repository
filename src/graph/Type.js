@@ -34,7 +34,7 @@ export class Type extends Appendable<Type> {
     extensions: ExtensionDefinition[] = [],
     type: Option<GraphQLNamedType> = none,
     isSystem: boolean = false,
-  ) {
+  ): void {
     super();
     this.name = name;
     this.typeRefs = typeRefs;

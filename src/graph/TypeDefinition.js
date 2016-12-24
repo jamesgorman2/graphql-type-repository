@@ -25,7 +25,7 @@ export class TypeDefinition {
     module: Module,
     definition: Option<NamedDefinitionNode<TypeDefinitionNode>> = none,
     type: Option<GraphQLNamedType> = none,
-  ) {
+  ): void {
     this.module = module;
     this.definition = definition;
     this.type = type;

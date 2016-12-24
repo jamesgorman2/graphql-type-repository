@@ -15,7 +15,7 @@ export class AppendableMap<T: Appendable<any>> {
     [key: string]: T
   };
 
-  constructor(data: { [key: string]: T } = {}) {
+  constructor(data: { [key: string]: T } = {}): void {
     this.data = data;
   }
 

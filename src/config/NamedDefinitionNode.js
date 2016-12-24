@@ -18,7 +18,7 @@ export class NamedDefinitionNode<T> {
     name: string,
     definition: T,
     resolvers: Option<TypeResolverConfig> = none,
-  ) {
+  ): void {
     this.name = name;
     this.definition = definition;
     this.resolvers = resolvers;

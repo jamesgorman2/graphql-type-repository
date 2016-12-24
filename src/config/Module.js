@@ -13,10 +13,12 @@ import {
 
 // eslint-disable-next-line no-duplicate-imports
 import type {
+  ASTNode,
   DocumentNode,
   DefinitionNode,
   DirectiveDefinitionNode,
   GraphQLNamedType,
+  GraphQLType,
   ObjectTypeDefinitionNode,
   TypeDefinitionNode,
   SchemaDefinitionNode,
@@ -38,19 +40,19 @@ import type {
 
 import { NamedDefinitionNode } from './NamedDefinitionNode';
 
-function isDirective(directive: any): boolean {
+function isDirective(directive: GraphQLDirective): boolean {
   return directive instanceof GraphQLDirective;
 }
 
-function isDirectiveDefinition(node: any): boolean {
+function isDirectiveDefinition(node: ASTNode): boolean {
   return node.kind === 'DirectiveDefinition';
 }
 
-function isExtensionNode(node: any): boolean {
+function isExtensionNode(node: ASTNode): boolean {
   return node.kind === 'TypeExtensionDefinition';
 }
 
-function isNamedType(type: any): boolean {
+function isNamedType(type: GraphQLType): boolean {
   return (
     type instanceof GraphQLScalarType ||
     type instanceof GraphQLObjectType ||
@@ -61,11 +63,11 @@ function isNamedType(type: any): boolean {
   );
 }
 
-function isSchemaDefinition(node: any): boolean {
+function isSchemaDefinition(node: ASTNode): boolean {
   return node.kind === 'SchemaDefinition';
 }
 
-function isTypeDefinition(node: any): boolean {
+function isTypeDefinition(node: ASTNode): boolean {
   return node.kind === 'ScalarTypeDefinition' ||
     node.kind === 'ObjectTypeDefinition' ||
     node.kind === 'InterfaceTypeDefinition' ||
@@ -74,10 +76,10 @@ function isTypeDefinition(node: any): boolean {
     node.kind === 'InputObjectTypeDefinition';
 }
 
-function maybeName(node: any): Option<string> {
+function maybeName(node: ASTNode): Option<string> {
   return someOrNone(node)
-    .map(n => someOrNone(n.definition).getOrElse(n))
-    .flatMap(n => someOrNone(n.name).map(name => name.value));
+    .map(n => someOrNone((n: any).definition).getOrElse(n))
+    .flatMap(n => someOrNone((n: any).name).map(name => name.value));
 }
 
 // eslint-disable-next-line no-use-before-define
@@ -114,11 +116,11 @@ function assertNewDirective(name: string, module: Module): void {
 
 function withDefinitionNode(
   module: Module, // eslint-disable-line no-use-before-define
-  node: any,
+  node: ASTNode,
   resolvers: Option<TypeResolverConfig>
 ): Module { // eslint-disable-line no-use-before-define
   if (isExtensionNode(node)) {
-    const n: ObjectTypeDefinitionNode = node.definition;
+    const n: ObjectTypeDefinitionNode = (node: any).definition;
     const name = nodeName(n);
     // eslint-disable-next-line no-use-before-define
     return new Module(
@@ -132,7 +134,7 @@ function withDefinitionNode(
       module.errors,
     );
   } else if (isTypeDefinition(node)) {
-    const n: TypeDefinitionNode = node;
+    const n: TypeDefinitionNode = (node: any);
     const name = nodeName(n);
     assertNewNamedType(name, module);
     // eslint-disable-next-line no-use-before-define
@@ -147,7 +149,7 @@ function withDefinitionNode(
       module.errors,
     );
   } else if (isSchemaDefinition(node)) {
-    const n: SchemaDefinitionNode = node;
+    const n: SchemaDefinitionNode = (node: any);
     // eslint-disable-next-line no-use-before-define
     return new Module(
       module.name,
@@ -160,7 +162,7 @@ function withDefinitionNode(
       module.errors,
     );
   } else if (isDirectiveDefinition(node)) {
-    const n: DirectiveDefinitionNode = node;
+    const n: DirectiveDefinitionNode = (node: any);
     const name = nodeName(n);
     assertNewDirective(name, module);
     // eslint-disable-next-line no-use-before-define
@@ -180,7 +182,7 @@ function withDefinitionNode(
 
 function withDocumentNode(
   module: Module, // eslint-disable-line no-use-before-define
-  node: any,
+  node: DocumentNode,
   resolvers: Option<TypeResolverConfigMap>
 ): Module {  // eslint-disable-line no-use-before-define
   assert(node.kind === 'Document', 'Parameter node must be a DocumentNode.');
@@ -238,7 +240,7 @@ export class Module {
     directiveDefinitionNodes: NamedDefinitionNode<DirectiveDefinitionNode>[] = [],
     schemaDefinitionNode: Option<SchemaDefinitionNode> = none,
     errors: Error[] = [],
-  ) {
+  ): void {
     assert(isNonEmptyString(name), 'Parameter name must be a non-empty string.');
     this.name = name;
     this.types = types;

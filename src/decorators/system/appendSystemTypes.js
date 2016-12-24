@@ -6,6 +6,7 @@ import {
   GraphQLString,
   GraphQLBoolean,
   GraphQLID,
+  GraphQLScalarType,
 } from 'graphql';
 
 import {
@@ -13,7 +14,7 @@ import {
   Type,
 } from '../../graph';
 
-const scalars = [
+const scalars: GraphQLScalarType[] = [
   GraphQLInt,
   GraphQLFloat,
   GraphQLString,

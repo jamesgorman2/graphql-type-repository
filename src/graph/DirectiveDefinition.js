@@ -25,7 +25,7 @@ export class DirectiveDefinition {
     module: Module,
     definition: Option<NamedDefinitionNode<DirectiveDefinitionNode>> = none,
     directive: Option<GraphQLDirective> = none,
-  ) {
+  ): void {
     this.module = module;
     this.definition = definition;
     this.directive = directive;

@@ -23,7 +23,7 @@ export class Directive extends Appendable<Directive> {
     definitions: DirectiveDefinition[] = [],
     directive: Option<GraphQLDirective> = none,
     isSystem: boolean = false,
-  ) {
+  ): void {
     super();
     this.name = name;
     this.definitions = definitions;

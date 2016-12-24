@@ -57,7 +57,7 @@ export class None<T> extends Option<T> {
 export class Some<T> extends Option<T> {
   t: T;
 
-  constructor(t: T) {
+  constructor(t: T): void {
     super();
     this.t = t;
   }

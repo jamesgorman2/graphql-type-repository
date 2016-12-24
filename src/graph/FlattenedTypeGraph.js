@@ -250,7 +250,7 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
     schema: Schema = new Schema(),
     errors: Error[] = [],
     moduleRepositories: ModuleRepository[] = []
-  ) {
+  ): void {
     super();
     this.types = types;
     this.directives = directives;

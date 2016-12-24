@@ -15,7 +15,7 @@ export class SchemaDefinition {
   constructor(
     module: Module,
     definition: SchemaDefinitionNode,
-  ) {
+  ): void {
     this.module = module;
     this.definition = definition;
   }
