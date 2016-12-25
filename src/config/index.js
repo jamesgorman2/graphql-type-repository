@@ -8,10 +8,10 @@ export { ModuleRepository } from './ModuleRepository';
 
 export type {
   FieldResolverConfig,
-  ScalarResolverConfig,
-  ObjectResolverConfig,
-  InterfaceResolverConfig,
-  UnionResolverConfig,
-  TypeResolverConfig,
-  TypeResolverConfigMap,
+  ScalarConfig,
+  ObjectConfig,
+  InterfaceConfig,
+  UnionConfig,
+  TypeConfig,
+  TypeConfigMap,
 } from './types';

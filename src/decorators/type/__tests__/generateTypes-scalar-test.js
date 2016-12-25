@@ -13,7 +13,7 @@ import {
 } from '../../../config';
 
 import type {
-  ScalarResolverConfig,
+  ScalarConfig,
 } from '../../../config';
 
 import {
@@ -75,18 +75,18 @@ describe('generateTypes', () => {
     expect(stringify(generateTypes(g).types.get('S').get().type.get()))
       .toEqual(stringify(t));
   });
-  it('should throw if missing resolvers', () => {
+  it('should throw if missing configs', () => {
     const g = FlattenedTypeGraph.from(
       new ModuleRepository()
         .withModule(new Module('foo').withSchema('scalar S'))
     );
     expect(generateTypes(g).errors.map(error => error.message))
       .toEqual([
-        'Scalar type S missing required resolvers in module foo.',
+        'Scalar type S missing required configs in module foo.',
       ]);
   });
   it('should throw if missing serialize', () => {
-    const r: ScalarResolverConfig<*, *> = ({}: any);
+    const r: ScalarConfig<*, *> = ({}: any);
     const g = FlattenedTypeGraph.from(
       new ModuleRepository()
         .withModule(
@@ -96,7 +96,7 @@ describe('generateTypes', () => {
     );
     expect(generateTypes(g).errors.map(error => error.message))
       .toEqual([
-        'Scalar type S missing required resolver parameter serialize in module foo.',
+        'Scalar type S missing required config parameter serialize in module foo.',
       ]);
   });
 });

@@ -12,12 +12,12 @@ export {
 
 export type {
   FieldResolverConfig,
-  ScalarResolverConfig,
-  ObjectResolverConfig,
-  InterfaceResolverConfig,
-  UnionResolverConfig,
-  TypeResolverConfig,
-  TypeResolverConfigMap,
+  ScalarConfig,
+  ObjectConfig,
+  InterfaceConfig,
+  UnionConfig,
+  TypeConfig,
+  TypeConfigMap,
 } from './config';
 
 export {

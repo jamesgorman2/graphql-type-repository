@@ -34,8 +34,8 @@ import {
 } from '../util';
 
 import type {
-  TypeResolverConfig,
-  TypeResolverConfigMap,
+  TypeConfig,
+  TypeConfigMap,
 } from './types';
 
 import { NamedDefinitionNode } from './NamedDefinitionNode';
@@ -117,7 +117,7 @@ function assertNewDirective(name: string, module: Module): void {
 function withDefinitionNode(
   module: Module, // eslint-disable-line no-use-before-define
   node: ASTNode,
-  resolvers: Option<TypeResolverConfig>
+  config: Option<TypeConfig>
 ): Module { // eslint-disable-line no-use-before-define
   if (isExtensionNode(node)) {
     const n: ObjectTypeDefinitionNode = (node: any).definition;
@@ -127,7 +127,7 @@ function withDefinitionNode(
       module.name,
       module.types,
       module.typeDefinitionNodes,
-      [...module.extensionDefinitionNodes, new NamedDefinitionNode(name, n, resolvers)],
+      [...module.extensionDefinitionNodes, new NamedDefinitionNode(name, n, config)],
       module.directives,
       module.directiveDefinitionNodes,
       module.schemaDefinitionNode,
@@ -141,7 +141,7 @@ function withDefinitionNode(
     return new Module(
       module.name,
       module.types,
-      [...module.typeDefinitionNodes, new NamedDefinitionNode(name, n, resolvers)],
+      [...module.typeDefinitionNodes, new NamedDefinitionNode(name, n, config)],
       module.extensionDefinitionNodes,
       module.directives,
       module.directiveDefinitionNodes,
@@ -172,7 +172,7 @@ function withDefinitionNode(
       module.typeDefinitionNodes,
       module.extensionDefinitionNodes,
       module.directives,
-      [...module.directiveDefinitionNodes, new NamedDefinitionNode(name, n, resolvers)],
+      [...module.directiveDefinitionNodes, new NamedDefinitionNode(name, n, config)],
       module.schemaDefinitionNode,
       module.errors,
     );
@@ -183,10 +183,10 @@ function withDefinitionNode(
 function withDocumentNode(
   module: Module, // eslint-disable-line no-use-before-define
   node: DocumentNode,
-  resolvers: Option<TypeResolverConfigMap>
+  configs: Option<TypeConfigMap>
 ): Module {  // eslint-disable-line no-use-before-define
   assert(node.kind === 'Document', 'Parameter node must be a DocumentNode.');
-  const matchedResolvers = [];
+  const matchedConfigs = [];
   const definitions: DefinitionNode[] = node.definitions;
   const newModule = definitions
     .reduce(
@@ -195,26 +195,26 @@ function withDocumentNode(
         maybeName(childNode)
           .flatMap(
             (name) => {
-              const matchedResolver = resolvers.flatMap(r => someOrNone(r[name]));
-              matchedResolver.forEach((_) => { matchedResolvers.push(name); });
-              return matchedResolver;
+              const matchedConfig = configs.flatMap(r => someOrNone(r[name]));
+              matchedConfig.forEach((_) => { matchedConfigs.push(name); });
+              return matchedConfig;
             }
           )
           .map(
-            (matchedResolver: TypeResolverConfig) =>
-              m.withDefinitionNode(childNode, matchedResolver)
+            (matchedconfig: TypeConfig) =>
+              m.withDefinitionNode(childNode, matchedconfig)
           )
           .getOrElse(m.withDefinitionNode(childNode)),
       module,
     );
-  resolvers.forEach(
-    (rs) => {
-      const resolverNames = Object.keys(rs);
-      if (matchedResolvers.length < resolverNames.length) {
-        const unmatchedResolverNames = resolverNames.filter(n => !matchedResolvers.includes(n));
-        const plural = unmatchedResolverNames.length > 1 ? 's' : '';
-        const nameString = unmatchedResolverNames.map(n => `'${n}'`).join(', ');
-        throw new Error(`Cannot add resolver${plural} ${nameString} with no matching type${plural}.`);
+  configs.forEach(
+    (cs) => {
+      const configNames = Object.keys(cs);
+      if (matchedConfigs.length < configNames.length) {
+        const unmatchedConfigNames = configNames.filter(n => !matchedConfigs.includes(n));
+        const plural = unmatchedConfigNames.length > 1 ? 's' : '';
+        const nameString = unmatchedConfigNames.map(n => `'${n}'`).join(', ');
+        throw new Error(`Cannot add config${plural} ${nameString} with no matching type${plural}.`);
       }
     }
   );
@@ -309,19 +309,19 @@ export class Module {
         );
       });
 
-  withDefinitionNode: (node: DefinitionNode, resolvers: ?TypeResolverConfig) => Module =
-    (node, resolvers) =>
-      this.captureError(() => withDefinitionNode(this, node, someOrNone(resolvers)));
+  withDefinitionNode: (node: DefinitionNode, config: ?TypeConfig) => Module =
+    (node, config) =>
+      this.captureError(() => withDefinitionNode(this, node, someOrNone(config)));
 
-  withDocumentNode: (node: DocumentNode, resolvers: ?TypeResolverConfigMap) => Module =
-    (node, resolvers) =>
-      this.captureError(() => withDocumentNode(this, node, someOrNone(resolvers)));
+  withDocumentNode: (node: DocumentNode, configs: ?TypeConfigMap) => Module =
+    (node, configs) =>
+      this.captureError(() => withDocumentNode(this, node, someOrNone(configs)));
 
-  withSchema: (schema: string, resolvers: ?TypeResolverConfigMap) => Module =
-    (schema, resolvers) =>
+  withSchema: (schema: string, configs: ?TypeConfigMap) => Module =
+    (schema, configs) =>
       this.captureError(() => {
         assert(isNonEmptyString(schema), 'Parameter schema must be a non-empty string.');
-        return this.withDocumentNode(parse(schema), resolvers);
+        return this.withDocumentNode(parse(schema), configs);
       });
 
   captureError: (f: () => Module) => Module =

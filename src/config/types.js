@@ -12,33 +12,33 @@ export type FieldResolverConfig = {
   [fieldName: string]: GraphQLFieldResolver<*>;
 };
 
-export type ScalarResolverConfig<TInternal, TExternal> = {
+export type ScalarConfig<TInternal, TExternal> = {
   description?: string;
   serialize: (value: mixed) => ?TExternal;
   parseValue?: (value: mixed) => ?TInternal;
   parseLiteral?: (valueNode: ValueNode) => ?TInternal;
 };
 
-export type ObjectResolverConfig = {
+export type ObjectConfig = {
   fields: FieldResolverConfig;
   isTypeOf?: GraphQLIsTypeOfFn<*, *>;
 };
 
-export type InterfaceResolverConfig = {
+export type InterfaceConfig = {
   fields: FieldResolverConfig;
   resolveType?: GraphQLTypeResolver<*, *>;
 };
 
-export type UnionResolverConfig = {
+export type UnionConfig = {
   resolveType?: GraphQLTypeResolver<*, *>;
 };
 
-export type TypeResolverConfig =
-  ObjectResolverConfig |
-  InterfaceResolverConfig |
-  UnionResolverConfig |
-  ScalarResolverConfig<*, *>;
+export type TypeConfig =
+  ObjectConfig |
+  InterfaceConfig |
+  UnionConfig |
+  ScalarConfig<*, *>;
 
-export type TypeResolverConfigMap = {
-  [typeName: string]: TypeResolverConfig;
+export type TypeConfigMap = {
+  [typeName: string]: TypeConfig;
 };

@@ -17,7 +17,7 @@ describe('assertNoMissingSchemaResolvers', () => {
     const g = new FlattenedTypeGraph();
     expect(assertNoMissingSchemaResolvers(g)).toBe(g);
   });
-  it('should do nothing when no missing resolvers', () => {
+  it('should do nothing when no missing configs', () => {
     const r = {
       Foo: {
         fields: {
@@ -65,7 +65,7 @@ describe('assertNoMissingSchemaResolvers', () => {
         'Unexpected type ScalarTypeDefinition for schema.subscription in module foo. Expected an ObjectTypeDefinition.',
       ]);
   });
-  it('should report missing resolvers', () => {
+  it('should report missing configs', () => {
     const r1 = {
       Foo: {
         fields: {
@@ -97,12 +97,12 @@ describe('assertNoMissingSchemaResolvers', () => {
     );
     expect(assertNoMissingSchemaResolvers(g).errors.map(error => error.message))
       .toEqual([
-        'Missing resolver for schema.query.id in module foo.',
-        'Missing resolver for schema.mutation.id in module foo.',
-        'Missing resolver for schema.mutation.name in module foo.',
-        'Missing resolver for schema.mutation.name in module bar.',
-        'Missing resolver for schema.subscription.id in module baz.',
-        'Missing resolver for schema.subscription.name in module baz.',
+        'Missing config for schema.query.id in module foo.',
+        'Missing config for schema.mutation.id in module foo.',
+        'Missing config for schema.mutation.name in module foo.',
+        'Missing config for schema.mutation.name in module bar.',
+        'Missing config for schema.subscription.id in module baz.',
+        'Missing config for schema.subscription.name in module baz.',
       ]);
   });
 });

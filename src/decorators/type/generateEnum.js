@@ -59,7 +59,7 @@ function generateEnumFromNamedDefinition(
   const config: GraphQLEnumTypeConfig = {
     name: namedDefinition.name,
     values: getValues(definition.values),
-    ...namedDefinition.resolvers.getOrElse({}),
+    ...namedDefinition.configs.getOrElse({}),
   };
   if (!hasOwnProperty(config, 'description')) {
     const description = getDescription(namedDefinition.definition);

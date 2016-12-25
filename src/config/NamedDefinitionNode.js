@@ -10,21 +10,21 @@ import {
 } from '../util';
 
 import type {
-  TypeResolverConfig,
+  TypeConfig,
 } from './types';
 
 export class NamedDefinitionNode<T: TypeDefinitionNode | DirectiveDefinitionNode> {
   name: string;
   definition: T;
-  resolvers: Option<TypeResolverConfig>;
+  configs: Option<TypeConfig>;
 
   constructor(
     name: string,
     definition: T,
-    resolvers: Option<TypeResolverConfig> = none,
+    configs: Option<TypeConfig> = none,
   ): void {
     this.name = name;
     this.definition = definition;
-    this.resolvers = resolvers;
+    this.configs = configs;
   }
 }

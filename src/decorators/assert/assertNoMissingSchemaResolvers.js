@@ -36,17 +36,17 @@ function assertMissingResolversForDefinition(
     .filter(
       field =>
         !(
-          definition.resolvers
+          definition.configs
             .map(
-              resolvers =>
-                hasOwnProperty(resolvers, 'fields') &&
+              configs =>
+                hasOwnProperty(configs, 'fields') &&
                 // flow-disable-next-line
-                hasOwnProperty(resolvers.fields, field)
+                hasOwnProperty(configs.fields, field)
             )
             .getOrElse(false)
         )
     )
-    .map(field => new AssertionError(`Missing resolver for ${label}.${field} in module ${module.name}.`));
+    .map(field => new AssertionError(`Missing config for ${label}.${field} in module ${module.name}.`));
 }
 
 function assertMissingResolvers(type: Option<Type>, label: string): AssertionError[] {

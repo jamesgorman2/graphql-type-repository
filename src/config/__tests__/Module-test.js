@@ -231,11 +231,11 @@ describe('module', () => {
       expect(m.extensionDefinitionNodes[0].name).toEqual('Foo');
       expect(m.extensionDefinitionNodes[1].name).toEqual('Foo');
     });
-    it('should accept optional resolver', () => {
+    it('should accept optional config', () => {
       const m = new Module('foo');
       const n = parse('type Foo { bar: Int }').definitions[0];
       const r = { fields: {} };
-      expect(m.withDefinitionNode(n, r).typeDefinitionNodes[0].resolvers.get()).toBe(r);
+      expect(m.withDefinitionNode(n, r).typeDefinitionNodes[0].configs.get()).toBe(r);
     });
     it('should accept schema', () => {
       const n = parse('schema { query: Query }').definitions[0];
@@ -280,13 +280,13 @@ describe('module', () => {
       expect(m.withDocumentNode(n).typeDefinitionNodes[0].name).toEqual('Foo');
       expect(m.withDocumentNode(n).typeDefinitionNodes[1].name).toEqual('Bar');
     });
-    it('should accept optional resolvers', () => {
+    it('should accept optional configs', () => {
       const m = new Module('foo');
       const n = parse('type Foo { bar: Int } type Bar { bar: Int }');
       const r = { fields: {} };
       const rs = { Foo: r };
-      expect(m.withDocumentNode(n, rs).typeDefinitionNodes[0].resolvers.get()).toBe(r);
-      expect(m.withDocumentNode(n, rs).typeDefinitionNodes[1].resolvers.isNone()).toBeTruthy();
+      expect(m.withDocumentNode(n, rs).typeDefinitionNodes[0].configs.get()).toBe(r);
+      expect(m.withDocumentNode(n, rs).typeDefinitionNodes[1].configs.isNone()).toBeTruthy();
     });
     it('should reject duplicate names', () => {
       const m = new Module('foo');
@@ -311,21 +311,21 @@ describe('module', () => {
       expect(m.withDocumentNode(n).errors[0].message)
         .toMatch(/Parameter node must be a DocumentNode\./);
     });
-    it('should reject resolvers with no matching type', () => {
+    it('should reject configs with no matching type', () => {
       const m = new Module('foo');
       const n = parse('type Foo { bar: Int } type Bar { bar: Int }');
       const r = { fields: {} };
       const rs = { Foo: r, Baz: r };
       expect(m.withDocumentNode(n, rs).errors[0].message)
-        .toMatch(/Cannot add resolver 'Baz' with no matching type\./);
+        .toMatch(/Cannot add config 'Baz' with no matching type\./);
     });
-    it('should reject resolvers with no matching type', () => {
+    it('should reject configs with no matching type', () => {
       const m = new Module('foo');
       const n = parse('type Foo { bar: Int } type Bar { bar: Int }');
       const r = { fields: {} };
       const rs = { Foo: r, Baz: r, Bim: r };
       expect(m.withDocumentNode(n, rs).errors[0].message)
-        .toMatch(/Cannot add resolvers 'Baz', 'Bim' with no matching types\./);
+        .toMatch(/Cannot add configs 'Baz', 'Bim' with no matching types\./);
     });
   });
 
@@ -341,13 +341,13 @@ describe('module', () => {
       expect(m.withSchema(n).typeDefinitionNodes[0].name).toEqual('Foo');
       expect(m.withSchema(n).typeDefinitionNodes[1].name).toEqual('Bar');
     });
-    it('should accept optional resolvers', () => {
+    it('should accept optional configs', () => {
       const m = new Module('foo');
       const n = 'type Foo { bar: Int } type Bar { bar: Int }';
       const r = { fields: {} };
       const rs = { Foo: r };
-      expect(m.withSchema(n, rs).typeDefinitionNodes[0].resolvers.get()).toBe(r);
-      expect(m.withSchema(n, rs).typeDefinitionNodes[1].resolvers.isNone()).toBeTruthy();
+      expect(m.withSchema(n, rs).typeDefinitionNodes[0].configs.get()).toBe(r);
+      expect(m.withSchema(n, rs).typeDefinitionNodes[1].configs.isNone()).toBeTruthy();
     });
     it('should reject malformed schema', () => {
       const m = new Module('foo');
@@ -360,21 +360,21 @@ describe('module', () => {
       expect(m.withSchema(n).errors[0].message)
         .toMatch(/Cannot add type with duplicate name 'Foo'\./);
     });
-    it('should reject resolvers with no matching type', () => {
+    it('should reject configs with no matching type', () => {
       const m = new Module('foo');
       const n = 'type Foo { bar: Int } type Bar { bar: Int }';
       const r = { fields: {} };
       const rs = { Foo: r, Baz: r };
       expect(m.withSchema(n, rs).errors[0].message)
-        .toMatch(/Cannot add resolver 'Baz' with no matching type\./);
+        .toMatch(/Cannot add config 'Baz' with no matching type\./);
     });
-    it('should reject resolvers with no matching type', () => {
+    it('should reject configs with no matching type', () => {
       const m = new Module('foo');
       const n = 'type Foo { bar: Int } type Bar { bar: Int }';
       const r = { fields: {} };
       const rs = { Foo: r, Baz: r, Bim: r };
       expect(m.withSchema(n, rs).errors[0].message)
-        .toMatch(/Cannot add resolvers 'Baz', 'Bim' with no matching types\./);
+        .toMatch(/Cannot add configs 'Baz', 'Bim' with no matching types\./);
     });
     it('should reject empty string', () => {
       expect(new Module('foo').withSchema('').errors[0].message)
