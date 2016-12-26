@@ -77,7 +77,7 @@ describe('option', () => {
       });
       it('should throw if error supplied and other is some', () => {
         expect(() => some(1).xor(some(2), () => new Error('Error')))
-          .toThrow(/Error/);
+          .toThrowError(/Error/);
       });
     });
     describe('ifNone', () => {
