@@ -29,7 +29,7 @@ import {
 } from '../../graph';
 
 import { getDescription } from './getDescription';
-import { ConfigurationError } from './ConfigurationError';
+import { TypeError } from './TypeError';
 
 function generateScalarFromNamedDefinition(
   namedDefinition: NamedDefinitionNode<*>,
@@ -37,7 +37,7 @@ function generateScalarFromNamedDefinition(
 ): GraphQLScalarType {
   namedDefinition.config.ifNone(
     () => {
-      throw new ConfigurationError(
+      throw new TypeError(
         `Scalar ${namedDefinition.name} missing required configs in module ${module.name}.`
       );
     }
@@ -45,7 +45,7 @@ function generateScalarFromNamedDefinition(
   const configIn: ScalarConfig<*, *> = (namedDefinition.config.get(): any);
 
   if (!configIn.serialize) {
-    throw new ConfigurationError(
+    throw new TypeError(
       `Scalar ${namedDefinition.name} missing required config parameter serialize in module ${module.name}.`
     );
   }
@@ -67,7 +67,7 @@ function generateScalarFromNamedDefinition(
   descriptionFromSchema.xor(
     descriptionFromConfig,
     () =>
-      new ConfigurationError(
+      new TypeError(
         `Description for scalar ${namedDefinition.name} supplied in both schema and config in module ${module.name}. It must only be supplied in one of these.`
       )
   )

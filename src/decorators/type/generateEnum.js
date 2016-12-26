@@ -30,7 +30,7 @@ import {
   Type,
 } from '../../graph';
 
-import { ConfigurationError } from './ConfigurationError';
+import { TypeError } from './TypeError';
 import { getDescription } from './getDescription';
 import { getDeprecationReason } from './getDeprecationReason';
 
@@ -56,7 +56,7 @@ function getValues(
       descriptionFromSchema.xor(
         descriptionFromConfig,
         () =>
-          new ConfigurationError(
+          new TypeError(
             `Description for enum value ${enumName}.${name} supplied in both schema and config in module ${module.name}. It must only be supplied in one of these.`
           )
       )
@@ -68,7 +68,7 @@ function getValues(
       deprecationReasonFromSchema.xor(
         deprecationReasonFromConfig,
         () =>
-          new ConfigurationError(
+          new TypeError(
             `Deprecation for enum value ${enumName}.${name} supplied in both schema and config in module ${module.name}. It must only be supplied in one of these.`
           )
       )
@@ -102,7 +102,7 @@ function generateEnumFromNamedDefinition(
   descriptionFromSchema.xor(
     descriptionFromConfig,
     () =>
-      new ConfigurationError(
+      new TypeError(
         `Description for enum ${namedDefinition.name} supplied in both schema and config in module ${module.name}. It must only be supplied in one of these.`
       )
   )
