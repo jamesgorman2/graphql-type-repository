@@ -36,7 +36,7 @@ function assertMissingResolversForDefinition(
     .filter(
       field =>
         !(
-          definition.configs
+          definition.config
             .map(
               configs =>
                 hasOwnProperty(configs, 'fields') &&

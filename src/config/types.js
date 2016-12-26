@@ -33,7 +33,19 @@ export type UnionConfig = {
   resolveType?: GraphQLTypeResolver<*, *>;
 };
 
+export type EnumConfig = {
+  description?: string;
+  values? : {
+    [valueName: string]: {
+      description?: ?string,
+      deprecationReason?: ?string,
+      value?: ?any,
+    }
+  }
+};
+
 export type TypeConfig =
+  EnumConfig |
   ObjectConfig |
   InterfaceConfig |
   UnionConfig |

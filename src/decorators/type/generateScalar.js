@@ -32,12 +32,12 @@ function generateScalarFromNamedDefinition(
   namedDefinition: NamedDefinitionNode<*>,
   module: Module
 ): GraphQLScalarType {
-  if (namedDefinition.configs.isNone()) {
+  if (namedDefinition.config.isNone()) {
     throw new ConfigurationError(
       `Scalar type ${namedDefinition.name} missing required configs in module ${module.name}.`
     );
   }
-  if (!namedDefinition.configs.get().serialize) {
+  if (!namedDefinition.config.get().serialize) {
     throw new ConfigurationError(
       `Scalar type ${namedDefinition.name} missing required config parameter serialize in module ${module.name}.`
     );
@@ -45,7 +45,7 @@ function generateScalarFromNamedDefinition(
 
   const config: GraphQLScalarTypeConfig<*, *> = {
     name: namedDefinition.name,
-    ...namedDefinition.configs.get(),
+    ...namedDefinition.config.get(),
   };
   if (!hasOwnProperty(config, 'description')) {
     const description = getDescription(namedDefinition.definition);

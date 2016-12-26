@@ -7,6 +7,7 @@ export { NamedDefinitionNode } from './NamedDefinitionNode';
 export { ModuleRepository } from './ModuleRepository';
 
 export type {
+  EnumConfig,
   FieldResolverConfig,
   ScalarConfig,
   ObjectConfig,

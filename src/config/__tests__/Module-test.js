@@ -235,7 +235,7 @@ describe('module', () => {
       const m = new Module('foo');
       const n = parse('type Foo { bar: Int }').definitions[0];
       const r = { fields: {} };
-      expect(m.withDefinitionNode(n, r).typeDefinitionNodes[0].configs.get()).toBe(r);
+      expect(m.withDefinitionNode(n, r).typeDefinitionNodes[0].config.get()).toBe(r);
     });
     it('should accept schema', () => {
       const n = parse('schema { query: Query }').definitions[0];
@@ -285,8 +285,8 @@ describe('module', () => {
       const n = parse('type Foo { bar: Int } type Bar { bar: Int }');
       const r = { fields: {} };
       const rs = { Foo: r };
-      expect(m.withDocumentNode(n, rs).typeDefinitionNodes[0].configs.get()).toBe(r);
-      expect(m.withDocumentNode(n, rs).typeDefinitionNodes[1].configs.isNone()).toBeTruthy();
+      expect(m.withDocumentNode(n, rs).typeDefinitionNodes[0].config.get()).toBe(r);
+      expect(m.withDocumentNode(n, rs).typeDefinitionNodes[1].config.isNone()).toBeTruthy();
     });
     it('should reject duplicate names', () => {
       const m = new Module('foo');
@@ -346,8 +346,8 @@ describe('module', () => {
       const n = 'type Foo { bar: Int } type Bar { bar: Int }';
       const r = { fields: {} };
       const rs = { Foo: r };
-      expect(m.withSchema(n, rs).typeDefinitionNodes[0].configs.get()).toBe(r);
-      expect(m.withSchema(n, rs).typeDefinitionNodes[1].configs.isNone()).toBeTruthy();
+      expect(m.withSchema(n, rs).typeDefinitionNodes[0].config.get()).toBe(r);
+      expect(m.withSchema(n, rs).typeDefinitionNodes[1].config.isNone()).toBeTruthy();
     });
     it('should reject malformed schema', () => {
       const m = new Module('foo');

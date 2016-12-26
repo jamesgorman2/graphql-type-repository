@@ -11,38 +11,72 @@ import type {
   GraphQLEnumValueConfigMap,
 } from 'graphql';
 
-import { getDescription } from 'graphql/utilities/buildASTSchema';
-
 import {
   Option,
-  hasOwnProperty,
   someOrNone,
   none,
 } from '../../util';
 
 import {
+  Module,
   NamedDefinitionNode,
+} from '../../config';
+
+import type {
+  EnumConfig,
 } from '../../config';
 
 import {
   Type,
 } from '../../graph';
 
+import { ConfigurationError } from './ConfigurationError';
+import { getDescription } from './getDescription';
 import { getDeprecationReason } from './getDeprecationReason';
 
-function getValues(values: EnumValueDefinitionNode[]): GraphQLEnumValueConfigMap {
+function getValues(
+  values: EnumValueDefinitionNode[],
+  configIn: Option<EnumConfig>,
+  enumName: string,
+  module: Module
+): GraphQLEnumValueConfigMap {
   return values.reduce(
     (map, v) => {
       const config = {};
+
       const name = v.name.value;
-      const description = getDescription(v);
-      const deprecationReason = getDeprecationReason(someOrNone(v.directives));
-      if (description) {
-        config.description = description;
-      }
-      if (deprecationReason) {
-        config.deprecationReason = deprecationReason;
-      }
+
+      const configInForValue = configIn
+        .flatMap(c => someOrNone(c.values))
+        .flatMap(c => someOrNone(c[name]));
+
+      const descriptionFromSchema = getDescription(v);
+      const descriptionFromConfig = configInForValue
+        .flatMap(c => someOrNone(c.description));
+      descriptionFromSchema.xor(
+        descriptionFromConfig,
+        () =>
+          new ConfigurationError(
+            `Description for enum value ${enumName}.${name} supplied in schema and config in module ${module.name}. It must only be supplied in one of these.`
+          )
+      )
+        .forEach((description) => { config.description = description; });
+
+      const deprecationReasonFromSchema = getDeprecationReason(someOrNone(v.directives));
+      const deprecationReasonFromConfig = configInForValue
+        .flatMap(c => someOrNone(c.deprecationReason));
+      deprecationReasonFromSchema.xor(
+        deprecationReasonFromConfig,
+        () =>
+          new ConfigurationError(
+            `Deprecation for enum value ${enumName}.${name} supplied in schema and config in module ${module.name}. It must only be supplied in one of these.`
+          )
+      )
+        .forEach((deprecationReason) => { config.deprecationReason = deprecationReason; });
+
+      configInForValue.flatMap(c => someOrNone(c.value))
+        .forEach((value) => { config.value = value; });
+
       return {
         ...map,
         [name]: config,
@@ -53,20 +87,27 @@ function getValues(values: EnumValueDefinitionNode[]): GraphQLEnumValueConfigMap
 }
 
 function generateEnumFromNamedDefinition(
-  namedDefinition: NamedDefinitionNode<*>
+  namedDefinition: NamedDefinitionNode<*>,
+  module: Module
 ): GraphQLEnumType {
+  const configIn: Option<EnumConfig> = (namedDefinition.config: any);
   const definition: EnumTypeDefinitionNode = (namedDefinition.definition: any);
   const config: GraphQLEnumTypeConfig = {
     name: namedDefinition.name,
-    values: getValues(definition.values),
-    ...namedDefinition.configs.getOrElse({}),
+    values: getValues(definition.values, configIn, namedDefinition.name, module),
   };
-  if (!hasOwnProperty(config, 'description')) {
-    const description = getDescription(namedDefinition.definition);
-    if (description) {
-      config.description = description;
-    }
-  }
+  const descriptionFromSchema = getDescription(namedDefinition.definition);
+  const descriptionFromConfig = configIn.flatMap(c => someOrNone(c.description));
+
+  descriptionFromSchema.xor(
+    descriptionFromConfig,
+    () =>
+      new ConfigurationError(
+        `Description for enum ${namedDefinition.name} supplied in schema and config in module ${module.name}. It must only be supplied in one of these.`
+      )
+  )
+    .forEach((d) => { config.description = d; });
+
   return new GraphQLEnumType(config);
 }
 
@@ -77,7 +118,10 @@ export function generateEnum(type: Type): Option<GraphQLNamedType> {
         () =>
           typeDefinition.definition
             .filter(namedDefinition => namedDefinition.definition.kind === 'EnumTypeDefinition')
-            .map(generateEnumFromNamedDefinition)
+            .map(
+              namedDefinition =>
+                generateEnumFromNamedDefinition(namedDefinition, typeDefinition.module)
+            )
       ),
     none
   );

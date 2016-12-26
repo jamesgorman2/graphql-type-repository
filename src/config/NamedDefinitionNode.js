@@ -16,15 +16,15 @@ import type {
 export class NamedDefinitionNode<T: TypeDefinitionNode | DirectiveDefinitionNode> {
   name: string;
   definition: T;
-  configs: Option<TypeConfig>;
+  config: Option<TypeConfig>;
 
   constructor(
     name: string,
     definition: T,
-    configs: Option<TypeConfig> = none,
+    config: Option<TypeConfig> = none,
   ): void {
     this.name = name;
     this.definition = definition;
-    this.configs = configs;
+    this.config = config;
   }
 }

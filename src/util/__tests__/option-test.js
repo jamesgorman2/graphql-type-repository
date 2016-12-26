@@ -68,6 +68,18 @@ describe('option', () => {
         expect(i).toEqual(1);
       });
     });
+    describe('xor', () => {
+      it('should return some if other none', () => {
+        expect(some(1).xor(none).get()).toEqual(1);
+      });
+      it('should return none if other some', () => {
+        expect(some(1).xor(some(2))).toBe(none);
+      });
+      it('should throw if error supplied and other is some', () => {
+        expect(() => some(1).xor(some(2), () => new Error('Error')))
+          .toThrow(/Error/);
+      });
+    });
   });
   describe('none', () => {
     describe('isSome', () => {
@@ -136,6 +148,17 @@ describe('option', () => {
     });
     it('should return some for value', () => {
       expect(someOrNone(1).get()).toEqual(1);
+    });
+  });
+  describe('xor', () => {
+    it('should return none if other none', () => {
+      expect(none.xor(none)).toBe(none);
+    });
+    it('should return some if other some', () => {
+      expect(none.xor(some(2)).get()).toEqual(2);
+    });
+    it('should throw if error supplied and other is some', () => {
+      expect(none.xor(none, () => new Error('Error'))).toBe(none);
     });
   });
 });

@@ -1,6 +1,9 @@
 // @flow
 
-import { GraphQLDeprecatedDirective } from 'graphql';
+import {
+  DEFAULT_DEPRECATION_REASON,
+  GraphQLDeprecatedDirective,
+} from 'graphql';
 
 import type {
   DirectiveNode,
@@ -38,7 +41,8 @@ export function getDeprecationReason(directives: Option<DirectiveNode[]>): Optio
       ds =>
         ds.filter(d => d.name.value === GraphQLDeprecatedDirective.name)
           .reduce(
-            (acc, directive) => acc.or(() => getReason(directive)),
+            (acc, directive) =>
+              acc.or(() => getReason(directive).orSome(DEFAULT_DEPRECATION_REASON)),
             none
           )
     );
