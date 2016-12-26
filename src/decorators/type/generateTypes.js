@@ -5,6 +5,11 @@ import type {
 } from 'graphql';
 
 import {
+  Module,
+  NamedDefinitionNode,
+} from '../../config';
+
+import {
   FlattenedTypeGraph,
   Type,
 } from '../../graph';
@@ -16,15 +21,37 @@ import {
 
 import { generateEnum } from './generateEnum';
 import { generateScalar } from './generateScalar';
+import { generateUnion } from './generateUnion';
 
-const builders: ((type: Type) => Option<GraphQLNamedType>)[] = [
+type Builder = (namedDefinition: NamedDefinitionNode<*>, module: Module) => GraphQLNamedType;
+
+const builders: [string, Builder][] = [
   generateEnum,
   generateScalar,
+  generateUnion,
 ];
+
+function buildTypeFromBuilder(
+  type: Type,
+  kind: string,
+  builder: Builder
+): Option<GraphQLNamedType> {
+  return type.definitions.reduce(
+    (acc, typeDefinition) =>
+      acc.or(
+        () =>
+          typeDefinition.definition
+            .filter(namedDefinition => namedDefinition.definition.kind === kind)
+            .map(d => builder(d, typeDefinition.module))
+      ),
+    none
+  );
+}
 
 function buildType(type: Type): Option<GraphQLNamedType> {
   return builders.reduce(
-    (acc, builder) => acc.or(() => builder(type)),
+    (acc, [kind, builder]) =>
+      acc.or(() => buildTypeFromBuilder(type, kind, builder)),
     none
   );
 }

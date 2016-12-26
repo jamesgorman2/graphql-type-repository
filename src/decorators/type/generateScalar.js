@@ -10,9 +10,7 @@ import type {
 } from 'graphql';
 
 import {
-  Option,
   someOrNone,
-  none,
 } from '../../util';
 
 import {
@@ -24,17 +22,13 @@ import type {
   ScalarConfig,
 } from '../../config';
 
-import {
-  Type,
-} from '../../graph';
-
 import { getDescription } from './getDescription';
 import { TypeError } from './TypeError';
 
-function generateScalarFromNamedDefinition(
+export function generateScalarFromNamedDefinition(
   namedDefinition: NamedDefinitionNode<*>,
   module: Module
-): GraphQLScalarType {
+): GraphQLNamedType {
   namedDefinition.config.ifNone(
     () => {
       throw new TypeError(
@@ -76,15 +70,4 @@ function generateScalarFromNamedDefinition(
   return new GraphQLScalarType(config);
 }
 
-export function generateScalar(type: Type): Option<GraphQLNamedType> {
-  return type.definitions.reduce(
-    (acc, typeDefinition) =>
-      acc.or(
-        () =>
-          typeDefinition.definition
-            .filter(namedDefinition => namedDefinition.definition.kind === 'ScalarTypeDefinition')
-            .map(d => generateScalarFromNamedDefinition(d, typeDefinition.module))
-      ),
-    none
-  );
-}
+export const generateScalar = ['ScalarTypeDefinition', generateScalarFromNamedDefinition];

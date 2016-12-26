@@ -14,7 +14,6 @@ import type {
 import {
   Option,
   someOrNone,
-  none,
 } from '../../util';
 
 import {
@@ -25,10 +24,6 @@ import {
 import type {
   EnumConfig,
 } from '../../config';
-
-import {
-  Type,
-} from '../../graph';
 
 import { TypeError } from './TypeError';
 import { getDescription } from './getDescription';
@@ -89,7 +84,7 @@ function getValues(
 function generateEnumFromNamedDefinition(
   namedDefinition: NamedDefinitionNode<*>,
   module: Module
-): GraphQLEnumType {
+): GraphQLNamedType {
   const configIn: Option<EnumConfig> = (namedDefinition.config: any);
   const definition: EnumTypeDefinitionNode = (namedDefinition.definition: any);
   const config: GraphQLEnumTypeConfig = {
@@ -111,18 +106,4 @@ function generateEnumFromNamedDefinition(
   return new GraphQLEnumType(config);
 }
 
-export function generateEnum(type: Type): Option<GraphQLNamedType> {
-  return type.definitions.reduce(
-    (acc, typeDefinition) =>
-      acc.or(
-        () =>
-          typeDefinition.definition
-            .filter(namedDefinition => namedDefinition.definition.kind === 'EnumTypeDefinition')
-            .map(
-              namedDefinition =>
-                generateEnumFromNamedDefinition(namedDefinition, typeDefinition.module)
-            )
-      ),
-    none
-  );
-}
+export const generateEnum = ['EnumTypeDefinition', generateEnumFromNamedDefinition];
