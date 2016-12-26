@@ -112,7 +112,7 @@ describe('generateTypes', () => {
     );
     expect(generateTypes(g).errors.map(error => error.message))
       .toEqual([
-        'Description for enum E supplied in schema and config in module foo. It must only be supplied in one of these.',
+        'Description for enum E supplied in both schema and config in module foo. It must only be supplied in one of these.',
       ]);
   });
   it('should use description for value from schema', () => {
@@ -195,7 +195,7 @@ describe('generateTypes', () => {
     );
     expect(generateTypes(g).errors.map(error => error.message))
       .toEqual([
-        'Description for enum value E.A supplied in schema and config in module foo. It must only be supplied in one of these.',
+        'Description for enum value E.A supplied in both schema and config in module foo. It must only be supplied in one of these.',
       ]);
   });
   it('should use bare deprecated directive with default description', () => {
@@ -299,7 +299,7 @@ describe('generateTypes', () => {
     );
     expect(generateTypes(g).errors.map(error => error.message))
       .toEqual([
-        'Deprecation for enum value E.A supplied in schema and config in module foo. It must only be supplied in one of these.',
+        'Deprecation for enum value E.A supplied in both schema and config in module foo. It must only be supplied in one of these.',
       ]);
   });
   it('should accept values from config', () => {

@@ -32,7 +32,6 @@ describe('generateTypes', () => {
               'scalar S',
             {
               S: {
-                name: 'S',
                 serialize: t => t,
               },
             },
@@ -56,7 +55,6 @@ describe('generateTypes', () => {
               scalar S`,
             {
               S: {
-                name: 'S',
                 serialize: _ => 1,
                 parseValue: _ => 1,
                 parseLiteral: _ => 1,
@@ -82,7 +80,7 @@ describe('generateTypes', () => {
     );
     expect(generateTypes(g).errors.map(error => error.message))
       .toEqual([
-        'Scalar type S missing required configs in module foo.',
+        'Scalar S missing required configs in module foo.',
       ]);
   });
   it('should throw if missing serialize', () => {
@@ -96,7 +94,29 @@ describe('generateTypes', () => {
     );
     expect(generateTypes(g).errors.map(error => error.message))
       .toEqual([
-        'Scalar type S missing required config parameter serialize in module foo.',
+        'Scalar S missing required config parameter serialize in module foo.',
+      ]);
+  });
+  it('should throw when given description in both schema and config ', () => {
+    const g = FlattenedTypeGraph.from(
+      new ModuleRepository()
+        .withModule(
+          new Module('foo')
+            .withSchema(
+              `# a scalar
+              scalar S`,
+            {
+              S: {
+                description: 'a scalar',
+                serialize: t => t,
+              },
+            },
+            )
+        )
+    );
+    expect(generateTypes(g).errors.map(error => error.message))
+      .toEqual([
+        'Description for scalar S supplied in both schema and config in module foo. It must only be supplied in one of these.',
       ]);
   });
 });

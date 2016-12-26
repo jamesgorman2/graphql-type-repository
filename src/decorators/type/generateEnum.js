@@ -57,7 +57,7 @@ function getValues(
         descriptionFromConfig,
         () =>
           new ConfigurationError(
-            `Description for enum value ${enumName}.${name} supplied in schema and config in module ${module.name}. It must only be supplied in one of these.`
+            `Description for enum value ${enumName}.${name} supplied in both schema and config in module ${module.name}. It must only be supplied in one of these.`
           )
       )
         .forEach((description) => { config.description = description; });
@@ -69,7 +69,7 @@ function getValues(
         deprecationReasonFromConfig,
         () =>
           new ConfigurationError(
-            `Deprecation for enum value ${enumName}.${name} supplied in schema and config in module ${module.name}. It must only be supplied in one of these.`
+            `Deprecation for enum value ${enumName}.${name} supplied in both schema and config in module ${module.name}. It must only be supplied in one of these.`
           )
       )
         .forEach((deprecationReason) => { config.deprecationReason = deprecationReason; });
@@ -96,14 +96,14 @@ function generateEnumFromNamedDefinition(
     name: namedDefinition.name,
     values: getValues(definition.values, configIn, namedDefinition.name, module),
   };
+
   const descriptionFromSchema = getDescription(namedDefinition.definition);
   const descriptionFromConfig = configIn.flatMap(c => someOrNone(c.description));
-
   descriptionFromSchema.xor(
     descriptionFromConfig,
     () =>
       new ConfigurationError(
-        `Description for enum ${namedDefinition.name} supplied in schema and config in module ${module.name}. It must only be supplied in one of these.`
+        `Description for enum ${namedDefinition.name} supplied in both schema and config in module ${module.name}. It must only be supplied in one of these.`
       )
   )
     .forEach((d) => { config.description = d; });

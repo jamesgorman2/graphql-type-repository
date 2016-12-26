@@ -16,6 +16,7 @@ export class Option<T> {
   or: (other: Thunk<Option<T>>) => Option<T>;
   orSome: (other: Thunk<T>) => Option<T>;
   xor: (other: Thunk<Option<T>>, error: ?() => Error) => Option<T>;
+  ifNone: (f: () => void) => void;
 }
 
 export class None<T> extends Option<T> {
@@ -56,6 +57,9 @@ export class None<T> extends Option<T> {
 
   xor: (other: Thunk<Option<T>>, error: ?() => Error) => Option<T> =
     (other, _) => resolveThunk(other);
+
+  ifNone: (f: () => void) => void =
+    f => f();
 }
 
 export class Some<T> extends Option<T> {
@@ -112,6 +116,9 @@ export class Some<T> extends Option<T> {
       }
       return this;
     };
+
+  ifNone: (f: () => void) => void =
+    (_) => {};
 }
 
 export const none: Option<any> = new None();  // eslint-disable-line no-use-before-define

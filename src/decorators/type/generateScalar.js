@@ -9,11 +9,9 @@ import type {
   GraphQLScalarTypeConfig,
 } from 'graphql';
 
-import { getDescription } from 'graphql/utilities/buildASTSchema';
-
 import {
   Option,
-  hasOwnProperty,
+  someOrNone,
   none,
 } from '../../util';
 
@@ -22,37 +20,59 @@ import {
   NamedDefinitionNode,
 } from '../../config';
 
+import type {
+  ScalarConfig,
+} from '../../config';
+
 import {
   Type,
 } from '../../graph';
 
+import { getDescription } from './getDescription';
 import { ConfigurationError } from './ConfigurationError';
 
 function generateScalarFromNamedDefinition(
   namedDefinition: NamedDefinitionNode<*>,
   module: Module
 ): GraphQLScalarType {
-  if (namedDefinition.config.isNone()) {
+  namedDefinition.config.ifNone(
+    () => {
+      throw new ConfigurationError(
+        `Scalar ${namedDefinition.name} missing required configs in module ${module.name}.`
+      );
+    }
+  );
+  const configIn: ScalarConfig<*, *> = (namedDefinition.config.get(): any);
+
+  if (!configIn.serialize) {
     throw new ConfigurationError(
-      `Scalar type ${namedDefinition.name} missing required configs in module ${module.name}.`
-    );
-  }
-  if (!namedDefinition.config.get().serialize) {
-    throw new ConfigurationError(
-      `Scalar type ${namedDefinition.name} missing required config parameter serialize in module ${module.name}.`
+      `Scalar ${namedDefinition.name} missing required config parameter serialize in module ${module.name}.`
     );
   }
 
   const config: GraphQLScalarTypeConfig<*, *> = {
     name: namedDefinition.name,
-    ...namedDefinition.config.get(),
+    serialize: configIn.serialize,
   };
-  if (!hasOwnProperty(config, 'description')) {
-    const description = getDescription(namedDefinition.definition);
-    if (description) {
-      config.description = description;
-    }
+
+  if (configIn.parseValue) {
+    config.parseValue = configIn.parseValue;
   }
+  if (configIn.parseLiteral) {
+    config.parseLiteral = configIn.parseLiteral;
+  }
+
+  const descriptionFromSchema = getDescription(namedDefinition.definition);
+  const descriptionFromConfig = someOrNone(configIn.description);
+  descriptionFromSchema.xor(
+    descriptionFromConfig,
+    () =>
+      new ConfigurationError(
+        `Description for scalar ${namedDefinition.name} supplied in both schema and config in module ${module.name}. It must only be supplied in one of these.`
+      )
+  )
+    .forEach((d) => { config.description = d; });
+
   return new GraphQLScalarType(config);
 }
 

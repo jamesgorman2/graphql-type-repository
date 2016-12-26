@@ -80,6 +80,13 @@ describe('option', () => {
           .toThrow(/Error/);
       });
     });
+    describe('ifNone', () => {
+      it('should do nothing', () => {
+        let i = 0;
+        some(1).ifNone(() => { i = 1; });
+        expect(i).toEqual(0);
+      });
+    });
   });
   describe('none', () => {
     describe('isSome', () => {
@@ -159,6 +166,13 @@ describe('option', () => {
     });
     it('should throw if error supplied and other is some', () => {
       expect(none.xor(none, () => new Error('Error'))).toBe(none);
+    });
+  });
+  describe('ifNone', () => {
+    it('should execute callback', () => {
+      let i = 0;
+      none.ifNone(() => { i = 1; });
+      expect(i).toEqual(1);
     });
   });
 });
