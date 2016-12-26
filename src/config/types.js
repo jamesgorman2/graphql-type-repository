@@ -30,6 +30,7 @@ export type InterfaceConfig = {
 };
 
 export type UnionConfig = {
+  description?: string;
   resolveType?: GraphQLTypeResolver<*, *>;
 };
 

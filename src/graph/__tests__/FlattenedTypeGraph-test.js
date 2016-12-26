@@ -64,17 +64,15 @@ describe('FlattenedTypeGraph', () => {
         },
       });
       const m = new Module('foo').withType(t);
-      expect(stringify(extractTypes(m)))
+      expect(stringify(extractTypes(m).types))
         .toEqual(
           stringify(
-            new FlattenedTypeGraph(
-              new AppendableMap()
-                .put(
-                  'Test',
-                  new Type('Test').withDefinition(new TypeDefinition(m).withType(t)),
-                ),
-            ),
-          ),
+            new AppendableMap()
+              .put(
+                'Test',
+                new Type('Test').withDefinition(new TypeDefinition(m).withType(t)),
+              )
+          )
         );
     });
   });
@@ -83,24 +81,22 @@ describe('FlattenedTypeGraph', () => {
     it('should get type and refs', () => {
       const t: any = parse('type Test {id: ID}').definitions[0];
       const m = new Module('foo').withSchema('type Test {id: ID}');
-      expect(stringify(extractTypeDefinitions(m)))
+      expect(stringify(extractTypeDefinitions(m).types))
         .toEqual(
           stringify(
-            new FlattenedTypeGraph(
-              new AppendableMap()
-                .put(
-                  'Test',
-                  new Type('Test')
-                    .withDefinition(
-                      new TypeDefinition(m).withDefinition(
-                        new NamedDefinitionNode('Test', t),
-                      ),
-                    )
-                    .withTypeRef('ID', m),
-                )
-                .put('ID', new Type('ID')),
-            ),
-          ),
+            new AppendableMap()
+              .put(
+                'Test',
+                new Type('Test')
+                  .withDefinition(
+                    new TypeDefinition(m).withDefinition(
+                      new NamedDefinitionNode('Test', t),
+                    ),
+                  )
+                  .withTypeRef('ID', m)
+              )
+              .put('ID', new Type('ID'))
+          )
         );
     });
     it('should extract schema types to schema', () => {
@@ -123,22 +119,20 @@ describe('FlattenedTypeGraph', () => {
     it('should get type and refs', () => {
       const t: ObjectTypeDefinitionNode = (parse('extend type Test {id: ID}').definitions[0] : any).definition;
       const m = new Module('foo').withSchema('extend type Test {id: ID}');
-      expect(stringify(extractTypeExtensions(m)))
+      expect(stringify(extractTypeExtensions(m).types))
         .toEqual(
           stringify(
-            new FlattenedTypeGraph(
-              new AppendableMap()
-                .put(
-                  'Test',
-                  new Type('Test')
-                    .withExtension(
-                      new ExtensionDefinition(m, new NamedDefinitionNode('Test', t)),
-                    )
-                    .withTypeRef('ID', m),
-                )
-                .put('ID', new Type('ID')),
-            ),
-          ),
+            new AppendableMap()
+              .put(
+                'Test',
+                new Type('Test')
+                  .withExtension(
+                    new ExtensionDefinition(m, new NamedDefinitionNode('Test', t)),
+                  )
+                  .withTypeRef('ID', m),
+              )
+              .put('ID', new Type('ID'))
+          )
         );
     });
     it('should extract schema type extensions to schema', () => {

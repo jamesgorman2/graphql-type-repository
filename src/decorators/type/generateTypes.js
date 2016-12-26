@@ -8,12 +8,11 @@ import {
   Module,
   NamedDefinitionNode,
 } from '../../config';
-
 import {
   FlattenedTypeGraph,
   Type,
+  TypeMap,
 } from '../../graph';
-
 import {
   Option,
   none,
@@ -23,7 +22,12 @@ import { generateEnum } from './generateEnum';
 import { generateScalar } from './generateScalar';
 import { generateUnion } from './generateUnion';
 
-type Builder = (namedDefinition: NamedDefinitionNode<*>, module: Module) => GraphQLNamedType;
+type Builder =
+  (
+    namedDefinition: NamedDefinitionNode<*>,
+    typeMap: TypeMap,
+    module: Module
+  ) => GraphQLNamedType;
 
 const builders: [string, Builder][] = [
   generateEnum,
@@ -33,6 +37,7 @@ const builders: [string, Builder][] = [
 
 function buildTypeFromBuilder(
   type: Type,
+  typeMap: TypeMap,
   kind: string,
   builder: Builder
 ): Option<GraphQLNamedType> {
@@ -42,16 +47,16 @@ function buildTypeFromBuilder(
         () =>
           typeDefinition.definition
             .filter(namedDefinition => namedDefinition.definition.kind === kind)
-            .map(d => builder(d, typeDefinition.module))
+            .map(d => builder(d, typeMap, typeDefinition.module))
       ),
     none
   );
 }
 
-function buildType(type: Type): Option<GraphQLNamedType> {
+function buildType(type: Type, typeMap: TypeMap): Option<GraphQLNamedType> {
   return builders.reduce(
     (acc, [kind, builder]) =>
-      acc.or(() => buildTypeFromBuilder(type, kind, builder)),
+      acc.or(() => buildTypeFromBuilder(type, typeMap, kind, builder)),
     none
   );
 }
@@ -63,8 +68,8 @@ function getRawType(type: Type): Option<GraphQLNamedType> {
   );
 }
 
-function generateType(type: Type): Type {
-  return getRawType(type).or(() => buildType(type))
+function generateType(type: Type, typeMap: TypeMap): Type {
+  return getRawType(type).or(() => buildType(type, typeMap))
     .map(namedType => type.withType(namedType))
     .getOrElse(type);
 }
@@ -81,14 +86,16 @@ function captureError(
 }
 
 export function generateTypes(graphIn: FlattenedTypeGraph): FlattenedTypeGraph {
+  const typeMap = new TypeMap();
   return captureError(
     () =>
       graphIn.types.values()
         .filter(type => type.type.isNone())
         .reduce(
-          (graph, type) => graph.replaceType(generateType(type)),
+          (graph, type) => graph.replaceType(generateType(type, typeMap)),
           graphIn
-        ),
+        )
+        .withTypeMap(typeMap),
     graphIn
   );
 }

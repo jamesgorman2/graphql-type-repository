@@ -12,26 +12,26 @@ import type {
 import {
   someOrNone,
 } from '../../util';
-
 import {
   Module,
   NamedDefinitionNode,
 } from '../../config';
-
 import type {
   ScalarConfig,
 } from '../../config';
+import { TypeMap } from '../../graph';
 
 import { getDescription } from './getDescription';
-import { TypeError } from './TypeError';
+import { GraphQLTypeError } from './GraphQLTypeError';
 
 export function generateScalarFromNamedDefinition(
   namedDefinition: NamedDefinitionNode<*>,
+  typeMap: TypeMap,
   module: Module
 ): GraphQLNamedType {
   namedDefinition.config.ifNone(
     () => {
-      throw new TypeError(
+      throw new GraphQLTypeError(
         `Scalar ${namedDefinition.name} missing required configs in module ${module.name}.`
       );
     }
@@ -39,7 +39,7 @@ export function generateScalarFromNamedDefinition(
   const configIn: ScalarConfig<*, *> = (namedDefinition.config.get(): any);
 
   if (!configIn.serialize) {
-    throw new TypeError(
+    throw new GraphQLTypeError(
       `Scalar ${namedDefinition.name} missing required config parameter serialize in module ${module.name}.`
     );
   }
@@ -56,14 +56,12 @@ export function generateScalarFromNamedDefinition(
     config.parseLiteral = configIn.parseLiteral;
   }
 
-  const descriptionFromSchema = getDescription(namedDefinition.definition);
-  const descriptionFromConfig = someOrNone(configIn.description);
-  descriptionFromSchema.xor(
-    descriptionFromConfig,
-    () =>
-      new TypeError(
-        `Description for scalar ${namedDefinition.name} supplied in both schema and config in module ${module.name}. It must only be supplied in one of these.`
-      )
+  getDescription(
+    namedDefinition.definition,
+    someOrNone(configIn.description),
+    'scalar',
+    namedDefinition.name,
+    module.name
   )
     .forEach((d) => { config.description = d; });
 

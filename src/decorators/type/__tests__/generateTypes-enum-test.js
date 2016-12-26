@@ -39,7 +39,7 @@ describe('generateTypes', () => {
         C: { },
       },
     });
-    expect(generateTypes(g).types.get('E').get().type.get())
+    expect(generateTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should use description for enum from schema', () => {
@@ -62,7 +62,7 @@ describe('generateTypes', () => {
         A: { },
       },
     });
-    expect(generateTypes(g).types.get('E').get().type.get())
+    expect(generateTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should use description for enum from config', () => {
@@ -89,7 +89,7 @@ describe('generateTypes', () => {
         A: { },
       },
     });
-    expect(generateTypes(g).types.get('E').get().type.get())
+    expect(generateTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should error when description for enum supplied in both schema and config', () => {
@@ -112,7 +112,7 @@ describe('generateTypes', () => {
     );
     expect(generateTypes(g).errors.map(error => error.message))
       .toEqual([
-        'Description for enum E supplied in both schema and config in module foo. It must only be supplied in one of these.',
+        'Description for enum E supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
       ]);
   });
   it('should use description for value from schema', () => {
@@ -136,7 +136,7 @@ describe('generateTypes', () => {
         },
       },
     });
-    expect(generateTypes(g).types.get('E').get().type.get())
+    expect(generateTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should use description for value from config', () => {
@@ -168,7 +168,7 @@ describe('generateTypes', () => {
         },
       },
     });
-    expect(generateTypes(g).types.get('E').get().type.get())
+    expect(generateTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should error when description for value supplied in both schema and config', () => {
@@ -195,7 +195,7 @@ describe('generateTypes', () => {
     );
     expect(generateTypes(g).errors.map(error => error.message))
       .toEqual([
-        'Description for enum value E.A supplied in both schema and config in module foo. It must only be supplied in one of these.',
+        'Description for enum value E.A supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
       ]);
   });
   it('should use bare deprecated directive with default description', () => {
@@ -218,7 +218,7 @@ describe('generateTypes', () => {
         },
       },
     });
-    expect(generateTypes(g).types.get('E').get().type.get())
+    expect(generateTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should use reason from deprecated directive', () => {
@@ -241,7 +241,7 @@ describe('generateTypes', () => {
         },
       },
     });
-    expect(generateTypes(g).types.get('E').get().type.get())
+    expect(generateTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should use deprecationReason from config', () => {
@@ -273,7 +273,7 @@ describe('generateTypes', () => {
         },
       },
     });
-    expect(generateTypes(g).types.get('E').get().type.get())
+    expect(generateTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should throw when given deprecated directive and deprecationReason', () => {
@@ -299,7 +299,7 @@ describe('generateTypes', () => {
     );
     expect(generateTypes(g).errors.map(error => error.message))
       .toEqual([
-        'Deprecation for enum value E.A supplied in both schema and config in module foo. It must only be supplied in one of these.',
+        'Deprecation for enum value E.A supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
       ]);
   });
   it('should accept values from config', () => {
@@ -349,7 +349,7 @@ describe('generateTypes', () => {
         },
       },
     });
-    expect(generateTypes(g).types.get('E').get().type.get())
+    expect(generateTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
 });

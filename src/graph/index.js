@@ -15,3 +15,5 @@ export { SchemaDefinition } from './SchemaDefinition';
 export { Type } from './Type';
 
 export { TypeDefinition } from './TypeDefinition';
+
+export { TypeMap } from './TypeMap';

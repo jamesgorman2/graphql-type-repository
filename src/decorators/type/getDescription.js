@@ -9,6 +9,17 @@ import {
   someOrNone,
 } from '../../util';
 
-export function getDescription(node: ASTNode): Option<string> {
-  return someOrNone(gqlGetdescription(node));
+import { configConflictError } from './configConflictError';
+
+export function getDescription(
+  node: ASTNode,
+  descriptionFromConfig: Option<string>,
+  type: string,
+  name: string,
+  module: string
+): Option<string> {
+  return someOrNone(gqlGetdescription(node)).xor(
+    descriptionFromConfig,
+    configConflictError('description', type, name, module)
+  );
 }

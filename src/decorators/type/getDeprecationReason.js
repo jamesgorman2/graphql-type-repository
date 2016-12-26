@@ -17,6 +17,8 @@ import {
   none,
 } from '../../util';
 
+import { configConflictError } from './configConflictError';
+
 function valueAsString(value: ValueNode): string {
   return value.value && typeof value.value === 'string' ?
     value.value : '';
@@ -35,7 +37,13 @@ function getReason(directive: DirectiveNode): Option<string> {
     );
 }
 
-export function getDeprecationReason(directives: Option<DirectiveNode[]>): Option<string> {
+export function getDeprecationReason(
+  directives: Option<DirectiveNode[]>,
+  deprecationReasonFromConfig: Option<string>,
+  type: string,
+  name: string,
+  module: string
+): Option<string> {
   return directives
     .flatMap(
       ds =>
@@ -45,5 +53,9 @@ export function getDeprecationReason(directives: Option<DirectiveNode[]>): Optio
               acc.or(() => getReason(directive).orSome(DEFAULT_DEPRECATION_REASON)),
             none
           )
+    )
+    .xor(
+      deprecationReasonFromConfig,
+      configConflictError('deprecation', type, name, module)
     );
 }

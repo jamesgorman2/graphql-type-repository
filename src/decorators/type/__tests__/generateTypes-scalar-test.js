@@ -42,7 +42,7 @@ describe('generateTypes', () => {
       name: 'S',
       serialize: s => s,
     });
-    expect(stringify(generateTypes(g).types.get('S').get().type.get()))
+    expect(stringify(generateTypes(g).typeMap.getType('S')))
       .toEqual(stringify(t));
   });
   it('should create complete scalar', () => {
@@ -70,7 +70,7 @@ describe('generateTypes', () => {
       parseValue: _ => 1,
       parseLiteral: _ => 1,
     });
-    expect(stringify(generateTypes(g).types.get('S').get().type.get()))
+    expect(stringify(generateTypes(g).typeMap.getType('S')))
       .toEqual(stringify(t));
   });
   it('should throw if missing configs', () => {
@@ -116,7 +116,7 @@ describe('generateTypes', () => {
     );
     expect(generateTypes(g).errors.map(error => error.message))
       .toEqual([
-        'Description for scalar S supplied in both schema and config in module foo. It must only be supplied in one of these.',
+        'Description for scalar S supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
       ]);
   });
 });

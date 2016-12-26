@@ -28,6 +28,7 @@ import { SchemaDefinition } from './SchemaDefinition';
 import { Type } from './Type';
 import { Schema } from './Schema';
 import { Directive } from './Directive';
+import { TypeMap } from './TypeMap';
 
 // eslint-disable-next-line no-use-before-define
 export function extractType(module: Module, type: GraphQLNamedType): Type {
@@ -239,6 +240,7 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
   schema: Schema;
   errors: Error[];
   moduleRepositories: ModuleRepository[];
+  typeMap: TypeMap;
 
   static from(moduleRepository: ModuleRepository): FlattenedTypeGraph {
     return fromModuleRepository(moduleRepository);
@@ -249,7 +251,8 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
     directives: AppendableMap<Directive> = new AppendableMap(),
     schema: Schema = new Schema(),
     errors: Error[] = [],
-    moduleRepositories: ModuleRepository[] = []
+    moduleRepositories: ModuleRepository[] = [],
+    typeMap: TypeMap = new TypeMap()
   ): void {
     super();
     this.types = types;
@@ -257,6 +260,9 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
     this.schema = schema;
     this.errors = errors;
     this.moduleRepositories = moduleRepositories;
+    this.typeMap = typeMap;
+
+    this.typeMap.graph = this;
   }
 
   append: (other: FlattenedTypeGraph) => FlattenedTypeGraph =
@@ -329,7 +335,8 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
         this.directives,
         this.schema,
         [...this.errors, error],
-        this.moduleRepositories
+        this.moduleRepositories,
+        this.typeMap
       );
 
   withErrors: (errors: Error[]) => FlattenedTypeGraph =
@@ -340,8 +347,20 @@ export class FlattenedTypeGraph extends Appendable<FlattenedTypeGraph> {
           this.directives,
           this.schema,
           [...this.errors, ...errors],
-          this.moduleRepositories
+          this.moduleRepositories,
+          this.typeMap
         ) :
         this
     );
+
+  withTypeMap: (typeMap: TypeMap) => FlattenedTypeGraph =
+    typeMap =>
+      new FlattenedTypeGraph(
+        this.types,
+        this.directives,
+        this.schema,
+        this.errors,
+        this.moduleRepositories,
+        typeMap
+      );
 }
