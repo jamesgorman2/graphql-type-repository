@@ -7,10 +7,16 @@ import {
   Type,
  } from '../../graph';
 
-import { Option } from '../../util';
+import {
+  Option,
+} from '../../util';
 
-import { AssertionError } from './AssertionError';
-import { inModules } from './errorInModules';
+import {
+  AssertionError,
+} from './AssertionError';
+import {
+  inModules,
+} from './errorInModules';
 
 function notDefined(type: Type): boolean {
   return type.type.isNone() && type.definitions.length === 0;

@@ -1,9 +1,15 @@
 // @flow
 
-import { AssertionError } from './AssertionError';
-import { errorInModules } from './errorInModules';
+import {
+  FlattenedTypeGraph,
+} from '../../graph';
 
-import { FlattenedTypeGraph } from '../../graph';
+import {
+  AssertionError,
+} from './AssertionError';
+import {
+  errorInModules,
+} from './errorInModules';
 
 export function assertNoDuplicateTypes(graphIn: FlattenedTypeGraph): FlattenedTypeGraph {
   return graphIn.types.values()

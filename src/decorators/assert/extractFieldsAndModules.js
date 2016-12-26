@@ -5,16 +5,18 @@ import type {
 } from 'graphql';
 
 import {
-  flatMap,
-  hasOwnProperty,
-  someOrNone,
-} from '../../util';
-
-import { Module } from '../../config';
+  Module,
+} from '../../config';
 
 import {
   Type,
 } from '../../graph';
+
+import {
+  flatMap,
+  hasOwnProperty,
+  someOrNone,
+} from '../../util';
 
 export function extractFieldsAndModules(type: Type): { [fieldName: string]: Module[] } {
   return flatMap(

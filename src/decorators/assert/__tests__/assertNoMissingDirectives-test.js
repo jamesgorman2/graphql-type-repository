@@ -6,10 +6,17 @@ import {
   ModuleRepository,
 } from '../../../config';
 
-import { FlattenedTypeGraph } from '../../../graph';
+import {
+  FlattenedTypeGraph,
+} from '../../../graph';
 
-import { assertNoMissingDirectives } from '../assertNoMissingDirectives';
-import { appendSystemDirectives } from '../../system/appendSystemDirectives';
+import {
+  appendSystemDirectives,
+} from '../../system/appendSystemDirectives';
+
+import {
+  assertNoMissingDirectives,
+} from '../assertNoMissingDirectives';
 
 describe('assertNoMissingDirectives', () => {
   it('should do nothing when no missing directives', () => {

@@ -6,14 +6,18 @@ import {
   GraphQLID,
 } from 'graphql';
 
-import { FlattenedTypeGraph } from '../../../graph';
-
 import {
   Module,
   ModuleRepository,
 } from '../../../config';
 
-import { appendSystemTypes } from '../appendSystemTypes';
+import {
+  FlattenedTypeGraph,
+} from '../../../graph';
+
+import {
+  appendSystemTypes,
+} from '../appendSystemTypes';
 
 describe('appendSystemTypes', () => {
   it('should append type', () => {

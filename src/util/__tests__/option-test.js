@@ -2,9 +2,9 @@
 /* eslint-env jest */
 
 import {
+  none,
   some,
   someOrNone,
-  none,
 } from '../option';
 
 describe('option', () => {

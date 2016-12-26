@@ -6,10 +6,17 @@ import {
   ModuleRepository,
 } from '../../../config';
 
-import { FlattenedTypeGraph } from '../../../graph';
+import {
+  FlattenedTypeGraph,
+} from '../../../graph';
 
-import { assertNoMissingTypes } from '../assertNoMissingTypes';
-import { appendSystemTypes } from '../../system/appendSystemTypes';
+import {
+  appendSystemTypes,
+} from '../../system/appendSystemTypes';
+
+import {
+  assertNoMissingTypes,
+} from '../assertNoMissingTypes';
 
 describe('assertNoMissingTypes', () => {
   it('should do nothing when no missing types', () => {

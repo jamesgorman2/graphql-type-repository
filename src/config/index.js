@@ -1,10 +1,16 @@
 // @flow
 
-export { Module } from './Module';
+export {
+  Module,
+} from './Module';
 
-export { NamedDefinitionNode } from './NamedDefinitionNode';
+export {
+  ModuleRepository,
+} from './ModuleRepository';
 
-export { ModuleRepository } from './ModuleRepository';
+export {
+  NamedDefinitionNode,
+} from './NamedDefinitionNode';
 
 export type {
   EnumConfig,

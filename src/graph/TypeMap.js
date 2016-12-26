@@ -7,13 +7,18 @@ import type {
   GraphQLNamedType,
 } from 'graphql';
 
-import { Module } from '../config';
+import {
+  Module,
+} from '../config';
+
 import {
   Option,
   someOrNone,
 } from '../util';
 
-import { FlattenedTypeGraph } from './FlattenedTypeGraph';
+import {
+  FlattenedTypeGraph,
+} from './FlattenedTypeGraph';
 
 function getErrorReferrence(referringTypeName: Option<string>, module: Option<Module>): string {
   return referringTypeName

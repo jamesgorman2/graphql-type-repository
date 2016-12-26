@@ -1,9 +1,7 @@
 // @flow
 /* eslint-env jest */
 
-import {
-  GraphQLScalarType,
-} from 'graphql';
+import { GraphQLScalarType } from 'graphql';
 
 import stringify from 'json-stable-stringify';
 
@@ -11,14 +9,9 @@ import {
   Module,
   ModuleRepository,
 } from '../../../config';
+import type { ScalarConfig } from '../../../config';
 
-import type {
-  ScalarConfig,
-} from '../../../config';
-
-import {
-  FlattenedTypeGraph,
-} from '../../../graph';
+import { FlattenedTypeGraph } from '../../../graph';
 
 import { generateTypes } from '../generateTypes';
 

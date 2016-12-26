@@ -1,15 +1,21 @@
 // @flow
 /* eslint-env jest */
 
-import { FlattenedTypeGraph } from '../../../graph';
-
 import {
   Module,
   ModuleRepository,
 } from '../../../config';
 
-import { assertNoModuleErrors } from '../assertNoModuleErrors';
-import { NestedAssertionError } from '../NestedAssertionError';
+import {
+  FlattenedTypeGraph,
+} from '../../../graph';
+
+import {
+  NestedAssertionError,
+} from '../NestedAssertionError';
+import {
+  assertNoModuleErrors,
+} from '../assertNoModuleErrors';
 
 describe('assertNoModuleErrors', () => {
   it('should do nothing when no module errors', () => {

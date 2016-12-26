@@ -4,6 +4,16 @@ import type {
   ObjectTypeDefinitionNode,
 } from 'graphql';
 
+import type {
+  Module,
+  NamedDefinitionNode,
+} from '../../config';
+
+import {
+  FlattenedTypeGraph,
+  Type,
+} from '../../graph';
+
 import {
   Option,
   flatMap,
@@ -11,16 +21,8 @@ import {
 } from '../../util';
 
 import {
-  FlattenedTypeGraph,
-  Type,
-} from '../../graph';
-
-import type {
-  Module,
-  NamedDefinitionNode,
-} from '../../config';
-
-import { AssertionError } from './AssertionError';
+  AssertionError,
+} from './AssertionError';
 
 function assertMissingResolversForDefinition(
   definition: NamedDefinitionNode<any>,

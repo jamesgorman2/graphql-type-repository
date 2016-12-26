@@ -1,8 +1,13 @@
 // @flow
 /* eslint-env jest */
 
-import { Module } from '../../../config';
-import { errorInModules } from '../errorInModules';
+import {
+  Module,
+} from '../../../config';
+
+import {
+  errorInModules,
+} from '../errorInModules';
 
 describe('errorInModules', () => {
   it('should render single module error', () => {

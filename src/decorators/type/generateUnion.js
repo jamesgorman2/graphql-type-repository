@@ -12,17 +12,17 @@ import type {
 } from 'graphql';
 
 import {
-  Option,
-  someOrNone,
-} from '../../util';
-import {
   Module,
   NamedDefinitionNode,
 } from '../../config';
-import type {
-  UnionConfig,
-} from '../../config';
+
 import { TypeMap } from '../../graph';
+import type { UnionConfig } from '../../config';
+
+import {
+  Option,
+  someOrNone,
+} from '../../util';
 
 import { getDescription } from './getDescription';
 

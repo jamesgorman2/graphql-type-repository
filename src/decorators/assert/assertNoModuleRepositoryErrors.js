@@ -1,6 +1,8 @@
 // @flow
 
-import { FlattenedTypeGraph } from '../../graph';
+import {
+  FlattenedTypeGraph,
+} from '../../graph';
 
 export function assertNoModuleRepositoryErrors(graphIn: FlattenedTypeGraph): FlattenedTypeGraph {
   return graphIn.moduleRepositories

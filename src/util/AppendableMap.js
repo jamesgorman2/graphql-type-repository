@@ -2,13 +2,14 @@
 
 import { hasOwnProperty } from './hasOwnProperty';
 
+
+// eslint-disable-next-line no-unused-vars
+import type { Appendable } from './Appendable';
+
 import {
   Option,
   someOrNone,
 } from './option';
-
-// eslint-disable-next-line no-unused-vars
-import type { Appendable } from './Appendable';
 
 export class AppendableMap<T: Appendable<any>> {
   data: {

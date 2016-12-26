@@ -1,28 +1,23 @@
 // @flow
 
-import {
-  GraphQLScalarType,
-} from 'graphql';
-
+import { GraphQLScalarType } from 'graphql';
 import type {
   GraphQLNamedType,
   GraphQLScalarTypeConfig,
 } from 'graphql';
 
 import {
-  someOrNone,
-} from '../../util';
-import {
   Module,
   NamedDefinitionNode,
 } from '../../config';
-import type {
-  ScalarConfig,
-} from '../../config';
+import type { ScalarConfig } from '../../config';
+
 import { TypeMap } from '../../graph';
 
-import { getDescription } from './getDescription';
+import { someOrNone } from '../../util';
+
 import { GraphQLTypeError } from './GraphQLTypeError';
+import { getDescription } from './getDescription';
 
 export function generateScalarFromNamedDefinition(
   namedDefinition: NamedDefinitionNode<*>,

@@ -8,8 +8,6 @@ import {
   GraphQLObjectType,
   parse,
 } from 'graphql';
-
-// eslint-disable-next-line no-duplicate-imports
 import type {
   ObjectTypeDefinitionNode,
 } from 'graphql';
@@ -17,14 +15,20 @@ import type {
 import stringify from 'json-stable-stringify';
 
 import {
-  AppendableList,
-  AppendableMap,
-} from '../../util';
-
-import {
   Module,
   NamedDefinitionNode,
 } from '../../config';
+
+import {
+  AppendableList,
+  AppendableMap,
+} from '../../util';
+import {
+  DirectiveDefinition,
+} from '../DirectiveDefinition';
+import {
+  ExtensionDefinition,
+} from '../ExtensionDefinition';
 
 import {
   FlattenedTypeGraph,
@@ -35,12 +39,15 @@ import {
   extractTypeExtensions,
   extractTypes,
 } from '../FlattenedTypeGraph';
-
-import { DirectiveDefinition } from '../DirectiveDefinition';
-import { ExtensionDefinition } from '../ExtensionDefinition';
-import { SchemaDefinition } from '../SchemaDefinition';
-import { Type } from '../Type';
-import { TypeDefinition } from '../TypeDefinition';
+import {
+  SchemaDefinition,
+} from '../SchemaDefinition';
+import {
+  Type,
+} from '../Type';
+import {
+  TypeDefinition,
+} from '../TypeDefinition';
 
 describe('FlattenedTypeGraph', () => {
   describe('append', () => {

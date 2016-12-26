@@ -4,8 +4,13 @@ import {
   FlattenedTypeGraph,
 } from '../../graph';
 
-import { errorInModules } from './errorInModules';
-import { AssertionError } from './AssertionError';
+import {
+  AssertionError,
+} from './AssertionError';
+import {
+  errorInModules,
+} from './errorInModules';
+
 /**
  * Assert that no Directives flagged as system directives also
  * have user definitions. This include both raw and

@@ -5,14 +5,18 @@ import {
   GraphQLDeprecatedDirective,
 } from 'graphql';
 
-import { FlattenedTypeGraph } from '../../../graph';
-
 import {
   Module,
   ModuleRepository,
 } from '../../../config';
 
-import { appendSystemDirectives } from '../appendSystemDirectives';
+import {
+  FlattenedTypeGraph,
+} from '../../../graph';
+
+import {
+  appendSystemDirectives,
+} from '../appendSystemDirectives';
 
 describe('appendSystemDirectives', () => {
   it('should append type', () => {

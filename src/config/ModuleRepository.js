@@ -1,11 +1,13 @@
 // @flow
 
-import { Module } from './Module';
-
 import {
   Appendable,
   assert,
 } from '../util';
+
+import {
+  Module,
+} from './Module';
 
 function isNewModule(module: Module, existingModules: Module[]): boolean {
   return !existingModules.find(m => m.name === module.name);

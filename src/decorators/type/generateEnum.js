@@ -1,30 +1,28 @@
 // @flow
-import {
-  GraphQLEnumType,
-} from 'graphql';
+import { GraphQLEnumType } from 'graphql';
 import type {
-  EnumValueDefinitionNode,
   EnumTypeDefinitionNode,
-  GraphQLNamedType,
+  EnumValueDefinitionNode,
   GraphQLEnumTypeConfig,
   GraphQLEnumValueConfigMap,
+  GraphQLNamedType,
 } from 'graphql';
+
+import {
+  Module,
+  NamedDefinitionNode,
+} from '../../config';
+import type { EnumConfig } from '../../config';
+
+import { TypeMap } from '../../graph';
 
 import {
   Option,
   someOrNone,
 } from '../../util';
-import {
-  Module,
-  NamedDefinitionNode,
-} from '../../config';
-import type {
-  EnumConfig,
-} from '../../config';
-import { TypeMap } from '../../graph';
 
-import { getDescription } from './getDescription';
 import { getDeprecationReason } from './getDeprecationReason';
+import { getDescription } from './getDescription';
 
 function getValues(
   values: EnumValueDefinitionNode[],

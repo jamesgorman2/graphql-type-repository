@@ -10,8 +10,6 @@ import {
   GraphQLObjectType,
   parse,
 } from 'graphql';
-
-// eslint-disable-next-line no-duplicate-imports
 import type {
   DefinitionNode,
   DocumentNode,
@@ -19,7 +17,9 @@ import type {
   SchemaDefinitionNode,
 } from 'graphql';
 
-import { Module } from '../Module';
+import {
+  Module,
+} from '../Module';
 
 describe('module', () => {
   describe('constructor', () => {

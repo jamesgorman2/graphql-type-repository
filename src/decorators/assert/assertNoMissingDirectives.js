@@ -7,10 +7,16 @@ import {
   Type,
  } from '../../graph';
 
-import { Option } from '../../util';
+import {
+  Option,
+} from '../../util';
 
-import { AssertionError } from './AssertionError';
-import { inModules } from './errorInModules';
+import {
+  AssertionError,
+} from './AssertionError';
+import {
+  inModules,
+} from './errorInModules';
 
 function notDefined(directive: Directive): boolean {
   return directive.directive.isNone() && directive.definitions.length === 0;

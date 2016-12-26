@@ -1,6 +1,10 @@
 // @flow
 
 import {
+  Module,
+} from '../config';
+
+import {
   Appendable,
   AppendableList,
   AppendableMap,
@@ -9,11 +13,12 @@ import {
   none,
 } from '../util';
 
-import { Module } from '../config';
-
-import { SchemaDefinition } from './SchemaDefinition';
-
-import { Type } from './Type';
+import {
+  SchemaDefinition,
+} from './SchemaDefinition';
+import {
+  Type,
+} from './Type';
 
 function maybeAppendTypes(o1: Option<Type>, o2: Option<Type>): Option<Type> {
   return o1

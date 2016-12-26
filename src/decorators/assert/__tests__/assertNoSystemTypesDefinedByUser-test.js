@@ -1,7 +1,14 @@
 // @flow
 /* eslint-env jest */
 
-import { parse } from 'graphql';
+import {
+  parse,
+} from 'graphql';
+
+import {
+  Module,
+  NamedDefinitionNode,
+} from '../../../config';
 
 import {
   ExtensionDefinition,
@@ -11,11 +18,8 @@ import {
 } from '../../../graph';
 
 import {
-  Module,
-  NamedDefinitionNode,
-} from '../../../config';
-
-import { assertNoSystemTypesDefinedByUser } from '../assertNoSystemTypesDefinedByUser';
+  assertNoSystemTypesDefinedByUser,
+} from '../assertNoSystemTypesDefinedByUser';
 
 describe('assertNoSystemTypesDefinedByUser', () => {
   it('should ignore non system types', () => {

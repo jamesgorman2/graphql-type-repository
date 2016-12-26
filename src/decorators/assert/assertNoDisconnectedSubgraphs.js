@@ -5,10 +5,16 @@ import {
   Type,
 } from '../../graph';
 
-import { Option } from '../../util';
+import {
+  Option,
+} from '../../util';
 
-import { AssertionError } from './AssertionError';
-import { errorInModules } from './errorInModules';
+import {
+  AssertionError,
+} from './AssertionError';
+import {
+  errorInModules,
+} from './errorInModules';
 
 function getRefs(type: Option<Type>): string[] {
   return type.map(t => t.typeRefs.keys()).getOrElse([]);

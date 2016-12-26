@@ -10,7 +10,10 @@ import {
   some,
   none,
 } from '../util';
-import { DirectiveDefinition } from './DirectiveDefinition';
+
+import {
+  DirectiveDefinition,
+} from './DirectiveDefinition';
 
 export class Directive extends Appendable<Directive> {
   name: string;

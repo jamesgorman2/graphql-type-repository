@@ -1,18 +1,24 @@
 // @flow
 
 import {
+  FlattenedTypeGraph,
+  Type,
+} from '../../graph';
+
+import {
   Option,
   entries,
 } from '../../util';
 
 import {
-  FlattenedTypeGraph,
-  Type,
-} from '../../graph';
-
-import { AssertionError } from './AssertionError';
-import { errorInModules } from './errorInModules';
-import { extractFieldsAndModules } from './extractFieldsAndModules';
+  AssertionError,
+} from './AssertionError';
+import {
+  errorInModules,
+} from './errorInModules';
+import {
+  extractFieldsAndModules,
+} from './extractFieldsAndModules';
 
 function typeToExtensionFieldErrors(type: Option<Type>, label: string): Error[] {
   return type.map(t => entries(extractFieldsAndModules(t))).getOrElse([])

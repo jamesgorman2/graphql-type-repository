@@ -4,8 +4,13 @@ import {
   FlattenedTypeGraph,
 } from '../../graph';
 
-import { errorInModules } from './errorInModules';
-import { AssertionError } from './AssertionError';
+import {
+  AssertionError,
+} from './AssertionError';
+import {
+  errorInModules,
+} from './errorInModules';
+
 /**
  * Assert that no Types flagged as system types also
  * have user definitions. This include both raw and

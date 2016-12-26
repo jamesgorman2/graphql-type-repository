@@ -1,7 +1,9 @@
 // @flow
 /* eslint-env jest */
 
-import { hasOwnProperty } from '../hasOwnProperty';
+import {
+  hasOwnProperty,
+} from '../hasOwnProperty';
 
 describe('hasOwnProperty', () => {
   it('should return true for matching property', () => {

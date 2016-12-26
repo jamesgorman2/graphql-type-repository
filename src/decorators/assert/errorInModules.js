@@ -1,6 +1,8 @@
 // @flow
 
-import { Module } from '../../config';
+import {
+  Module,
+} from '../../config';
 
 export function inModules(modules: Module[]): string {
   const module = `module${modules.length === 1 ? '' : 's'}`;

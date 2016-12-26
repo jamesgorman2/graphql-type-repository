@@ -6,9 +6,13 @@ import {
   ModuleRepository,
 } from '../../../config';
 
-import { FlattenedTypeGraph } from '../../../graph';
+import {
+  FlattenedTypeGraph,
+} from '../../../graph';
 
-import { assertNoDuplicateTypes } from '../assertNoDuplicateTypes';
+import {
+  assertNoDuplicateTypes,
+} from '../assertNoDuplicateTypes';
 
 describe('assertNoDuplicateTypes', () => {
   it('should do nothing when no duplicate types', () => {

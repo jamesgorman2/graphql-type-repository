@@ -11,9 +11,7 @@ import {
   ModuleRepository,
 } from '../../../config';
 
-import {
-  FlattenedTypeGraph,
-} from '../../../graph';
+import { FlattenedTypeGraph } from '../../../graph';
 
 import { generateTypes } from '../generateTypes';
 

@@ -4,7 +4,6 @@ import {
   DEFAULT_DEPRECATION_REASON,
   GraphQLDeprecatedDirective,
 } from 'graphql';
-
 import type {
   DirectiveNode,
   ValueNode,

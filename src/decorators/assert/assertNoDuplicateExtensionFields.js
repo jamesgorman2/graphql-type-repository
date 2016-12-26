@@ -1,15 +1,23 @@
 // @flow
 
-import { entries } from '../../util';
-
 import {
   FlattenedTypeGraph,
   Type,
 } from '../../graph';
 
-import { AssertionError } from './AssertionError';
-import { errorInModules } from './errorInModules';
-import { extractFieldsAndModules } from './extractFieldsAndModules';
+import {
+  entries,
+} from '../../util';
+
+import {
+  AssertionError,
+} from './AssertionError';
+import {
+  errorInModules,
+} from './errorInModules';
+import {
+  extractFieldsAndModules,
+} from './extractFieldsAndModules';
 
 function typeToExtensionFieldErrors(type: Type): Error[] {
   return entries(extractFieldsAndModules(type))

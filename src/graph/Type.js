@@ -4,6 +4,10 @@ import type {
 } from 'graphql';
 
 import {
+  Module,
+} from '../config';
+
+import {
   Appendable,
   AppendableList,
   AppendableMap,
@@ -12,10 +16,12 @@ import {
   none,
 } from '../util';
 
-import { Module } from '../config';
-
-import { TypeDefinition } from './TypeDefinition';
-import { ExtensionDefinition } from './ExtensionDefinition';
+import {
+  ExtensionDefinition,
+} from './ExtensionDefinition';
+import {
+  TypeDefinition,
+} from './TypeDefinition';
 
 export class Type extends Appendable<Type> {
   name: string;

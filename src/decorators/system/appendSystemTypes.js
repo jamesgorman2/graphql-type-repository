@@ -1,12 +1,12 @@
 // @flow
 
 import {
-  GraphQLInt,
-  GraphQLFloat,
-  GraphQLString,
   GraphQLBoolean,
   GraphQLID,
+  GraphQLInt,
+  GraphQLFloat,
   GraphQLScalarType,
+  GraphQLString,
 } from 'graphql';
 
 import {
@@ -15,11 +15,11 @@ import {
 } from '../../graph';
 
 const scalars: GraphQLScalarType[] = [
+  GraphQLBoolean,
+  GraphQLID,
   GraphQLInt,
   GraphQLFloat,
   GraphQLString,
-  GraphQLBoolean,
-  GraphQLID,
 ];
 
 /**

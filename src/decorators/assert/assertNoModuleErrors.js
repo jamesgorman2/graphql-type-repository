@@ -1,11 +1,19 @@
 // @flow
 
-import { flatMap } from '../../util';
+import {
+  FlattenedTypeGraph,
+} from '../../graph';
 
-import { FlattenedTypeGraph } from '../../graph';
+import {
+  flatMap,
+} from '../../util';
 
-import { errorInModules } from './errorInModules';
-import { NestedAssertionError } from './NestedAssertionError';
+import {
+  NestedAssertionError,
+} from './NestedAssertionError';
+import {
+  errorInModules,
+} from './errorInModules';
 
 export function assertNoModuleErrors(graphIn: FlattenedTypeGraph): FlattenedTypeGraph {
   return flatMap(

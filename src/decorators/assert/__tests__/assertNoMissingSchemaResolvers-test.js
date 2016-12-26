@@ -2,15 +2,17 @@
 /* eslint-env jest */
 
 import {
-  FlattenedTypeGraph,
-} from '../../../graph';
-
-import {
   Module,
   ModuleRepository,
 } from '../../../config';
 
-import { assertNoMissingSchemaResolvers } from '../assertNoMissingSchemaResolvers';
+import {
+  FlattenedTypeGraph,
+} from '../../../graph';
+
+import {
+  assertNoMissingSchemaResolvers,
+} from '../assertNoMissingSchemaResolvers';
 
 describe('assertNoMissingSchemaResolvers', () => {
   it('should do nothing when no schema', () => {

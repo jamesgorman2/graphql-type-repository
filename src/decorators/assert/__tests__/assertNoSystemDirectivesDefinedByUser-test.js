@@ -2,16 +2,18 @@
 /* eslint-env jest */
 
 import {
-  FlattenedTypeGraph,
-  Directive,
-  DirectiveDefinition,
-} from '../../../graph';
-
-import {
   Module,
 } from '../../../config';
 
-import { assertNoSystemDirectivesDefinedByUser } from '../assertNoSystemDirectivesDefinedByUser';
+import {
+  Directive,
+  DirectiveDefinition,
+  FlattenedTypeGraph,
+} from '../../../graph';
+
+import {
+  assertNoSystemDirectivesDefinedByUser,
+} from '../assertNoSystemDirectivesDefinedByUser';
 
 describe('assertNoSystemDirectivesDefinedByUser', () => {
   it('should ignore non system directives', () => {

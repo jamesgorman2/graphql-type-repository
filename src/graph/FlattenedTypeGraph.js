@@ -21,13 +21,13 @@ import {
   someOrNone,
 } from '../util';
 
-import { TypeDefinition } from './TypeDefinition';
-import { ExtensionDefinition } from './ExtensionDefinition';
+import { Directive } from './Directive';
 import { DirectiveDefinition } from './DirectiveDefinition';
+import { ExtensionDefinition } from './ExtensionDefinition';
+import { Schema } from './Schema';
 import { SchemaDefinition } from './SchemaDefinition';
 import { Type } from './Type';
-import { Schema } from './Schema';
-import { Directive } from './Directive';
+import { TypeDefinition } from './TypeDefinition';
 import { TypeMap } from './TypeMap';
 
 // eslint-disable-next-line no-use-before-define

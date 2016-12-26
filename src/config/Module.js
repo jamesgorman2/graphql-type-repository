@@ -10,8 +10,6 @@ import {
   GraphQLUnionType,
   parse,
 } from 'graphql';
-
-// eslint-disable-next-line no-duplicate-imports
 import type {
   ASTNode,
   DocumentNode,
@@ -20,17 +18,17 @@ import type {
   GraphQLNamedType,
   GraphQLType,
   ObjectTypeDefinitionNode,
-  TypeDefinitionNode,
   SchemaDefinitionNode,
+  TypeDefinitionNode,
 } from 'graphql';
 
 import {
   Option,
-  some,
-  someOrNone,
-  none,
   assert,
   isNonEmptyString,
+  none,
+  some,
+  someOrNone,
 } from '../util';
 
 import type {
@@ -38,7 +36,9 @@ import type {
   TypeConfigMap,
 } from './types';
 
-import { NamedDefinitionNode } from './NamedDefinitionNode';
+import {
+  NamedDefinitionNode,
+} from './NamedDefinitionNode';
 
 function isDirective(directive: GraphQLDirective): boolean {
   return directive instanceof GraphQLDirective;
