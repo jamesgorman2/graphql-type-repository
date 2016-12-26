@@ -56,6 +56,6 @@ export function extractFieldsAndModules(type: Type): { [fieldName: string]: Modu
         }
         return acc;
       },
-      {}
+      ({}: {[key:string]: Module[]})
     );
 }
