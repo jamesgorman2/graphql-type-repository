@@ -7,6 +7,7 @@ export class Option<T> {
   isNone: () => boolean;
   isSome: () => boolean;
   map: <R>(f: (t: T) => R) => Option<R>; // eslint-disable-line no-undef
+  mapOrNone: <R>(f: (t: T) => ?R) => Option<R>; // eslint-disable-line no-undef
   flatMap: <R>(f: (t: T) => Option<R>) => Option<R>; // eslint-disable-line no-undef
   toArray: () => T[];
   filter: (f: (t: T) => boolean) => Option<T>;
@@ -27,6 +28,9 @@ export class None<T> extends Option<T> {
     () => false;
 
   map: <R>(f: (t: T) => R) => Option<R> =  // eslint-disable-line no-undef
+    _ => none; // eslint-disable-line no-use-before-define
+
+  mapOrNone: <R>(f: (t: T) => ?R) => Option<R> =  // eslint-disable-line no-undef
     _ => none; // eslint-disable-line no-use-before-define
 
   flatMap: <R>(f: (t: T) => Option<R>) => Option<R> =  // eslint-disable-line no-undef
@@ -79,6 +83,10 @@ export class Some<T> extends Option<T> {
   map: <R>(f: (t: T) => R) => Option<R> = // eslint-disable-line no-undef
   // flow-disable-next-line
     f => some(f(this.t));
+
+  mapOrNone: <R>(f: (t: T) => ?R) => Option<R> = // eslint-disable-line no-undef
+  // flow-disable-next-line
+    f => this.flatMap(t => someOrNone(f(t)));
 
   flatMap: <R>(f: (t: T) => Option<R>) => Option<R> = // eslint-disable-line no-undef
   // flow-disable-next-line

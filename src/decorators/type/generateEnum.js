@@ -1,5 +1,7 @@
 // @flow
-import { GraphQLEnumType } from 'graphql';
+import {
+  GraphQLEnumType,
+} from 'graphql';
 import type {
   EnumTypeDefinitionNode,
   EnumValueDefinitionNode,
@@ -12,17 +14,25 @@ import {
   Module,
   NamedDefinitionNode,
 } from '../../config';
-import type { EnumConfig } from '../../config';
+import type {
+  EnumConfig,
+} from '../../config';
 
-import { TypeMap } from '../../graph';
+import {
+  TypeMap,
+} from '../../graph';
 
 import {
   Option,
   someOrNone,
 } from '../../util';
 
-import { getDeprecationReason } from './getDeprecationReason';
-import { getDescription } from './getDescription';
+import {
+  getDeprecationReason,
+} from './getDeprecationReason';
+import {
+  getDescription,
+} from './getDescription';
 
 function getValues(
   values: EnumValueDefinitionNode[],
@@ -37,12 +47,12 @@ function getValues(
       const name = v.name.value;
 
       const configInForValue = configIn
-        .flatMap(c => someOrNone(c.values))
-        .flatMap(c => someOrNone(c[name]));
+        .mapOrNone(c => c.values)
+        .mapOrNone(c => c[name]);
 
       getDescription(
         v,
-        configInForValue.flatMap(c => someOrNone(c.description)),
+        configInForValue.mapOrNone(c => c.description),
         'enum value',
         `${enumName}.${name}`,
         module.name
@@ -51,14 +61,14 @@ function getValues(
 
       getDeprecationReason(
         someOrNone(v.directives),
-        configInForValue.flatMap(c => someOrNone(c.deprecationReason)),
+        configInForValue.mapOrNone(c => c.deprecationReason),
         'enum value',
         `${enumName}.${name}`,
         module.name
       )
         .forEach((deprecationReason) => { config.deprecationReason = deprecationReason; });
 
-      configInForValue.flatMap(c => someOrNone(c.value))
+      configInForValue.mapOrNone(c => c.value)
         .forEach((value) => { config.value = value; });
 
       return {
@@ -84,7 +94,7 @@ function generateEnumFromNamedDefinition(
 
   getDescription(
     namedDefinition.definition,
-    configIn.flatMap(c => someOrNone(c.description)),
+    configIn.mapOrNone(c => c.description),
     'enum',
     namedDefinition.name,
     module.name

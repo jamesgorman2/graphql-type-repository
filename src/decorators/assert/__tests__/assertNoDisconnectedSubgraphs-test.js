@@ -2,6 +2,10 @@
 /* eslint-env jest */
 
 import {
+  toHaveErrors,
+} from '../../../__tests__';
+
+import {
   Module,
   ModuleRepository,
 } from '../../../config';
@@ -13,6 +17,8 @@ import {
 import {
   assertNoDisconnectedSubgraphs,
 } from '../assertNoDisconnectedSubgraphs';
+
+expect.extend({ toHaveErrors });
 
 describe('assertNoDisconnectedSubgraphs', () => {
   it('should do nothing when no duplicates', () => {
@@ -62,8 +68,8 @@ describe('assertNoDisconnectedSubgraphs', () => {
             `)
         )
     );
-    expect(assertNoDisconnectedSubgraphs(g).errors.map(error => error.message))
-      .toEqual([
+    expect(assertNoDisconnectedSubgraphs(g))
+      .toHaveErrors([
         'Type D1 not reachable from schema in module foo.',
         'Type D2 not reachable from schema in module foo.',
         'Type D3 not reachable from schema in module foo.',

@@ -14,7 +14,7 @@ export {
 
 export type {
   EnumConfig,
-  FieldResolverConfig,
+  FieldConfig,
   ScalarConfig,
   ObjectConfig,
   InterfaceConfig,

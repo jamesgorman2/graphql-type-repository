@@ -34,6 +34,17 @@ describe('option', () => {
         expect(some(1).map(i => i * 2).getOrElse(0)).toEqual(2);
       });
     });
+    describe('mapOrNone', () => {
+      it('should return mapped value', () => {
+        expect(some(1).mapOrNone(i => i * 2).getOrElse(0)).toEqual(2);
+      });
+      it('should return none if null', () => {
+        expect(some(1).mapOrNone(_ => null)).toBe(none);
+      });
+      it('should return none if undefined', () => {
+        expect(some(1).mapOrNone(_ => undefined)).toBe(none);
+      });
+    });
     describe('flatMap', () => {
       it('should return mapped value', () => {
         expect(some(1).flatMap(i => some(i * 2)).getOrElse(0)).toEqual(2);
@@ -112,6 +123,17 @@ describe('option', () => {
     describe('map', () => {
       it('should return mapped value', () => {
         expect(none.map(i => i * 2)).toBe(none);
+      });
+    });
+    describe('mapOrNone', () => {
+      it('should return mapped value', () => {
+        expect(none.mapOrNone(i => i * 2)).toBe(none);
+      });
+      it('should return none if null', () => {
+        expect(none.mapOrNone(_ => null)).toBe(none);
+      });
+      it('should return none if undefined', () => {
+        expect(none.mapOrNone(_ => undefined)).toBe(none);
       });
     });
     describe('flatMap', () => {

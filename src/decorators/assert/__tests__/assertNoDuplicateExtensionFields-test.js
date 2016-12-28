@@ -2,6 +2,10 @@
 /* eslint-env jest */
 
 import {
+  toHaveErrors,
+} from '../../../__tests__';
+
+import {
   Module,
   ModuleRepository,
 } from '../../../config';
@@ -13,6 +17,8 @@ import {
 import {
   assertNoDuplicateExtensionFields,
 } from '../assertNoDuplicateExtensionFields';
+
+expect.extend({ toHaveErrors });
 
 describe('assertNoDuplicateExtensionFields', () => {
   it('should do nothing when no duplicates', () => {
@@ -37,8 +43,8 @@ describe('assertNoDuplicateExtensionFields', () => {
           new Module('baz').withSchema('extend type Foo { name: Foo }')
         )
     );
-    expect(assertNoDuplicateExtensionFields(g).errors.map(error => error.message))
-      .toEqual([
+    expect(assertNoDuplicateExtensionFields(g))
+      .toHaveErrors([
         'Field Foo.id declared more than once in modules foo, bar.',
         'Field Foo.name declared more than once in modules foo, bar, baz.',
       ]);

@@ -2,7 +2,7 @@
 
 import type { ASTNode } from 'graphql';
 
-import { getDescription as gqlGetdescription } from 'graphql/utilities/buildASTSchema';
+import { getDescription as gqlGetDescription } from 'graphql/utilities/buildASTSchema';
 
 import {
   Option,
@@ -18,7 +18,7 @@ export function getDescription(
   name: string,
   module: string
 ): Option<string> {
-  return someOrNone(gqlGetdescription(node)).xor(
+  return someOrNone(gqlGetDescription(node)).xor(
     descriptionFromConfig,
     configConflictError('description', type, name, module)
   );

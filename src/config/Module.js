@@ -195,7 +195,7 @@ function withDocumentNode(
         maybeName(childNode)
           .flatMap(
             (name) => {
-              const matchedConfig = configs.flatMap(r => someOrNone(r[name]));
+              const matchedConfig = configs.mapOrNone(r => r[name]);
               matchedConfig.forEach((_) => { matchedConfigs.push(name); });
               return matchedConfig;
             }

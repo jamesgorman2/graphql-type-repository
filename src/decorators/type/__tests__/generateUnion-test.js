@@ -7,13 +7,21 @@ import {
 } from 'graphql';
 
 import {
+  toHaveErrors,
+} from '../../../__tests__';
+
+import {
   Module,
   ModuleRepository,
 } from '../../../config';
 
-import { FlattenedTypeGraph } from '../../../graph';
+import {
+  FlattenedTypeGraph,
+} from '../../../graph';
 
-import { generateTypes } from '../generateTypes';
+import {
+  generateTypes,
+} from '../generateTypes';
 
 const a = new GraphQLObjectType({
   name: 'A',
@@ -30,7 +38,9 @@ const b = new GraphQLObjectType({
   isTypeOf: _ => true,
 });
 
-describe('generateTypes', () => {
+expect.extend({ toHaveErrors });
+
+describe('generateUnion', () => {
   it('should create basic union', () => {
     const g = FlattenedTypeGraph.from(
       new ModuleRepository()
@@ -98,8 +108,8 @@ describe('generateTypes', () => {
             )
         )
     );
-    expect(generateTypes(g).errors.map(error => error.message))
-      .toEqual([
+    expect(generateTypes(g))
+      .toHaveErrors([
         'Description for union U supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
       ]);
   });

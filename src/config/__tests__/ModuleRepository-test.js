@@ -7,11 +7,17 @@ import {
 } from 'graphql';
 
 import {
+  toHaveErrors,
+} from '../../__tests__';
+
+import {
   ModuleRepository,
 } from '../ModuleRepository';
 import {
   Module,
 } from '../Module';
+
+expect.extend({ toHaveErrors });
 
 const type: GraphQLObjectType = new GraphQLObjectType({
   name: 'Test',
@@ -46,8 +52,8 @@ describe('', () => {
       const m1 = new Module('foo').withType(type);
       const m2 = new Module('foo').withType(type);
       const r = new ModuleRepository();
-      expect(r.withModule(m1).withModule(m2).errors[0].message)
-        .toMatch(/cannot add module with duplicate name 'foo'/);
+      expect(r.withModule(m1).withModule(m2))
+        .toHaveErrors([/cannot add module with duplicate name 'foo'/]);
     });
     it('should not be empty after adding module', () => {
       const m = new Module('foo').withType(type);
@@ -57,8 +63,8 @@ describe('', () => {
     it('should reject empty module', () => {
       const m = new Module('foo');
       const r = new ModuleRepository();
-      expect(r.withModule(m).errors[0].message)
-        .toMatch(/cannot add empty module 'foo'/);
+      expect(r.withModule(m))
+        .toHaveErrors([/cannot add empty module 'foo'/]);
     });
   });
 });

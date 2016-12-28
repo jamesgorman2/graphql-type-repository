@@ -8,32 +8,6 @@ import type {
   ValueNode,
 } from 'graphql';
 
-export type FieldResolverConfig = {
-  [fieldName: string]: GraphQLFieldResolver<*>;
-};
-
-export type ScalarConfig<TInternal, TExternal> = {
-  description?: string;
-  serialize: (value: mixed) => ?TExternal;
-  parseValue?: (value: mixed) => ?TInternal;
-  parseLiteral?: (valueNode: ValueNode) => ?TInternal;
-};
-
-export type ObjectConfig = {
-  fields: FieldResolverConfig;
-  isTypeOf?: GraphQLIsTypeOfFn<*, *>;
-};
-
-export type InterfaceConfig = {
-  fields: FieldResolverConfig;
-  resolveType?: GraphQLTypeResolver<*, *>;
-};
-
-export type UnionConfig = {
-  description?: string;
-  resolveType?: GraphQLTypeResolver<*, *>;
-};
-
 export type EnumConfig = {
   description?: string;
   values? : {
@@ -43,6 +17,37 @@ export type EnumConfig = {
       value?: ?any,
     }
   }
+};
+
+export type FieldConfig = {
+  [fieldName: string]: {
+    description?: string;
+    resolver?: GraphQLFieldResolver<*>;
+  }
+};
+
+export type InterfaceConfig = {
+  description?: string;
+  fields?: FieldConfig;
+  resolveType?: GraphQLTypeResolver<*, *>;
+};
+
+export type ObjectConfig = {
+  description?: string;
+  fields: FieldConfig;
+  isTypeOf?: GraphQLIsTypeOfFn<*, *>;
+};
+
+export type ScalarConfig<TInternal, TExternal> = {
+  description?: string;
+  serialize: (value: mixed) => ?TExternal;
+  parseValue?: (value: mixed) => ?TInternal;
+  parseLiteral?: (valueNode: ValueNode) => ?TInternal;
+};
+
+export type UnionConfig = {
+  description?: string;
+  resolveType?: GraphQLTypeResolver<*, *>;
 };
 
 export type TypeConfig =

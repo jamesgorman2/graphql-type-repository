@@ -7,15 +7,25 @@ import {
 } from 'graphql';
 
 import {
+  toHaveErrors,
+} from '../../../__tests__';
+
+import {
   Module,
   ModuleRepository,
 } from '../../../config';
 
-import { FlattenedTypeGraph } from '../../../graph';
+import {
+  FlattenedTypeGraph,
+} from '../../../graph';
 
-import { generateTypes } from '../generateTypes';
+import {
+  generateTypes,
+} from '../generateTypes';
 
-describe('generateTypes', () => {
+expect.extend({ toHaveErrors });
+
+describe('generateEnum', () => {
   it('should create basic enum', () => {
     const g = FlattenedTypeGraph.from(
       new ModuleRepository()
@@ -108,8 +118,8 @@ describe('generateTypes', () => {
             )
         )
     );
-    expect(generateTypes(g).errors.map(error => error.message))
-      .toEqual([
+    expect(generateTypes(g))
+      .toHaveErrors([
         'Description for enum E supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
       ]);
   });
@@ -191,8 +201,8 @@ describe('generateTypes', () => {
             )
         )
     );
-    expect(generateTypes(g).errors.map(error => error.message))
-      .toEqual([
+    expect(generateTypes(g))
+      .toHaveErrors([
         'Description for enum value E.A supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
       ]);
   });
@@ -295,8 +305,8 @@ describe('generateTypes', () => {
             )
         )
     );
-    expect(generateTypes(g).errors.map(error => error.message))
-      .toEqual([
+    expect(generateTypes(g))
+      .toHaveErrors([
         'Deprecation for enum value E.A supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
       ]);
   });

@@ -15,16 +15,21 @@ import {
   Module,
   NamedDefinitionNode,
 } from '../../config';
+import type {
+  UnionConfig,
+} from '../../config';
 
-import { TypeMap } from '../../graph';
-import type { UnionConfig } from '../../config';
+import {
+  TypeMap,
+} from '../../graph';
 
 import {
   Option,
-  someOrNone,
 } from '../../util';
 
-import { getDescription } from './getDescription';
+import {
+  getDescription,
+} from './getDescription';
 
 function getTypes(
   definition: UnionTypeDefinitionNode,
@@ -54,7 +59,7 @@ function generateUnionFromNamedDefinition(
 
   getDescription(
     namedDefinition.definition,
-    configIn.flatMap(c => someOrNone(c.description)),
+    configIn.mapOrNone(c => c.description),
     'union',
     namedDefinition.name,
     module.name
@@ -62,7 +67,7 @@ function generateUnionFromNamedDefinition(
     .forEach((d) => { config.description = d; });
 
   configIn
-    .flatMap(c => someOrNone(c.resolveType))
+    .mapOrNone(c => c.resolveType)
     .forEach((resolveType) => { config.resolveType = resolveType; });
 
   return new GraphQLUnionType(config);

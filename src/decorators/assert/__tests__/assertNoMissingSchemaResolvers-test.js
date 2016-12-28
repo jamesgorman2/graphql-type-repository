@@ -2,6 +2,10 @@
 /* eslint-env jest */
 
 import {
+  toHaveErrors,
+} from '../../../__tests__';
+
+import {
   Module,
   ModuleRepository,
 } from '../../../config';
@@ -13,6 +17,8 @@ import {
 import {
   assertNoMissingSchemaResolvers,
 } from '../assertNoMissingSchemaResolvers';
+
+expect.extend({ toHaveErrors });
 
 describe('assertNoMissingSchemaResolvers', () => {
   it('should do nothing when no schema', () => {
@@ -58,8 +64,8 @@ describe('assertNoMissingSchemaResolvers', () => {
             `)
         )
     );
-    expect(assertNoMissingSchemaResolvers(g).errors.map(error => error.message))
-      .toEqual([
+    expect(assertNoMissingSchemaResolvers(g))
+      .toHaveErrors([
         'Unexpected type InterfaceTypeDefinition for schema.query in module foo. Expected an ObjectTypeDefinition.',
         'Unexpected type InputObjectTypeDefinition for schema.query in module bar. Expected an ObjectTypeDefinition.',
         'Unexpected type EnumTypeDefinition for schema.mutation in module foo. Expected an ObjectTypeDefinition.',
@@ -97,8 +103,8 @@ describe('assertNoMissingSchemaResolvers', () => {
           .withSchema('type Foo { id: ID name: String } schema { subscription: Foo }')
         )
     );
-    expect(assertNoMissingSchemaResolvers(g).errors.map(error => error.message))
-      .toEqual([
+    expect(assertNoMissingSchemaResolvers(g))
+      .toHaveErrors([
         'Missing config for schema.query.id in module foo.',
         'Missing config for schema.mutation.id in module foo.',
         'Missing config for schema.mutation.name in module foo.',

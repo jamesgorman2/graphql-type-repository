@@ -225,6 +225,9 @@ type JestExpectType = {
    * matching the most recent snapshot when it is called.
    */
   toThrowErrorMatchingSnapshot(): void,
+
+  toHaveErrors(expected: Array<string | Error | RegExp>): void,
+  toEqualIgnoreFunctions(expected: any): void,
 }
 
 type JestObjectType = {

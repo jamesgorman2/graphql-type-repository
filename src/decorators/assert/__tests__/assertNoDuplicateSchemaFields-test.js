@@ -2,6 +2,10 @@
 /* eslint-env jest */
 
 import {
+  toHaveErrors,
+} from '../../../__tests__';
+
+import {
   Module,
   ModuleRepository,
 } from '../../../config';
@@ -13,6 +17,8 @@ import {
 import {
   assertNoDuplicateSchemaFields,
 } from '../assertNoDuplicateSchemaFields';
+
+expect.extend({ toHaveErrors });
 
 describe('assertNoDuplicateSchemaFields', () => {
   it('should do nothing when no duplicates', () => {
@@ -37,8 +43,8 @@ describe('assertNoDuplicateSchemaFields', () => {
           new Module('baz').withSchema('type Baz { name: Foo } schema { query: Baz }')
         )
     );
-    expect(assertNoDuplicateSchemaFields(g).errors.map(error => error.message))
-      .toEqual([
+    expect(assertNoDuplicateSchemaFields(g))
+      .toHaveErrors([
         'Field schema.query.id declared more than once in modules foo, bar.',
         'Field schema.query.name declared more than once in modules foo, bar, baz.',
       ]);

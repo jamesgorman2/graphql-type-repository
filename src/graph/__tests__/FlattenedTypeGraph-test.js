@@ -12,7 +12,9 @@ import type {
   ObjectTypeDefinitionNode,
 } from 'graphql';
 
-import stringify from 'json-stable-stringify';
+import {
+  toEqualIgnoreFunctions,
+} from '../../__tests__';
 
 import {
   Module,
@@ -49,6 +51,8 @@ import {
   TypeDefinition,
 } from '../TypeDefinition';
 
+expect.extend({ toEqualIgnoreFunctions });
+
 describe('FlattenedTypeGraph', () => {
   describe('append', () => {
     it('should return new object', () => {
@@ -71,15 +75,13 @@ describe('FlattenedTypeGraph', () => {
         },
       });
       const m = new Module('foo').withType(t);
-      expect(stringify(extractTypes(m).types))
-        .toEqual(
-          stringify(
-            new AppendableMap()
-              .put(
-                'Test',
-                new Type('Test').withDefinition(new TypeDefinition(m).withType(t)),
-              )
-          )
+      expect(extractTypes(m).types)
+        .toEqualIgnoreFunctions(
+          new AppendableMap()
+            .put(
+              'Test',
+              new Type('Test').withDefinition(new TypeDefinition(m).withType(t)),
+            )
         );
     });
   });
@@ -88,22 +90,20 @@ describe('FlattenedTypeGraph', () => {
     it('should get type and refs', () => {
       const t: any = parse('type Test {id: ID}').definitions[0];
       const m = new Module('foo').withSchema('type Test {id: ID}');
-      expect(stringify(extractTypeDefinitions(m).types))
-        .toEqual(
-          stringify(
-            new AppendableMap()
-              .put(
-                'Test',
-                new Type('Test')
-                  .withDefinition(
-                    new TypeDefinition(m).withDefinition(
-                      new NamedDefinitionNode('Test', t),
-                    ),
-                  )
-                  .withTypeRef('ID', m)
-              )
-              .put('ID', new Type('ID'))
-          )
+      expect(extractTypeDefinitions(m).types)
+        .toEqualIgnoreFunctions(
+          new AppendableMap()
+            .put(
+              'Test',
+              new Type('Test')
+                .withDefinition(
+                  new TypeDefinition(m).withDefinition(
+                    new NamedDefinitionNode('Test', t),
+                  ),
+                )
+                .withTypeRef('ID', m)
+            )
+            .put('ID', new Type('ID'))
         );
     });
     it('should extract schema types to schema', () => {
@@ -126,20 +126,18 @@ describe('FlattenedTypeGraph', () => {
     it('should get type and refs', () => {
       const t: ObjectTypeDefinitionNode = (parse('extend type Test {id: ID}').definitions[0] : any).definition;
       const m = new Module('foo').withSchema('extend type Test {id: ID}');
-      expect(stringify(extractTypeExtensions(m).types))
-        .toEqual(
-          stringify(
-            new AppendableMap()
-              .put(
-                'Test',
-                new Type('Test')
-                  .withExtension(
-                    new ExtensionDefinition(m, new NamedDefinitionNode('Test', t)),
-                  )
-                  .withTypeRef('ID', m),
-              )
-              .put('ID', new Type('ID'))
-          )
+      expect(extractTypeExtensions(m).types)
+        .toEqualIgnoreFunctions(
+          new AppendableMap()
+            .put(
+              'Test',
+              new Type('Test')
+                .withExtension(
+                  new ExtensionDefinition(m, new NamedDefinitionNode('Test', t)),
+                )
+                .withTypeRef('ID', m),
+            )
+            .put('ID', new Type('ID'))
         );
     });
     it('should extract schema type extensions to schema', () => {
@@ -176,12 +174,10 @@ describe('FlattenedTypeGraph', () => {
         .withSchema('directive @bar(baz: Boolean!) on FIELD');
       expect(extractDirectiveDefinitions(m).directives.data.bar.name).toEqual('bar');
       expect(extractDirectiveDefinitions(m).directives.data.bar.definitions[0].module).toBe(m);
-      expect(stringify(extractDirectiveDefinitions(m).directives.data.bar.definitions[0]))
-        .toEqual(
-          stringify(
-            new DirectiveDefinition(m).withDefinition(
-              new NamedDefinitionNode('bar', d),
-            ),
+      expect(extractDirectiveDefinitions(m).directives.data.bar.definitions[0])
+        .toEqualIgnoreFunctions(
+          new DirectiveDefinition(m).withDefinition(
+            new NamedDefinitionNode('bar', d),
           ),
         );
     });
@@ -196,9 +192,9 @@ describe('FlattenedTypeGraph', () => {
     });
     it('should get directive refs', () => {
       const m = new Module('foo').withSchema('schema @foo { query: bar }');
-      expect(stringify(extractSchema(m).schema.directiveRefs))
-        .toEqual(
-          stringify(new AppendableMap().put('foo', new AppendableList().push(m)))
+      expect(extractSchema(m).schema.directiveRefs)
+        .toEqualIgnoreFunctions(
+          new AppendableMap().put('foo', new AppendableList().push(m))
         );
     });
   });

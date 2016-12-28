@@ -2,6 +2,10 @@
 /* eslint-env jest */
 
 import {
+  toHaveErrors,
+} from '../../../__tests__';
+
+import {
   Module,
   ModuleRepository,
 } from '../../../config';
@@ -13,6 +17,8 @@ import {
 import {
   assertNoDuplicateDirectives,
 } from '../assertNoDuplicateDirectives';
+
+expect.extend({ toHaveErrors });
 
 describe('assertNoDisconnectedSubgraphs', () => {
   it('should do nothing when no duplicates', () => {
@@ -29,8 +35,8 @@ describe('assertNoDisconnectedSubgraphs', () => {
         .withModule(new Module('bar').withSchema('directive @foo(if: Boolean!) on FIELD'))
         .withModule(new Module('baz').withSchema('directive @foo(if: Boolean!) on FIELD'))
     );
-    expect(assertNoDuplicateDirectives(g).errors.map(error => error.message))
-      .toEqual([
+    expect(assertNoDuplicateDirectives(g))
+      .toHaveErrors([
         'Directive @foo declared more than once in modules foo, bar, baz.',
       ]);
   });

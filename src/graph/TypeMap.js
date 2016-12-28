@@ -1,10 +1,17 @@
 // @flow
 import {
+  GraphQLEnumType,
+  GraphQLInputObjectType,
+  GraphQLInterfaceType,
   GraphQLObjectType,
+  GraphQLScalarType,
   GraphQLUnionType,
+  getNamedType,
 } from 'graphql';
 import type {
   GraphQLNamedType,
+  GraphQLOutputType,
+  GraphQLType,
 } from 'graphql';
 
 import {
@@ -20,6 +27,28 @@ import {
   FlattenedTypeGraph,
 } from './FlattenedTypeGraph';
 
+function isOutputType(type: ?GraphQLType): boolean {
+  const namedType = getNamedType(type);
+  return (
+    namedType instanceof GraphQLScalarType ||
+    namedType instanceof GraphQLObjectType ||
+    namedType instanceof GraphQLInterfaceType ||
+    namedType instanceof GraphQLUnionType ||
+    namedType instanceof GraphQLEnumType
+  );
+}
+
+function isNamedType(type: ?GraphQLType): boolean {
+  return (
+    type instanceof GraphQLScalarType ||
+    type instanceof GraphQLObjectType ||
+    type instanceof GraphQLInterfaceType ||
+    type instanceof GraphQLUnionType ||
+    type instanceof GraphQLEnumType ||
+    type instanceof GraphQLInputObjectType
+  );
+}
+
 function getErrorReferrence(referringTypeName: Option<string>, module: Option<Module>): string {
   return referringTypeName
     .map(n => ` for type ${n}`)
@@ -30,6 +59,15 @@ function getErrorReferrence(referringTypeName: Option<string>, module: Option<Mo
           .map(n => `${s} in module ${n}`)
     )
     .getOrElse('');
+}
+
+function errorInstanceOf(
+  type: GraphQLNamedType,
+  expected: any,
+  referringTypeName?: string,
+  module?: Module
+): Error {
+  return new Error(`Type ${type.name} not a ${expected.name}${getErrorReferrence(someOrNone(referringTypeName), someOrNone(module))}.`);
 }
 
 export class TypeMap {
@@ -45,20 +83,51 @@ export class TypeMap {
       return type.get();
     };
 
+  getInterfaceType: (
+    name: string,
+    referringTypeName?: string,
+    module?: Module
+  ) => GraphQLInterfaceType =
+    (name, referringTypeName, module) => {
+      const type = this.getType(name, referringTypeName, module);
+      if (!(type instanceof GraphQLInterfaceType)) {
+        throw errorInstanceOf(type, GraphQLInterfaceType, referringTypeName, module);
+      }
+      return type;
+    }
+
+  getNamedType: (name: string, referringTypeName?: string, module?: Module) => GraphQLNamedType =
+    (name, referringTypeName, module) => {
+      const type = this.getType(name, referringTypeName, module);
+      if (!isNamedType(type)) {
+        throw errorInstanceOf(type, GraphQLObjectType, referringTypeName, module);
+      }
+      return type;
+    }
+
   getObjectType: (name: string, referringTypeName?: string, module?: Module) => GraphQLObjectType =
     (name, referringTypeName, module) => {
       const type = this.getType(name, referringTypeName, module);
       if (!(type instanceof GraphQLObjectType)) {
-        throw new Error(`Type ${name} not a GraphQLObjectType${getErrorReferrence(someOrNone(referringTypeName), someOrNone(module))}.`);
+        throw errorInstanceOf(type, GraphQLObjectType, referringTypeName, module);
       }
       return type;
+    }
+
+  getOuputType: (name: string, referringTypeName?: string, module?: Module) => GraphQLOutputType =
+    (name, referringTypeName, module) => {
+      const type = this.getType(name, referringTypeName, module);
+      if (!isOutputType(type)) {
+        throw errorInstanceOf(type, GraphQLObjectType, referringTypeName, module);
+      }
+      return (type: any);
     }
 
   getUnionType: (name: string, referringTypeName?: string, module?: Module) => GraphQLUnionType =
     (name, referringTypeName, module) => {
       const type = this.getType(name, referringTypeName, module);
       if (!(type instanceof GraphQLUnionType)) {
-        throw new Error(`Type ${name} not a GraphQLUnionType${getErrorReferrence(someOrNone(referringTypeName), someOrNone(module))}.`);
+        throw errorInstanceOf(type, GraphQLUnionType, referringTypeName, module);
       }
       return type;
     }

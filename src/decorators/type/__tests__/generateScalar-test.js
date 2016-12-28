@@ -1,21 +1,34 @@
 // @flow
 /* eslint-env jest */
 
-import { GraphQLScalarType } from 'graphql';
+import {
+  GraphQLScalarType,
+} from 'graphql';
 
-import stringify from 'json-stable-stringify';
+import {
+  toEqualIgnoreFunctions,
+  toHaveErrors,
+} from '../../../__tests__';
 
 import {
   Module,
   ModuleRepository,
 } from '../../../config';
-import type { ScalarConfig } from '../../../config';
+import type {
+  ScalarConfig,
+} from '../../../config';
 
-import { FlattenedTypeGraph } from '../../../graph';
+import {
+  FlattenedTypeGraph,
+} from '../../../graph';
 
-import { generateTypes } from '../generateTypes';
+import {
+  generateTypes,
+} from '../generateTypes';
 
-describe('generateTypes', () => {
+expect.extend({ toEqualIgnoreFunctions, toHaveErrors });
+
+describe('generateScalar', () => {
   it('should create basic scalar', () => {
     const g = FlattenedTypeGraph.from(
       new ModuleRepository()
@@ -35,8 +48,8 @@ describe('generateTypes', () => {
       name: 'S',
       serialize: s => s,
     });
-    expect(stringify(generateTypes(g).typeMap.getType('S')))
-      .toEqual(stringify(t));
+    expect(generateTypes(g).typeMap.getType('S'))
+      .toEqualIgnoreFunctions(t);
   });
   it('should create complete scalar', () => {
     const g = FlattenedTypeGraph.from(
@@ -63,16 +76,16 @@ describe('generateTypes', () => {
       parseValue: _ => 1,
       parseLiteral: _ => 1,
     });
-    expect(stringify(generateTypes(g).typeMap.getType('S')))
-      .toEqual(stringify(t));
+    expect(generateTypes(g).typeMap.getType('S'))
+      .toEqualIgnoreFunctions(t);
   });
   it('should throw if missing configs', () => {
     const g = FlattenedTypeGraph.from(
       new ModuleRepository()
         .withModule(new Module('foo').withSchema('scalar S'))
     );
-    expect(generateTypes(g).errors.map(error => error.message))
-      .toEqual([
+    expect(generateTypes(g))
+      .toHaveErrors([
         'Scalar S missing required configs in module foo.',
       ]);
   });
@@ -85,8 +98,8 @@ describe('generateTypes', () => {
             .withSchema('scalar S', { S: r })
         )
     );
-    expect(generateTypes(g).errors.map(error => error.message))
-      .toEqual([
+    expect(generateTypes(g))
+      .toHaveErrors([
         'Scalar S missing required config parameter serialize in module foo.',
       ]);
   });
@@ -107,8 +120,8 @@ describe('generateTypes', () => {
             )
         )
     );
-    expect(generateTypes(g).errors.map(error => error.message))
-      .toEqual([
+    expect(generateTypes(g))
+      .toHaveErrors([
         'Description for scalar S supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
       ]);
   });

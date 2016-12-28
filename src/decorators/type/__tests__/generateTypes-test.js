@@ -16,7 +16,9 @@ import {
   Type,
 } from '../../../graph';
 
-import { generateTypes } from '../generateTypes';
+import {
+  generateTypes,
+} from '../generateTypes';
 
 describe('generateTypes', () => {
   it('should not change system types', () => {

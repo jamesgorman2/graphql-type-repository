@@ -11,7 +11,7 @@ export {
 } from './config';
 
 export type {
-  FieldResolverConfig,
+  FieldConfig,
   ScalarConfig,
   ObjectConfig,
   InterfaceConfig,

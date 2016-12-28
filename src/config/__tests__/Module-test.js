@@ -18,8 +18,14 @@ import type {
 } from 'graphql';
 
 import {
+  toHaveErrors,
+} from '../../__tests__';
+
+import {
   Module,
 } from '../Module';
+
+expect.extend({ toHaveErrors });
 
 describe('module', () => {
   describe('constructor', () => {
@@ -94,17 +100,17 @@ describe('module', () => {
     it('should reject null type', () => {
       const m = new Module('foo');
       const t: GraphQLNamedType = (null: any);
-      expect(m.withType(t).errors[0].message).toMatch(/Parameter type must be a GraphQLNamedType\./);
+      expect(m.withType(t)).toHaveErrors([/Parameter type must be a GraphQLNamedType\./]);
     });
     it('should reject undefined type', () => {
       const m = new Module('foo');
       const t: GraphQLNamedType = (undefined: any);
-      expect(m.withType(t).errors[0].message).toMatch(/Parameter type must be a GraphQLNamedType\./);
+      expect(m.withType(t)).toHaveErrors([/Parameter type must be a GraphQLNamedType\./]);
     });
     it('should reject not a type', () => {
       const m = new Module('foo');
       const t: GraphQLNamedType = ('type': any);
-      expect(m.withType(t).errors[0].message).toMatch(/Parameter type must be a GraphQLNamedType\./);
+      expect(m.withType(t)).toHaveErrors([/Parameter type must be a GraphQLNamedType\./]);
     });
     it('should reject unnamed type', () => {
       const m = new Module('foo');
@@ -116,7 +122,7 @@ describe('module', () => {
           },
         }),
       );
-      expect(m.withType(t).errors[0].message).toMatch(/Parameter type must be a GraphQLNamedType\./);
+      expect(m.withType(t)).toHaveErrors([/Parameter type must be a GraphQLNamedType\./]);
     });
     it('should throw duplicate type name', () => {
       const m = new Module('foo');
@@ -132,8 +138,8 @@ describe('module', () => {
           id: { type: GraphQLID },
         },
       });
-      expect(m.withType(t1).withType(t2).errors[0].message)
-        .toMatch(/Cannot add type with duplicate name 'Test'\./);
+      expect(m.withType(t1).withType(t2))
+        .toHaveErrors([/Cannot add type with duplicate name 'Test'\./]);
     });
   });
 
@@ -163,24 +169,24 @@ describe('module', () => {
     it('should reject null directive', () => {
       const m = new Module('foo');
       const d: GraphQLDirective = (null: any);
-      expect(m.withDirective(d).errors[0].message).toMatch(/Parameter directive must be a GraphQLDirective\./);
+      expect(m.withDirective(d)).toHaveErrors([/Parameter directive must be a GraphQLDirective\./]);
     });
     it('should reject undefined directive', () => {
       const m = new Module('foo');
       const d: GraphQLDirective = (undefined : any);
-      expect(m.withDirective(d).errors[0].message).toMatch(/Parameter directive must be a GraphQLDirective\./);
+      expect(m.withDirective(d)).toHaveErrors([/Parameter directive must be a GraphQLDirective\./]);
     });
     it('should reject not a directive', () => {
       const m = new Module('foo');
       const d: GraphQLDirective = ('type' : any);
-      expect(m.withDirective(d).errors[0].message).toMatch(/Parameter directive must be a GraphQLDirective\./);
+      expect(m.withDirective(d)).toHaveErrors([/Parameter directive must be a GraphQLDirective\./]);
     });
     it('should throw duplicate directive name', () => {
       const m = new Module('foo');
       const d1 = new GraphQLDirective({ name: 'foo', locations: [DirectiveLocation.FIELD] });
       const d2 = new GraphQLDirective({ name: 'foo', locations: [DirectiveLocation.FRAGMENT_SPREAD] });
-      expect(m.withDirective(d1).withDirective(d2).errors[0].message)
-        .toMatch(/Cannot add directive with duplicate name 'foo'\./);
+      expect(m.withDirective(d1).withDirective(d2))
+        .toHaveErrors([/Cannot add directive with duplicate name 'foo'\./]);
     });
   });
 
@@ -219,8 +225,8 @@ describe('module', () => {
       const m = new Module('foo');
       const n1 = parse('type Foo { bar: Int }').definitions[0];
       const n2 = parse('type Foo { baz: Int }').definitions[0];
-      expect(m.withDefinitionNode(n1).withDefinitionNode(n2).errors[0].message)
-        .toMatch(/Cannot add type with duplicate name 'Foo'\./);
+      expect(m.withDefinitionNode(n1).withDefinitionNode(n2))
+        .toHaveErrors([/Cannot add type with duplicate name 'Foo'\./]);
     });
     it('should accept duplicate extension nodes', () => {
       const n1 = parse('type Foo { bar: Int }').definitions[0];
@@ -251,20 +257,20 @@ describe('module', () => {
       const m = new Module('foo');
       const n1 = parse('directive @skip(if: Boolean!) on FIELD').definitions[0];
       const n2 = parse('directive @skip(if: Boolean!) on FRAGMENT_SPREAD ').definitions[0];
-      expect(m.withDefinitionNode(n1).withDefinitionNode(n2).errors[0].message)
-        .toMatch(/Cannot add directive with duplicate name 'skip'\./);
+      expect(m.withDefinitionNode(n1).withDefinitionNode(n2))
+        .toHaveErrors([/Cannot add directive with duplicate name 'skip'\./]);
     });
     it('should reject non-TypeSystemDefinitionNode', () => {
       const m = new Module('foo');
       const n = parse('mutation likeStory { like(story: 123) @defer { story { id } } }').definitions[0];
-      expect(m.withDefinitionNode(n).errors[0].message)
-        .toMatch(/Parameter node must be a TypeSystemDefinitionNode\./);
+      expect(m.withDefinitionNode(n))
+        .toHaveErrors([/Parameter node must be a TypeSystemDefinitionNode\./]);
     });
     it('should reject non-DefinitionNode', () => {
       const m = new Module('foo');
       const n: DefinitionNode = ('foo': any);
-      expect(m.withDefinitionNode(n).errors[0].message)
-        .toMatch(/Parameter node must be a TypeSystemDefinitionNode\./);
+      expect(m.withDefinitionNode(n))
+        .toHaveErrors([/Parameter node must be a TypeSystemDefinitionNode\./]);
     });
   });
 
@@ -291,14 +297,14 @@ describe('module', () => {
     it('should reject duplicate names', () => {
       const m = new Module('foo');
       const n = parse('type Foo { bar: Int } type Foo { baz: Int }');
-      expect(m.withDocumentNode(n).errors[0].message)
-        .toMatch(/Cannot add type with duplicate name 'Foo'\./);
+      expect(m.withDocumentNode(n))
+        .toHaveErrors([/Cannot add type with duplicate name 'Foo'\./]);
     });
     it('should reject unnamed types', () => {
       const m = new Module('foo');
       const n = parse('mutation likeStory { like(story: 123) @defer { story { id } } }');
-      expect(m.withDocumentNode(n).errors[0].message)
-        .toMatch(/Parameter node must be a TypeSystemDefinitionNode\./);
+      expect(m.withDocumentNode(n))
+        .toHaveErrors([/Parameter node must be a TypeSystemDefinitionNode\./]);
     });
     it('should accept schema', () => {
       const n = parse('schema { query: Query }');
@@ -308,24 +314,24 @@ describe('module', () => {
     it('should reject non-DocumentNote', () => {
       const m = new Module('foo');
       const n: DocumentNode = ('foo': any);
-      expect(m.withDocumentNode(n).errors[0].message)
-        .toMatch(/Parameter node must be a DocumentNode\./);
+      expect(m.withDocumentNode(n))
+        .toHaveErrors([/Parameter node must be a DocumentNode\./]);
     });
     it('should reject configs with no matching type', () => {
       const m = new Module('foo');
       const n = parse('type Foo { bar: Int } type Bar { bar: Int }');
       const r = { fields: {} };
       const rs = { Foo: r, Baz: r };
-      expect(m.withDocumentNode(n, rs).errors[0].message)
-        .toMatch(/Cannot add config 'Baz' with no matching type\./);
+      expect(m.withDocumentNode(n, rs))
+        .toHaveErrors([/Cannot add config 'Baz' with no matching type\./]);
     });
     it('should reject configs with no matching type', () => {
       const m = new Module('foo');
       const n = parse('type Foo { bar: Int } type Bar { bar: Int }');
       const r = { fields: {} };
       const rs = { Foo: r, Baz: r, Bim: r };
-      expect(m.withDocumentNode(n, rs).errors[0].message)
-        .toMatch(/Cannot add configs 'Baz', 'Bim' with no matching types\./);
+      expect(m.withDocumentNode(n, rs))
+        .toHaveErrors([/Cannot add configs 'Baz', 'Bim' with no matching types\./]);
     });
   });
 
@@ -357,33 +363,33 @@ describe('module', () => {
     it('should reject duplicate names', () => {
       const m = new Module('foo');
       const n = 'type Foo { bar: Int } type Foo { baz: Int }';
-      expect(m.withSchema(n).errors[0].message)
-        .toMatch(/Cannot add type with duplicate name 'Foo'\./);
+      expect(m.withSchema(n))
+        .toHaveErrors([/Cannot add type with duplicate name 'Foo'\./]);
     });
     it('should reject configs with no matching type', () => {
       const m = new Module('foo');
       const n = 'type Foo { bar: Int } type Bar { bar: Int }';
       const r = { fields: {} };
       const rs = { Foo: r, Baz: r };
-      expect(m.withSchema(n, rs).errors[0].message)
-        .toMatch(/Cannot add config 'Baz' with no matching type\./);
+      expect(m.withSchema(n, rs))
+        .toHaveErrors([/Cannot add config 'Baz' with no matching type\./]);
     });
     it('should reject configs with no matching type', () => {
       const m = new Module('foo');
       const n = 'type Foo { bar: Int } type Bar { bar: Int }';
       const r = { fields: {} };
       const rs = { Foo: r, Baz: r, Bim: r };
-      expect(m.withSchema(n, rs).errors[0].message)
-        .toMatch(/Cannot add configs 'Baz', 'Bim' with no matching types\./);
+      expect(m.withSchema(n, rs))
+        .toHaveErrors([/Cannot add configs 'Baz', 'Bim' with no matching types\./]);
     });
     it('should reject empty string', () => {
-      expect(new Module('foo').withSchema('').errors[0].message)
-        .toMatch(/schema must be a non-empty string/);
+      expect(new Module('foo').withSchema(''))
+        .toHaveErrors([/schema must be a non-empty string/]);
     });
     it('should reject null string', () => {
       const s: string = (null: any);
-      expect(new Module('foo').withSchema(s).errors[0].message)
-        .toMatch(/schema must be a non-empty string/);
+      expect(new Module('foo').withSchema(s))
+        .toHaveErrors([/schema must be a non-empty string/]);
     });
   });
 });

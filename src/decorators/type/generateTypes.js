@@ -19,6 +19,7 @@ import {
 } from '../../util';
 
 import { generateEnum } from './generateEnum';
+import { generateInterface } from './generateInterface';
 import { generateScalar } from './generateScalar';
 import { generateUnion } from './generateUnion';
 
@@ -31,6 +32,7 @@ type Builder =
 
 const builders: [string, Builder][] = [
   generateEnum,
+  generateInterface,
   generateScalar,
   generateUnion,
 ];
