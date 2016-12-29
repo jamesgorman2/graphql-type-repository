@@ -11,6 +11,7 @@ import type {
 
 import {
   Option,
+  Try,
   some,
   someOrNone,
   none,
@@ -42,19 +43,36 @@ export function getDeprecationReason(
   type: string,
   name: string,
   module: string
-): Option<string> {
-  return directives
-    .flatMap(
-      ds =>
-        ds.filter(d => d.name.value === GraphQLDeprecatedDirective.name)
-          .reduce(
-            (acc, directive) =>
-              acc.or(() => getReason(directive).orSome(DEFAULT_DEPRECATION_REASON)),
-            none
-          )
-    )
-    .xor(
-      deprecationReasonFromConfig,
-      configConflictError('deprecation', type, name, module)
+): Try<Option<string>> {
+  return Try.of(() =>
+    directives
+      .flatMap(
+        ds =>
+          ds.filter(d => d.name.value === GraphQLDeprecatedDirective.name)
+            .reduce(
+              (acc, directive) =>
+                acc.or(() => getReason(directive).orSome(DEFAULT_DEPRECATION_REASON)),
+              none
+            )
+      )
+      .xor(
+        deprecationReasonFromConfig,
+        configConflictError('deprecation', type, name, module)
+      )
+  );
+}
+
+export function getDeprecationReasonObject(
+  directives: Option<DirectiveNode[]>,
+  deprecationReasonFromConfig: Option<string>,
+  type: string,
+  name: string,
+  module: string
+): Try<{ deprecationReason?: ?string }> {
+  return getDeprecationReason(directives, deprecationReasonFromConfig, type, name, module)
+    .map(
+      o =>
+        o.map(d => ({ deprecationReason: d }))
+          .getOrElse({})
     );
 }

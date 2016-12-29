@@ -25,10 +25,11 @@ import {
 
 import {
   Option,
+  Try,
 } from '../../util';
 
 import {
-  getDescription,
+  getDescriptionObject,
 } from './getDescription';
 
 function getTypes(
@@ -47,30 +48,40 @@ function generateUnionFromNamedDefinition(
   namedDefinition: NamedDefinitionNode<*>,
   typeMap: TypeMap,
   module: Module
-): GraphQLNamedType {
+): Try<GraphQLNamedType> {
   const name = namedDefinition.name;
   const configIn: Option<UnionConfig> = (namedDefinition.config: any);
   const types = getTypes(namedDefinition.definition, name, typeMap, module);
 
-  const config: GraphQLUnionTypeConfig<*, *> = {
-    name,
-    types,
-  };
-
-  getDescription(
+  const description = getDescriptionObject(
     namedDefinition.definition,
     configIn.mapOrNone(c => c.description),
     'union',
     namedDefinition.name,
     module.name
-  )
-    .forEach((d) => { config.description = d; });
+  );
 
-  configIn
-    .mapOrNone(c => c.resolveType)
-    .forEach((resolveType) => { config.resolveType = resolveType; });
+  const config: Try<GraphQLUnionTypeConfig<*, *>> = Try.of({
+    name,
+    types,
+  })
+    .map(
+      c => ({
+        ...c,
+        ...(
+          configIn.mapOrNone(cIn => cIn.resolveType)
+            .map(resolveType => ({ resolveType }))
+            .getOrElse({})
+        ),
+      })
+    )
+    .mergeWith(
+      description,
+      (c, enumDescription) =>
+        ({ ...c, ...enumDescription })
+    );
 
-  return new GraphQLUnionType(config);
+  return config.map(c => new GraphQLUnionType(c));
 }
 
 export const generateUnion = ['UnionTypeDefinition', generateUnionFromNamedDefinition];

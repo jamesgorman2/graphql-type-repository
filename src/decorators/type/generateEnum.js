@@ -24,14 +24,15 @@ import {
 
 import {
   Option,
+  Try,
   someOrNone,
 } from '../../util';
 
 import {
-  getDeprecationReason,
+  getDeprecationReasonObject,
 } from './getDeprecationReason';
 import {
-  getDescription,
+  getDescriptionObject,
 } from './getDescription';
 
 function getValues(
@@ -39,44 +40,55 @@ function getValues(
   configIn: Option<EnumConfig>,
   enumName: string,
   module: Module
-): GraphQLEnumValueConfigMap {
+): Try<GraphQLEnumValueConfigMap> {
   return values.reduce(
-    (map, v) => {
-      const config = {};
-
+    (acc, v) => {
       const name = v.name.value;
 
       const configInForValue = configIn
         .mapOrNone(c => c.values)
         .mapOrNone(c => c[name]);
 
-      getDescription(
+      const description = getDescriptionObject(
         v,
         configInForValue.mapOrNone(c => c.description),
         'enum value',
         `${enumName}.${name}`,
         module.name
-      )
-        .forEach((description) => { config.description = description; });
+      );
 
-      getDeprecationReason(
+      const deprecationReason = getDeprecationReasonObject(
         someOrNone(v.directives),
         configInForValue.mapOrNone(c => c.deprecationReason),
         'enum value',
         `${enumName}.${name}`,
         module.name
+      );
+
+      const config = Try.of(
+        configInForValue.mapOrNone(c => c.value)
+          .map(value => ({ value }))
+          .getOrElse({})
       )
-        .forEach((deprecationReason) => { config.deprecationReason = deprecationReason; });
+        .mergeWith(
+          description,
+          (c1, c2) => ({ ...c1, ...c2 })
+        )
+        .mergeWith(
+          deprecationReason,
+          (c1, c2) => ({ ...c1, ...c2 })
+        );
 
-      configInForValue.mapOrNone(c => c.value)
-        .forEach((value) => { config.value = value; });
-
-      return {
-        ...map,
-        [name]: config,
-      };
+      return acc.mergeWith(
+        config,
+        (accumulatedConfig, newValueConfig) => ({
+          ...accumulatedConfig,
+          [name]: newValueConfig,
+        }
+        )
+      );
     },
-    {}
+    Try.of({})
   );
 }
 
@@ -84,24 +96,31 @@ function generateEnumFromNamedDefinition(
   namedDefinition: NamedDefinitionNode<*>,
   typeMap: TypeMap,
   module: Module
-): GraphQLNamedType {
+): Try<GraphQLNamedType> {
   const configIn: Option<EnumConfig> = (namedDefinition.config: any);
   const definition: EnumTypeDefinitionNode = (namedDefinition.definition: any);
-  const config: GraphQLEnumTypeConfig = {
-    name: namedDefinition.name,
-    values: getValues(definition.values, configIn, namedDefinition.name, module),
-  };
-
-  getDescription(
+  const values = getValues(definition.values, configIn, namedDefinition.name, module);
+  const description = getDescriptionObject(
     namedDefinition.definition,
-    configIn.mapOrNone(c => c.description),
+    configIn.mapOrNone(cIn => cIn.description),
     'enum',
     namedDefinition.name,
     module.name
-  )
-    .forEach((d) => { config.description = d; });
+  );
 
-  return new GraphQLEnumType(config);
+  const config: Try<GraphQLEnumTypeConfig> = values.map(
+    vs => ({
+      name: namedDefinition.name,
+      values: vs,
+    })
+  )
+    .mergeWith(
+      description,
+      (enumConfig: GraphQLEnumTypeConfig, enumDescription) =>
+        ({ ...enumConfig, ...enumDescription })
+    );
+
+  return config.map(c => new GraphQLEnumType(c));
 }
 
 export const generateEnum = ['EnumTypeDefinition', generateEnumFromNamedDefinition];

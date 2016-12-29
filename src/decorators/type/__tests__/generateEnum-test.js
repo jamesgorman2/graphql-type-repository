@@ -360,4 +360,42 @@ describe('generateEnum', () => {
     expect(generateTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
+  it('should report multiple errors', () => {
+    const g = FlattenedTypeGraph.from(
+      new ModuleRepository()
+        .withModule(
+          new Module('foo')
+            .withSchema(
+              `# description
+              enum E {
+                # description
+                A @deprecated
+                # description
+                B
+              }`,
+            {
+              E: {
+                description: 'description',
+                values: {
+                  A: {
+                    description: 'description',
+                    deprecationReason: 'very good reason',
+                  },
+                  B: {
+                    description: 'description',
+                  },
+                },
+              },
+            }
+            )
+        )
+    );
+    expect(generateTypes(g))
+      .toHaveErrors([
+        'Description for enum E supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
+        'Description for enum value E.A supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
+        'Deprecation for enum value E.A supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
+        'Description for enum value E.B supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
+      ]);
+  });
 });

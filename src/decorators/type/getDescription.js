@@ -6,6 +6,7 @@ import { getDescription as gqlGetDescription } from 'graphql/utilities/buildASTS
 
 import {
   Option,
+  Try,
   someOrNone,
 } from '../../util';
 
@@ -17,9 +18,26 @@ export function getDescription(
   type: string,
   name: string,
   module: string
-): Option<string> {
-  return someOrNone(gqlGetDescription(node)).xor(
-    descriptionFromConfig,
-    configConflictError('description', type, name, module)
+): Try<Option<string>> {
+  return Try.of(() =>
+    someOrNone(gqlGetDescription(node)).xor(
+      descriptionFromConfig,
+      configConflictError('description', type, name, module)
+    )
   );
+}
+
+export function getDescriptionObject(
+  node: ASTNode,
+  descriptionFromConfig: Option<string>,
+  type: string,
+  name: string,
+  module: string
+): Try<{ description?: ?string }> {
+  return getDescription(node, descriptionFromConfig, type, name, module)
+    .map(
+      o =>
+        o.map(d => ({ description: d }))
+          .getOrElse({})
+    );
 }

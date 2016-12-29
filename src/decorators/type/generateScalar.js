@@ -21,6 +21,7 @@ import {
 } from '../../graph';
 
 import {
+  Try,
   someOrNone,
 } from '../../util';
 
@@ -28,51 +29,78 @@ import {
   GraphQLTypeError,
 } from './GraphQLTypeError';
 import {
-  getDescription,
+  getDescriptionObject,
 } from './getDescription';
+
+function getConfigIn(
+  namedDefinition: NamedDefinitionNode<*>,
+  module: Module
+): Try<ScalarConfig<*, *>> {
+  if (namedDefinition.config.isNone()) {
+    return Try.failure(
+      new GraphQLTypeError(
+        `Scalar ${namedDefinition.name} missing required configs in module ${module.name}.`
+      )
+    );
+  }
+
+  const configIn: ScalarConfig<*, *> = (namedDefinition.config.get(): any);
+  if (!configIn.serialize) {
+    return Try.failure(
+      new GraphQLTypeError(
+        `Scalar ${namedDefinition.name} missing required config parameter serialize in module ${module.name}.`
+      )
+    );
+  }
+  return Try.of(configIn);
+}
 
 export function generateScalarFromNamedDefinition(
   namedDefinition: NamedDefinitionNode<*>,
   typeMap: TypeMap,
   module: Module
-): GraphQLNamedType {
-  namedDefinition.config.ifNone(
-    () => {
-      throw new GraphQLTypeError(
-        `Scalar ${namedDefinition.name} missing required configs in module ${module.name}.`
-      );
-    }
+): Try<GraphQLNamedType> {
+  const configIn = getConfigIn(namedDefinition, module);
+
+  const description = configIn.flatMap(
+    cIn =>
+      getDescriptionObject(
+        namedDefinition.definition,
+        someOrNone(cIn.description),
+        'scalar',
+        namedDefinition.name,
+        module.name
+      )
   );
-  const configIn: ScalarConfig<*, *> = (namedDefinition.config.get(): any);
 
-  if (!configIn.serialize) {
-    throw new GraphQLTypeError(
-      `Scalar ${namedDefinition.name} missing required config parameter serialize in module ${module.name}.`
-    );
-  }
+  const config: Try<GraphQLScalarTypeConfig<*, *>> = configIn.flatMap(
+    cIn =>
+      Try.success({
+        name: namedDefinition.name,
+        serialize: cIn.serialize,
+      })
+        .map(
+          c => (
+            cIn.parseValue ?
+            { ...c, parseValue: cIn.parseValue } :
+            c
+          )
+        )
+        .map(
+          c => (
+            cIn.parseLiteral ?
+            { ...c, parseLiteral: cIn.parseLiteral } :
+            c
+          )
+        )
+        .mergeWith(
+          description,
+          (c, enumDescription) =>
+            ({ ...c, ...enumDescription })
+        )
+  );
 
-  const config: GraphQLScalarTypeConfig<*, *> = {
-    name: namedDefinition.name,
-    serialize: configIn.serialize,
-  };
-
-  if (configIn.parseValue) {
-    config.parseValue = configIn.parseValue;
-  }
-  if (configIn.parseLiteral) {
-    config.parseLiteral = configIn.parseLiteral;
-  }
-
-  getDescription(
-    namedDefinition.definition,
-    someOrNone(configIn.description),
-    'scalar',
-    namedDefinition.name,
-    module.name
-  )
-    .forEach((d) => { config.description = d; });
-
-  return new GraphQLScalarType(config);
+  return config.map(c => new GraphQLScalarType(c));
 }
 
 export const generateScalar = ['ScalarTypeDefinition', generateScalarFromNamedDefinition];
