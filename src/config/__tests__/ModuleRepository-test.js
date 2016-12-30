@@ -26,7 +26,7 @@ const type: GraphQLObjectType = new GraphQLObjectType({
   },
 });
 
-describe('', () => {
+describe('ModuleRepository', () => {
   describe('constructor', () => {
     it('should be empty when initialised', () => {
       expect(new ModuleRepository().isEmpty()).toEqual(true);

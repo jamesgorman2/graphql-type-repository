@@ -27,7 +27,7 @@ import {
 
 expect.extend({ toHaveErrors });
 
-describe('module', () => {
+describe('Module', () => {
   describe('constructor', () => {
     it('should require name', () => {
       // flow-disable-next-line

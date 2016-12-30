@@ -24,6 +24,7 @@ import type {
 
 import {
   Option,
+  Try,
   assert,
   isNonEmptyString,
   none,
@@ -99,16 +100,16 @@ function nodeName(node: TypeDefinitionNode | DirectiveDefinitionNode): string {
 }
 
 // eslint-disable-next-line no-use-before-define
-function assertNewNamedType(name: string, module: Module): void {
-  assert(
+function assertNewNamedType(name: string, module: Module): Try<void> {
+  return assert(
     newNamedType(name, module),
     `Cannot add type with duplicate name '${name}'.`,
   );
 }
 
 // eslint-disable-next-line no-use-before-define
-function assertNewDirective(name: string, module: Module): void {
-  assert(
+function assertNewDirective(name: string, module: Module): Try<void> {
+  return assert(
     newDirective(name, module),
     `Cannot add directive with duplicate name '${name}'.`,
   );
@@ -118,107 +119,116 @@ function withDefinitionNode(
   module: Module, // eslint-disable-line no-use-before-define
   node: ASTNode,
   config: Option<TypeConfig>
-): Module { // eslint-disable-line no-use-before-define
+): Try<Module> { // eslint-disable-line no-use-before-define
   if (isExtensionNode(node)) {
     const n: ObjectTypeDefinitionNode = (node: any).definition;
     const name = nodeName(n);
-    // eslint-disable-next-line no-use-before-define
-    return new Module(
-      module.name,
-      module.types,
-      module.typeDefinitionNodes,
-      [...module.extensionDefinitionNodes, new NamedDefinitionNode(name, n, config)],
-      module.directives,
-      module.directiveDefinitionNodes,
-      module.schemaDefinitionNode,
-      module.errors,
+    return Try.of(
+      new Module(
+        module.name,
+        module.types,
+        module.typeDefinitionNodes,
+        [...module.extensionDefinitionNodes, new NamedDefinitionNode(name, n, config)],
+        module.directives,
+        module.directiveDefinitionNodes,
+        module.schemaDefinitionNode,
+        module.errors
+      )
     );
   } else if (isTypeDefinition(node)) {
     const n: TypeDefinitionNode = (node: any);
     const name = nodeName(n);
-    assertNewNamedType(name, module);
-    // eslint-disable-next-line no-use-before-define
-    return new Module(
-      module.name,
-      module.types,
-      [...module.typeDefinitionNodes, new NamedDefinitionNode(name, n, config)],
-      module.extensionDefinitionNodes,
-      module.directives,
-      module.directiveDefinitionNodes,
-      module.schemaDefinitionNode,
-      module.errors,
-    );
+    return assertNewNamedType(name, module)
+      .map(_ =>
+        new Module(
+          module.name,
+          module.types,
+          [...module.typeDefinitionNodes, new NamedDefinitionNode(name, n, config)],
+          module.extensionDefinitionNodes,
+          module.directives,
+          module.directiveDefinitionNodes,
+          module.schemaDefinitionNode,
+          module.errors
+        )
+      );
   } else if (isSchemaDefinition(node)) {
     const n: SchemaDefinitionNode = (node: any);
-    // eslint-disable-next-line no-use-before-define
-    return new Module(
-      module.name,
-      module.types,
-      module.typeDefinitionNodes,
-      module.extensionDefinitionNodes,
-      module.directives,
-      module.directiveDefinitionNodes,
-      some(n),
-      module.errors,
+    return Try.of(
+      new Module(
+        module.name,
+        module.types,
+        module.typeDefinitionNodes,
+        module.extensionDefinitionNodes,
+        module.directives,
+        module.directiveDefinitionNodes,
+        some(n),
+        module.errors,
+      )
     );
   } else if (isDirectiveDefinition(node)) {
     const n: DirectiveDefinitionNode = (node: any);
     const name = nodeName(n);
-    assertNewDirective(name, module);
-    // eslint-disable-next-line no-use-before-define
-    return new Module(
-      module.name,
-      module.types,
-      module.typeDefinitionNodes,
-      module.extensionDefinitionNodes,
-      module.directives,
-      [...module.directiveDefinitionNodes, new NamedDefinitionNode(name, n, config)],
-      module.schemaDefinitionNode,
-      module.errors,
-    );
+    return assertNewDirective(name, module)
+      .map(_ =>
+        new Module(
+          module.name,
+          module.types,
+          module.typeDefinitionNodes,
+          module.extensionDefinitionNodes,
+          module.directives,
+          [...module.directiveDefinitionNodes, new NamedDefinitionNode(name, n, config)],
+          module.schemaDefinitionNode,
+          module.errors
+        )
+      );
   }
-  throw new Error('Parameter node must be a TypeSystemDefinitionNode.');
+  return Try.failure(new Error('Parameter node must be a TypeSystemDefinitionNode.'));
 }
 
 function withDocumentNode(
   module: Module, // eslint-disable-line no-use-before-define
   node: DocumentNode,
   configs: Option<TypeConfigMap>
-): Module {  // eslint-disable-line no-use-before-define
-  assert(node.kind === 'Document', 'Parameter node must be a DocumentNode.');
-  const matchedConfigs = [];
-  const definitions: DefinitionNode[] = node.definitions;
-  const newModule = definitions
-    .reduce(
-      // eslint-disable-next-line no-use-before-define
-      (m: Module, childNode: DefinitionNode) =>
-        maybeName(childNode)
-          .flatMap(
-            (name) => {
-              const matchedConfig = configs.mapOrNone(r => r[name]);
-              matchedConfig.forEach((_) => { matchedConfigs.push(name); });
-              return matchedConfig;
+): Try<Module> {  // eslint-disable-line no-use-before-define
+  return assert(node.kind === 'Document', 'Parameter node must be a DocumentNode.')
+    .flatMap(
+      (_) => {
+        const matchedConfigs = [];
+        const definitions: DefinitionNode[] = node.definitions;
+        const newModule = definitions
+          .reduce(
+            // eslint-disable-next-line no-use-before-define
+            (m: Module, childNode: DefinitionNode) =>
+              maybeName(childNode)
+                .flatMap(
+                  (name) => {
+                    const matchedConfig = configs.mapOrNone(r => r[name]);
+                    matchedConfig.forEach((_1) => { matchedConfigs.push(name); });
+                    return matchedConfig;
+                  }
+                )
+                .map(
+                  (matchedconfig: TypeConfig) =>
+                    m.withDefinitionNode(childNode, matchedconfig)
+                )
+                .getOrElse(m.withDefinitionNode(childNode)),
+            module,
+          );
+        return configs.map(
+          (cs) => {
+            const configNames = Object.keys(cs);
+            if (matchedConfigs.length < configNames.length) {
+              const unmatchedConfigNames = configNames.filter(n => !matchedConfigs.includes(n));
+              const plural = unmatchedConfigNames.length > 1 ? 's' : '';
+              const nameString = unmatchedConfigNames.map(n => `'${n}'`).join(', ');
+              return Try.failure(new Error(`Cannot add config${plural} ${nameString} with no matching type${plural}.`));
             }
-          )
-          .map(
-            (matchedconfig: TypeConfig) =>
-              m.withDefinitionNode(childNode, matchedconfig)
-          )
-          .getOrElse(m.withDefinitionNode(childNode)),
-      module,
-    );
-  configs.forEach(
-    (cs) => {
-      const configNames = Object.keys(cs);
-      if (matchedConfigs.length < configNames.length) {
-        const unmatchedConfigNames = configNames.filter(n => !matchedConfigs.includes(n));
-        const plural = unmatchedConfigNames.length > 1 ? 's' : '';
-        const nameString = unmatchedConfigNames.map(n => `'${n}'`).join(', ');
-        throw new Error(`Cannot add config${plural} ${nameString} with no matching type${plural}.`);
+            return Try.success(newModule);
+          }
+        )
+          .getOrElse(Try.success(newModule));
       }
-    }
-  );
-  return newModule;
+    );
 }
 
 export class Module {
@@ -241,7 +251,7 @@ export class Module {
     schemaDefinitionNode: Option<SchemaDefinitionNode> = none,
     errors: Error[] = [],
   ): void {
-    assert(isNonEmptyString(name), 'Parameter name must be a non-empty string.');
+    assert(isNonEmptyString(name), 'Parameter name must be a non-empty string.').throw();
     this.name = name;
     this.types = types;
     this.typeDefinitionNodes = typeDefinitionNodes;
@@ -275,61 +285,79 @@ export class Module {
         [...this.errors, error],
       );
 
+  withErrors: (errors: Error[]) => Module =
+    errors =>
+      new Module(
+        this.name,
+        this.types,
+        this.typeDefinitionNodes,
+        this.extensionDefinitionNodes,
+        this.directives,
+        this.directiveDefinitionNodes,
+        this.schemaDefinitionNode,
+        [...this.errors, ...errors],
+      );
+
   withType: (type: GraphQLNamedType) => Module =
     type =>
-      this.captureError(() => {
-        assert(isNamedType(type), 'Parameter type must be a GraphQLNamedType.');
-        assertNewNamedType(type.name, this);
-        return new Module(
-          this.name,
-          [...this.types, type],
-          this.typeDefinitionNodes,
-          this.extensionDefinitionNodes,
-          this.directives,
-          this.directiveDefinitionNodes,
-          this.schemaDefinitionNode,
-          this.errors,
-        );
-      });
+      this.captureError(
+        assert(isNamedType(type), 'Parameter type must be a GraphQLNamedType.')
+          .flatMap(_ => assertNewNamedType(type.name, this))
+          .map(
+            _ =>
+              new Module(
+                this.name,
+                [...this.types, type],
+                this.typeDefinitionNodes,
+                this.extensionDefinitionNodes,
+                this.directives,
+                this.directiveDefinitionNodes,
+                this.schemaDefinitionNode,
+                this.errors,
+              )
+          )
+      );
 
   withDirective: (directive: GraphQLDirective) => Module =
     directive =>
-      this.captureError(() => {
-        assert(isDirective(directive), 'Parameter directive must be a GraphQLDirective.');
-        assertNewDirective(directive.name, this);
-        return new Module(
-          this.name,
-          this.types,
-          this.typeDefinitionNodes,
-          this.extensionDefinitionNodes,
-          [...this.directives, directive],
-          this.directiveDefinitionNodes,
-          this.schemaDefinitionNode,
-          this.errors,
-        );
-      });
+      this.captureError(
+        assert(isDirective(directive), 'Parameter directive must be a GraphQLDirective.')
+          .flatMap(_ => assertNewDirective(directive.name, this))
+          .map(
+            _ =>
+              new Module(
+                this.name,
+                this.types,
+                this.typeDefinitionNodes,
+                this.extensionDefinitionNodes,
+                [...this.directives, directive],
+                this.directiveDefinitionNodes,
+                this.schemaDefinitionNode,
+                this.errors,
+              )
+          )
+      );
 
   withDefinitionNode: (node: DefinitionNode, config: ?TypeConfig) => Module =
     (node, config) =>
-      this.captureError(() => withDefinitionNode(this, node, someOrNone(config)));
+      this.captureError(withDefinitionNode(this, node, someOrNone(config)));
 
   withDocumentNode: (node: DocumentNode, configs: ?TypeConfigMap) => Module =
     (node, configs) =>
-      this.captureError(() => withDocumentNode(this, node, someOrNone(configs)));
+      this.captureError(withDocumentNode(this, node, someOrNone(configs)));
 
   withSchema: (schema: string, configs: ?TypeConfigMap) => Module =
     (schema, configs) =>
-      this.captureError(() => {
-        assert(isNonEmptyString(schema), 'Parameter schema must be a non-empty string.');
-        return this.withDocumentNode(parse(schema), configs);
-      });
+      this.captureError(
+        assert(isNonEmptyString(schema), 'Parameter schema must be a non-empty string.')
+          .map(_ => this.withDocumentNode(parse(schema), configs))
+      );
 
-  captureError: (f: () => Module) => Module =
-    (f) => {
-      try {
-        return f();
-      } catch (e) {
-        return this.withError(e);
-      }
-    }
+  captureError: (maybeModule: Try<Module>) => Module =
+    maybeModule =>
+      maybeModule.toEither()
+        .mapReduce(
+          module => module,
+          this.withErrors
+        )
 }

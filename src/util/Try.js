@@ -4,11 +4,24 @@
 import type { Thunk } from 'graphql';
 
 import {
+  CompositeError,
+} from './CompositeError';
+import {
   Either,
   left,
   right,
 } from './either';
 import { resolveThunk } from './resolveThunk';
+
+function maybeCompositeError(errors: Error[]) {
+  if (errors.length === 0) {
+    throw new Error();
+  }
+  if (errors.length === 1) {
+    throw errors[0];
+  }
+  throw new CompositeError(errors);
+}
 
 export class Try<T> {
 
@@ -31,6 +44,7 @@ export class Try<T> {
   // eslint-disable-next-line no-undef
   mergeWith: <T1, R>(other: Try<T1>, f: (t: T, t1: T1) => R) => Try<R>;
   toEither: () => Either<T, Error[]>;
+  throw: () => void;
 }
 
 export class Success<T> extends Try<T> {
@@ -63,6 +77,9 @@ export class Success<T> extends Try<T> {
 
   toEither: () => Either<T, Error[]> =
     () => left(this.t);
+
+  throw: () => void =
+    () => {};
 }
 
 export class Failure<T> extends Try<T> {
@@ -93,4 +110,7 @@ export class Failure<T> extends Try<T> {
 
   toEither: () => Either<T, Error[]> =
     () => right(this.errors);
+
+  throw: () => void =
+    () => { throw maybeCompositeError(this.errors); };
 }

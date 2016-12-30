@@ -1,7 +1,12 @@
 // @flow
 
-export function assert(test: boolean, msg: string): void {
+import {
+  Try,
+} from './Try';
+
+export function assert(test: boolean, msg: string): Try<void> {
   if (!test) {
-    throw new Error(msg);
+    return Try.failure(new Error(msg));
   }
+  return Try.success();
 }

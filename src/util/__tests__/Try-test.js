@@ -7,11 +7,15 @@ import {
 } from '../../__tests__';
 
 import {
+  CompositeError,
+} from '../CompositeError';
+import {
   left,
   right,
 } from '../either';
 
 import {
+  Failure,
   Try,
 } from '../Try';
 
@@ -82,6 +86,11 @@ describe('Try', () => {
         expect(Try.of(1).toEither()).toEqualIgnoreFunctions(left(1));
       });
     });
+    describe('throw', () => {
+      it('should not throw', () => {
+        success(1).throw();
+      });
+    });
   });
   describe('Failure', () => {
     describe('isSuccess', () => {
@@ -120,6 +129,20 @@ describe('Try', () => {
       it('should return right', () => {
         expect(failure(new Error('foo')).toEither())
           .toEqualIgnoreFunctions(right([new Error('foo')]));
+      });
+    });
+    describe('throw', () => {
+      it('should throw', () => {
+        const e = new Error('foo');
+        expect(() => failure(e).throw()).toThrowError(e);
+      });
+      it('should throw empty', () => {
+        expect(() => new Failure([]).throw()).toThrowError(new Error());
+      });
+      it('should throw multiple', () => {
+        const e1 = new Error('foo');
+        const e2 = new Error('foo');
+        expect(() => new Failure([e1, e2]).throw()).toThrowError(new CompositeError([e1, e2]));
       });
     });
   });
