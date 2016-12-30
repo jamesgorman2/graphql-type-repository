@@ -19,10 +19,10 @@ import {
   none,
 } from '../../util';
 
-import { generateEnum } from './generateEnum';
-import { generateInterface } from './generateInterface';
-import { generateScalar } from './generateScalar';
-import { generateUnion } from './generateUnion';
+import { makeEnum } from './makeEnum';
+import { makeInterface } from './makeInterface';
+import { makeScalar } from './makeScalar';
+import { makeUnion } from './makeUnion';
 
 type Builder =
   (
@@ -32,10 +32,10 @@ type Builder =
   ) => Try<GraphQLNamedType>;
 
 const builders: [string, Builder][] = [
-  generateEnum,
-  generateInterface,
-  generateScalar,
-  generateUnion,
+  makeEnum,
+  makeInterface,
+  makeScalar,
+  makeUnion,
 ];
 
 function buildTypeFromBuilder(
@@ -71,7 +71,7 @@ function getRawType(type: Type): Option<Try<GraphQLNamedType>> {
   );
 }
 
-function generateType(type: Type, typeMap: TypeMap): Try<Type> {
+function makeType(type: Type, typeMap: TypeMap): Try<Type> {
   return getRawType(type).or(() => buildType(type, typeMap))
     .map(
       namedTypeTry =>
@@ -82,13 +82,13 @@ function generateType(type: Type, typeMap: TypeMap): Try<Type> {
     .getOrElse(Try.of(type));
 }
 
-export function generateTypes(graphIn: FlattenedTypeGraph): FlattenedTypeGraph {
+export function makeTypes(graphIn: FlattenedTypeGraph): FlattenedTypeGraph {
   const typeMap = new TypeMap();
   return graphIn.types.values()
     .filter(type => type.type.isNone())
     .reduce(
       (graph, type) =>
-        generateType(type, typeMap).toEither()
+        makeType(type, typeMap).toEither()
           .mapReduce(graph.replaceType, graph.withErrors),
       graphIn
     )

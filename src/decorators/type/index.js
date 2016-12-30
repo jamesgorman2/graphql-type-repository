@@ -1,6 +1,6 @@
 // @flow
 
-export { generateTypes } from './generateTypes';
+export { makeTypes } from './makeTypes';
 
 export { getDeprecationReason } from './getDeprecationReason';
 

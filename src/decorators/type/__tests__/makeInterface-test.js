@@ -2,6 +2,7 @@
 /* eslint-env jest */
 
 import {
+  DEFAULT_DEPRECATION_REASON,
   GraphQLID,
 } from 'graphql';
 
@@ -23,12 +24,12 @@ import {
 } from '../../system';
 
 import {
-  generateTypes,
-} from '../generateTypes';
+  makeTypes,
+} from '../makeTypes';
 
 expect.extend({ toHaveErrors });
 
-describe('generateInterface', () => {
+describe('makeInterface', () => {
   it('should create basic interface', () => {
     const g = FlattenedTypeGraph.from(
       new ModuleRepository()
@@ -38,7 +39,7 @@ describe('generateInterface', () => {
         )
     )
       .map(appendSystemTypes);
-    expect(generateTypes(g).typeMap.getInterfaceType('I').name)
+    expect(makeTypes(g).typeMap.getInterfaceType('I').name)
       .toEqual('I');
   });
   it('should use description from schema', () => {
@@ -53,7 +54,7 @@ describe('generateInterface', () => {
         )
     )
       .map(appendSystemTypes);
-    expect(generateTypes(g).typeMap.getInterfaceType('I').description)
+    expect(makeTypes(g).typeMap.getInterfaceType('I').description)
       .toEqual('description');
   });
   it('should use description from config', () => {
@@ -72,7 +73,7 @@ describe('generateInterface', () => {
         )
     )
       .map(appendSystemTypes);
-    expect(generateTypes(g).typeMap.getInterfaceType('I').description)
+    expect(makeTypes(g).typeMap.getInterfaceType('I').description)
       .toEqual('description');
   });
   it('should error when description for supplied in both schema and config', () => {
@@ -91,7 +92,7 @@ describe('generateInterface', () => {
             )
         )
     );
-    expect(generateTypes(g))
+    expect(makeTypes(g))
       .toHaveErrors([
         'Description for interface I supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
       ]);
@@ -108,10 +109,10 @@ describe('generateInterface', () => {
         )
     )
       .map(appendSystemTypes);
-    expect(generateTypes(g).typeMap.getInterfaceType('I').getFields().id.type)
+    expect(makeTypes(g).typeMap.getInterfaceType('I').getFields().id.type)
       .toBe(GraphQLID);
   });
-  it('should attach argument map', () => {
+  it('should attach arguments', () => {
 
   });
   it('should attach field resolver', () => {
@@ -131,11 +132,33 @@ describe('generateInterface', () => {
         )
     )
       .map(appendSystemTypes);
-    expect(generateTypes(g).typeMap.getInterfaceType('I').getFields().id.description)
+    expect(makeTypes(g).typeMap.getInterfaceType('I').getFields().id.description)
       .toEqual('an id');
   });
   it('should attach field description from config', () => {
-
+    const g = FlattenedTypeGraph.from(
+      new ModuleRepository()
+        .withModule(
+          new Module('foo')
+            .withSchema(
+              `interface I {
+                id: ID
+              }`,
+            {
+              I: {
+                fields: {
+                  id: {
+                    description: 'an id',
+                  },
+                },
+              },
+            }
+            )
+        )
+    )
+      .map(appendSystemTypes);
+    expect(makeTypes(g).typeMap.getInterfaceType('I').getFields().id.description)
+      .toEqual('an id');
   });
   it('should error on field description from schema and config', () => {
     const g = FlattenedTypeGraph.from(
@@ -160,22 +183,94 @@ describe('generateInterface', () => {
         )
     )
       .map(appendSystemTypes);
-    expect(generateTypes(g))
+    expect(makeTypes(g))
       .toHaveErrors([
         'Description for interface field I.id supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
       ]);
   });
   it('should attach field default deprecation reason from schema', () => {
-
+    const g = FlattenedTypeGraph.from(
+      new ModuleRepository()
+        .withModule(
+          new Module('foo')
+            .withSchema(
+              `interface I {
+                id: ID @deprecated
+              }`
+            )
+        )
+    )
+      .map(appendSystemTypes);
+    expect(makeTypes(g).typeMap.getInterfaceType('I').getFields().id.deprecationReason)
+      .toEqual(DEFAULT_DEPRECATION_REASON);
   });
   it('should attach field deprecation reason from schema', () => {
-
+    const g = FlattenedTypeGraph.from(
+      new ModuleRepository()
+        .withModule(
+          new Module('foo')
+            .withSchema(
+              `interface I {
+                id: ID @deprecated(reason: "foo")
+              }`
+            )
+        )
+    )
+      .map(appendSystemTypes);
+    expect(makeTypes(g).typeMap.getInterfaceType('I').getFields().id.deprecationReason)
+      .toEqual('foo');
   });
   it('should attach field deprecation reason from config', () => {
-
+    const g = FlattenedTypeGraph.from(
+      new ModuleRepository()
+        .withModule(
+          new Module('foo')
+            .withSchema(
+              `interface I {
+                id: ID
+              }`,
+            {
+              I: {
+                fields: {
+                  id: {
+                    deprecationReason: 'foo',
+                  },
+                },
+              },
+            }
+            )
+        )
+    )
+      .map(appendSystemTypes);
+    expect(makeTypes(g).typeMap.getInterfaceType('I').getFields().id.deprecationReason)
+      .toEqual('foo');
   });
   it('should error on field deprecation reason from schema and config', () => {
-
+    const g = FlattenedTypeGraph.from(
+      new ModuleRepository()
+        .withModule(
+          new Module('foo')
+            .withSchema(
+              `interface I {
+                id: ID @deprecated
+              }`,
+            {
+              I: {
+                fields: {
+                  id: {
+                    deprecationReason: 'foo',
+                  },
+                },
+              },
+            }
+            )
+        )
+    )
+      .map(appendSystemTypes);
+    expect(makeTypes(g))
+      .toHaveErrors([
+        'Deprecation for interface field I.id supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
+      ]);
   });
   it('should append resolve type', () => {
     const r = (_1, _2, _3) => '';
@@ -194,6 +289,6 @@ describe('generateInterface', () => {
             )
         )
     );
-    expect(generateTypes(g).typeMap.getInterfaceType('I').resolveType).toBe(r);
+    expect(makeTypes(g).typeMap.getInterfaceType('I').resolveType).toBe(r);
   });
 });

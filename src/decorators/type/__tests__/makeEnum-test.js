@@ -20,12 +20,12 @@ import {
 } from '../../../graph';
 
 import {
-  generateTypes,
-} from '../generateTypes';
+  makeTypes,
+} from '../makeTypes';
 
 expect.extend({ toHaveErrors });
 
-describe('generateEnum', () => {
+describe('makeEnum', () => {
   it('should create basic enum', () => {
     const g = FlattenedTypeGraph.from(
       new ModuleRepository()
@@ -47,7 +47,7 @@ describe('generateEnum', () => {
         C: { },
       },
     });
-    expect(generateTypes(g).typeMap.getType('E'))
+    expect(makeTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should use description for enum from schema', () => {
@@ -70,7 +70,7 @@ describe('generateEnum', () => {
         A: { },
       },
     });
-    expect(generateTypes(g).typeMap.getType('E'))
+    expect(makeTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should use description for enum from config', () => {
@@ -97,7 +97,7 @@ describe('generateEnum', () => {
         A: { },
       },
     });
-    expect(generateTypes(g).typeMap.getType('E'))
+    expect(makeTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should error when description for enum supplied in both schema and config', () => {
@@ -118,7 +118,7 @@ describe('generateEnum', () => {
             )
         )
     );
-    expect(generateTypes(g))
+    expect(makeTypes(g))
       .toHaveErrors([
         'Description for enum E supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
       ]);
@@ -144,7 +144,7 @@ describe('generateEnum', () => {
         },
       },
     });
-    expect(generateTypes(g).typeMap.getType('E'))
+    expect(makeTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should use description for value from config', () => {
@@ -176,7 +176,7 @@ describe('generateEnum', () => {
         },
       },
     });
-    expect(generateTypes(g).typeMap.getType('E'))
+    expect(makeTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should error when description for value supplied in both schema and config', () => {
@@ -201,7 +201,7 @@ describe('generateEnum', () => {
             )
         )
     );
-    expect(generateTypes(g))
+    expect(makeTypes(g))
       .toHaveErrors([
         'Description for enum value E.A supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
       ]);
@@ -226,7 +226,7 @@ describe('generateEnum', () => {
         },
       },
     });
-    expect(generateTypes(g).typeMap.getType('E'))
+    expect(makeTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should use reason from deprecated directive', () => {
@@ -249,7 +249,7 @@ describe('generateEnum', () => {
         },
       },
     });
-    expect(generateTypes(g).typeMap.getType('E'))
+    expect(makeTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should use deprecationReason from config', () => {
@@ -281,7 +281,7 @@ describe('generateEnum', () => {
         },
       },
     });
-    expect(generateTypes(g).typeMap.getType('E'))
+    expect(makeTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should throw when given deprecated directive and deprecationReason', () => {
@@ -305,7 +305,7 @@ describe('generateEnum', () => {
             )
         )
     );
-    expect(generateTypes(g))
+    expect(makeTypes(g))
       .toHaveErrors([
         'Deprecation for enum value E.A supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
       ]);
@@ -357,7 +357,7 @@ describe('generateEnum', () => {
         },
       },
     });
-    expect(generateTypes(g).typeMap.getType('E'))
+    expect(makeTypes(g).typeMap.getType('E'))
       .toEqual(t);
   });
   it('should report multiple errors', () => {
@@ -390,7 +390,7 @@ describe('generateEnum', () => {
             )
         )
     );
-    expect(generateTypes(g))
+    expect(makeTypes(g))
       .toHaveErrors([
         'Description for enum E supplied in both schema and config in module foo. It must only be supplied in one of these locations.',
         'Description for enum value E.A supplied in both schema and config in module foo. It must only be supplied in one of these locations.',

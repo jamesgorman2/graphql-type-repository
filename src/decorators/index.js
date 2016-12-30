@@ -21,4 +21,4 @@ export {
   appendSystemTypes,
 } from './system';
 
-export { generateTypes } from './type';
+export { makeTypes } from './type';

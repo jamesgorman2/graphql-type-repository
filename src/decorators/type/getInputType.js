@@ -5,7 +5,7 @@ import {
   GraphQLNonNull,
 } from 'graphql';
 import type {
-  GraphQLOutputType,
+  GraphQLInputType,
   TypeNode,
 } from 'graphql';
 
@@ -30,7 +30,7 @@ function getList(
 ): Option<any> {
   if (typeNode.kind === 'ListType') {
     return getNonNull(typeNode.type, typeMap, referringTypeName, module)
-      .orSome(() => getNamedOutputType((typeNode: any).type, typeMap, referringTypeName, module))
+      .orSome(() => getNamedInputType((typeNode: any).type, typeMap, referringTypeName, module))
       .map(inner => new GraphQLList(inner));
   }
   return none;
@@ -44,31 +44,31 @@ function getNonNull(
 ): Option<any> {
   if (typeNode.kind === 'NonNullType') {
     return getList(typeNode.type, typeMap, referringTypeName, module)
-      .orSome(() => getNamedOutputType((typeNode: any).type, typeMap, referringTypeName, module))
+      .orSome(() => getNamedInputType((typeNode: any).type, typeMap, referringTypeName, module))
       .map(inner => new GraphQLNonNull(inner));
   }
   return none;
 }
 
-function getNamedOutputType(
+function getNamedInputType(
   typeNode: TypeNode,
   typeMap: TypeMap,
   referringTypeName: string,
   module: Module
-): GraphQLOutputType {
-  return typeMap.getOutputType((typeNode: any).name.value, referringTypeName, module);
+): GraphQLInputType {
+  return typeMap.getInutType((typeNode: any).name.value, referringTypeName, module);
 }
 
 
-export function getOutputType(
+export function getInputType(
   typeNode: TypeNode,
   typeMap: TypeMap,
   referringTypeName: string,
   module: Module
-): GraphQLOutputType {
-  const t: GraphQLOutputType =
+): GraphQLInputType {
+  const t: GraphQLInputType =
     getList(typeNode, typeMap, referringTypeName, module)
       .or(() => getNonNull(typeNode, typeMap, referringTypeName, module))
-      .getOrElse(() => getNamedOutputType(typeNode, typeMap, referringTypeName, module));
+      .getOrElse(() => getNamedInputType(typeNode, typeMap, referringTypeName, module));
   return t;
 }

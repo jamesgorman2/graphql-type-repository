@@ -1,14 +1,11 @@
 // @flow
 
 import {
-  GraphQLUnionType,
+  GraphQLInterfaceType,
 } from 'graphql';
 import type {
   GraphQLNamedType,
-  GraphQLObjectType,
-  GraphQLUnionTypeConfig,
-  UnionTypeDefinitionNode,
-  Thunk,
+  GraphQLInterfaceTypeConfig,
 } from 'graphql';
 
 import {
@@ -16,7 +13,7 @@ import {
   NamedDefinitionNode,
 } from '../../config';
 import type {
-  UnionConfig,
+  InterfaceConfig,
 } from '../../config';
 
 import {
@@ -29,42 +26,43 @@ import {
 } from '../../util';
 
 import {
+  makeFields,
+} from './makeFields';
+import {
   getDescriptionObject,
 } from './getDescription';
 
-function getTypes(
-  definition: UnionTypeDefinitionNode,
-  name: string,
-  typeMap: TypeMap,
-  module: Module
-): Thunk<Array<GraphQLObjectType>> {
-  return () =>
-    definition.types
-      .map(node => node.name.value)
-      .map(typeName => typeMap.getObjectType(typeName, name, module));
-}
-
-function generateUnionFromNamedDefinition(
+function makeInterfaceFromNamedDefinition(
   namedDefinition: NamedDefinitionNode<*>,
   typeMap: TypeMap,
   module: Module
 ): Try<GraphQLNamedType> {
   const name = namedDefinition.name;
-  const configIn: Option<UnionConfig> = (namedDefinition.config: any);
-  const types = getTypes(namedDefinition.definition, name, typeMap, module);
+  const configIn: Option<InterfaceConfig> = (namedDefinition.config: any);
+  const fields = makeFields(
+    namedDefinition.definition.fields,
+    configIn.mapOrNone(c => c.fields),
+    'interface',
+    name,
+    typeMap,
+    module
+  );
 
   const description = getDescriptionObject(
     namedDefinition.definition,
     configIn.mapOrNone(c => c.description),
-    'union',
+    'interface',
     namedDefinition.name,
     module.name
   );
 
-  const config: Try<GraphQLUnionTypeConfig<*, *>> = Try.of({
-    name,
-    types,
-  })
+  const config: Try<GraphQLInterfaceTypeConfig<*, *>> =
+    fields.map(
+      fs => ({
+        name,
+        fields: fs,
+      })
+    )
     .map(
       c => ({
         ...c,
@@ -81,7 +79,7 @@ function generateUnionFromNamedDefinition(
         ({ ...c, ...enumDescription })
     );
 
-  return config.map(c => new GraphQLUnionType(c));
+  return config.map(c => new GraphQLInterfaceType(c));
 }
 
-export const generateUnion = ['UnionTypeDefinition', generateUnionFromNamedDefinition];
+export const makeInterface = ['InterfaceTypeDefinition', makeInterfaceFromNamedDefinition];

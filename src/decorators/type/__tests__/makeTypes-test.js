@@ -17,17 +17,17 @@ import {
 } from '../../../graph';
 
 import {
-  generateTypes,
-} from '../generateTypes';
+  makeTypes,
+} from '../makeTypes';
 
-describe('generateTypes', () => {
+describe('makeTypes', () => {
   it('should not change system types', () => {
     const g = new FlattenedTypeGraph()
       .withType(
         new Type(GraphQLID.name)
           .withType(GraphQLID)
       );
-    expect(generateTypes(g).types.get(GraphQLID.name).get().type.get())
+    expect(makeTypes(g).types.get(GraphQLID.name).get().type.get())
       .toBe(GraphQLID);
   });
 
@@ -44,6 +44,6 @@ describe('generateTypes', () => {
           new Module('foo').withType(t)
         )
     );
-    expect(generateTypes(g).types.get('Test').get().type.get()).toBe(t);
+    expect(makeTypes(g).types.get('Test').get().type.get()).toBe(t);
   });
 });

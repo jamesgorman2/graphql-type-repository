@@ -55,7 +55,7 @@ function getConfigIn(
   return Try.of(configIn);
 }
 
-export function generateScalarFromNamedDefinition(
+export function makeScalarFromNamedDefinition(
   namedDefinition: NamedDefinitionNode<*>,
   typeMap: TypeMap,
   module: Module
@@ -103,4 +103,4 @@ export function generateScalarFromNamedDefinition(
   return config.map(c => new GraphQLScalarType(c));
 }
 
-export const generateScalar = ['ScalarTypeDefinition', generateScalarFromNamedDefinition];
+export const makeScalar = ['ScalarTypeDefinition', makeScalarFromNamedDefinition];

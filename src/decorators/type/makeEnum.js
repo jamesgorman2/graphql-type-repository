@@ -92,7 +92,7 @@ function getValues(
   );
 }
 
-function generateEnumFromNamedDefinition(
+function makeEnumFromNamedDefinition(
   namedDefinition: NamedDefinitionNode<*>,
   typeMap: TypeMap,
   module: Module
@@ -123,4 +123,4 @@ function generateEnumFromNamedDefinition(
   return config.map(c => new GraphQLEnumType(c));
 }
 
-export const generateEnum = ['EnumTypeDefinition', generateEnumFromNamedDefinition];
+export const makeEnum = ['EnumTypeDefinition', makeEnumFromNamedDefinition];

@@ -22,6 +22,7 @@ export type EnumConfig = {
 export type FieldConfig = {
   [fieldName: string]: {
     description?: string;
+    deprecationReason?: string;
     resolver?: GraphQLFieldResolver<*>;
   }
 };
