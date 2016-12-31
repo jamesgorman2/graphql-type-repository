@@ -75,7 +75,7 @@ describe('Module', () => {
       });
       expect(m.withType(t).types).toEqual([t]);
     });
-    it('should not mmodify orignal types list', () => {
+    it('should not modify orignal types list', () => {
       const m = new Module('foo');
       const t = new GraphQLObjectType({
         name: 'Test',

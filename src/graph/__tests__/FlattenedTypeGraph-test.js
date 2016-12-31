@@ -53,6 +53,8 @@ import {
 
 expect.extend({ toEqualIgnoreFunctions });
 
+// TODO test - append, directive refs, ???
+
 describe('FlattenedTypeGraph', () => {
   describe('append', () => {
     it('should return new object', () => {
@@ -88,8 +90,8 @@ describe('FlattenedTypeGraph', () => {
 
   describe('extractTypeDefinitions', () => {
     it('should get type and refs', () => {
-      const t: any = parse('type Test {id: ID}').definitions[0];
-      const m = new Module('foo').withSchema('type Test {id: ID}');
+      const t: any = parse('type Test {id(i: Int): ID}').definitions[0];
+      const m = new Module('foo').withSchema('type Test {id(i: Int): ID}');
       expect(extractTypeDefinitions(m).types)
         .toEqualIgnoreFunctions(
           new AppendableMap()
@@ -101,9 +103,11 @@ describe('FlattenedTypeGraph', () => {
                     new NamedDefinitionNode('Test', t),
                   ),
                 )
+                .withTypeRef('Int', m)
                 .withTypeRef('ID', m)
             )
             .put('ID', new Type('ID'))
+            .put('Int', new Type('Int'))
         );
     });
     it('should extract schema types to schema', () => {
@@ -124,8 +128,9 @@ describe('FlattenedTypeGraph', () => {
 
   describe('extractTypeExtensions', () => {
     it('should get type and refs', () => {
-      const t: ObjectTypeDefinitionNode = (parse('extend type Test {id: ID}').definitions[0] : any).definition;
-      const m = new Module('foo').withSchema('extend type Test {id: ID}');
+      const t: ObjectTypeDefinitionNode =
+        (parse('extend type Test {id(i: Int): ID}').definitions[0] : any).definition;
+      const m = new Module('foo').withSchema('extend type Test {id(i: Int): ID}');
       expect(extractTypeExtensions(m).types)
         .toEqualIgnoreFunctions(
           new AppendableMap()
@@ -135,9 +140,11 @@ describe('FlattenedTypeGraph', () => {
                 .withExtension(
                   new ExtensionDefinition(m, new NamedDefinitionNode('Test', t)),
                 )
-                .withTypeRef('ID', m),
+                .withTypeRef('ID', m)
+                .withTypeRef('Int', m),
             )
             .put('ID', new Type('ID'))
+            .put('Int', new Type('Int'))
         );
     });
     it('should extract schema type extensions to schema', () => {

@@ -48,17 +48,33 @@ export function extractTypes(module: Module): FlattenedTypeGraph {
 function getTypeRefs(type: any): string[] {
   const interfaceRefs: string[] = type.interfaces ? type.interfaces.map(i => i.name.value) : [];
   const fieldRefs: string[] = type.fields ? type.fields.map(f => f.type.name.value) : [];
-  return interfaceRefs.concat(fieldRefs);
+  const argumentRefs: string[] =
+    flatMap(
+      type.fields ? type.fields : [],
+      f => (f.arguments ? f.arguments.map(argument => argument.type.name.value) : [])
+    );
+  return interfaceRefs
+    .concat(fieldRefs)
+    .concat(argumentRefs);
 }
 
 function getDirectivesRefs(type: any): string[] {
-  return (type.directives ? type.directives.map(i => i.name.value) : [])
-    .concat(
+  const typeDirectives = type.directives ? type.directives.map(i => i.name.value) : [];
+  const fieldDirectives = flatMap(
+    type.fields ? type.fields : [],
+    f => f.directives.map(d => d.name.value)
+  );
+  const argumentDirectives = flatMap(
+    type.fields ? type.fields : [],
+    f =>
       flatMap(
-        type.fields ? type.fields : [],
-        f => f.directives.map(d => d.name.value)
+        f.arguments ? f.arguments : [],
+        a => (a.directives ? a.directives.map(d => d.name.value) : [])
       )
-    );
+  );
+  return (typeDirectives)
+    .concat(fieldDirectives)
+    .concat(argumentDirectives);
 }
 
 function getTypeBaseGraph(
