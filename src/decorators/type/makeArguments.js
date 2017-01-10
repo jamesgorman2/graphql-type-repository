@@ -15,7 +15,7 @@ import {
   Module,
 } from '../../config';
 import type {
-  FieldConfig,
+  ArgumentConfig,
 } from '../../config';
 
 import {
@@ -38,55 +38,75 @@ import {
   getInputType,
 } from './getInputType';
 
-export function makeFields(
+
+function makeArgument(
+  argumentNode: InputValueDefinitionNode,
+  configIn: Option<ArgumentConfig>,
+  referringType: string,
+  referringFieldName: string,
+  referringTypeName: string,
+  typeMap: TypeMap,
+  module: Module
+) {
+  const name = argumentNode.name.value;
+  const getType = () => getInputType(argumentNode.type, typeMap, referringTypeName, module);
+
+  const configInForValue = configIn
+    .mapOrNone(c => c[name]);
+
+  const description = getDescriptionObject(
+    argumentNode,
+    configInForValue.mapOrNone(c => c.description),
+    `${referringType} argument`,
+    `${referringTypeName}.${name}.${referringFieldName}`,
+    module.name
+  );
+  const defaultValue = // TODO also from config
+    (type: GraphQLInputType) =>
+      someOrNone(argumentNode.defaultValue).map(
+        (v) => {
+          const value = valueFromAST(v, type);
+          if (value === undefined) {
+            throw new GraphQLTypeError(
+              `Invalid default value in argument for ${referringType} ${referringTypeName}.${name}.${referringFieldName} in module ${module.name}.`
+            );
+          }
+          return value;
+        }
+      )
+        .map(d => ({ defaultValue: d }))
+        .getOrElse({});
+
+  return description.map(
+    d => ({
+      name,
+      getType,
+      defaultValue,
+      description: d,
+    })
+  );
+}
+
+export function makeArguments(
   argumentNodes: InputValueDefinitionNode[],
-  configIn: Option<FieldConfig>,
-  referringField: string,
+  configIn: Option<ArgumentConfig>,
+  referringType: string,
   referringFieldName: string,
   referringTypeName: string,
   typeMap: TypeMap,
   module: Module
 ): Try<Thunk<GraphQLFieldConfigArgumentMap>> {
   const argumentSpecs = argumentNodes.map(
-    (argumentNode) => {
-      const name = argumentNode.name.value;
-      const getType = () => getInputType(argumentNode.type, typeMap, referringTypeName, module);
-
-      const configInForValue = configIn
-        .mapOrNone(c => c[name]);
-
-      const description = getDescriptionObject(
+    argumentNode =>
+      makeArgument(
         argumentNode,
-        configInForValue.mapOrNone(c => c.description),
-        `${referringTypeName} argument`,
-        `${referringTypeName}.${name}.${referringFieldName}`,
-        module.name
-      );
-      const defaultValue =
-        (type: GraphQLInputType) =>
-          someOrNone(argumentNode.defaultValue).map(
-            (v) => {
-              const value = valueFromAST(v, type);
-              if (value === undefined) {
-                throw new GraphQLTypeError(
-                  `Invalid default value in argument for ${referringTypeName} ${referringTypeName}.${name}.${referringFieldName} in module ${module.name}.`
-                );
-              }
-              return value;
-            }
-          )
-            .map(d => ({ defaultValue: d }))
-            .getOrElse({});
-
-      return description.map(
-        d => ({
-          name,
-          getType,
-          defaultValue,
-          description: d,
-        })
-      );
-    }
+        configIn,
+        referringType,
+        referringFieldName,
+        referringTypeName,
+        typeMap,
+        module
+      )
   )
     .reduce(
       (acc, trySpec) =>

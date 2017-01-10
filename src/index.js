@@ -11,6 +11,7 @@ export {
 } from './config';
 
 export type {
+  ArgumentConfig,
   FieldConfig,
   ScalarConfig,
   ObjectConfig,

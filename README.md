@@ -11,6 +11,7 @@ schema specified in the GraphQL schema language.
 
 ## TODO
 - [ ] finish decorators
+- [ ] new decorator to check input/ouputness of fields/arguments
 - [ ] finish schema builder
 - [ ] finish root class and config
 - [ ] fix this page
@@ -21,6 +22,8 @@ schema specified in the GraphQL schema language.
 - [ ] use Module to get type so we can register refs from raw types
 - [ ] panic checking for unexpected state
 - [ ] extend raw types
+- [ ] fix up tests
+- [ ] fix up naming in lambdas
 
 ## Getting Started
 

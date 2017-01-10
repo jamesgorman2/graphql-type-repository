@@ -13,6 +13,7 @@ export {
 } from './NamedDefinitionNode';
 
 export type {
+  ArgumentConfig,
   EnumConfig,
   FieldConfig,
   ScalarConfig,

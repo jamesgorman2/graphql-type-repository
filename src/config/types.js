@@ -19,8 +19,16 @@ export type EnumConfig = {
   }
 };
 
+export type ArgumentConfig = {
+  [argumentName: string]: {
+    description?: string;
+    defaultValue?: mixed;
+  }
+}
+
 export type FieldConfig = {
   [fieldName: string]: {
+    arguments?: ArgumentConfig;
     description?: string;
     deprecationReason?: string;
     resolver?: GraphQLFieldResolver<*>;
