@@ -50,7 +50,7 @@
     "eslint-config-airbnb-base": "^11.0.0",
     "eslint-plugin-babel": "^4.0.0",
     "eslint-plugin-import": "^2.2.0",
-    "flow-bin": "^0.37.4",
+    "flow-bin": "^0.41.0",
     "flow-coverage-report": "^0.2.0",
     "graphql": "^0.8.1",
     "jest": "^18.1.0",
