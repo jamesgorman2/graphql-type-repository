@@ -33,30 +33,30 @@
     "graphql": "^0.8.1"
   },
   "devDependencies": {
-    "babel": "^6.5.2",
-    "babel-cli": "^6.18.0",
-    "babel-eslint": "^7.1.0",
-    "babel-jest": "^18.0.0",
-    "babel-plugin-transform-builtin-extend": "^1.1.0",
-    "babel-plugin-transform-flow-strip-types": "^6.21.0",
-    "babel-polyfill": "^6.16.0",
-    "babel-preset-es2015": "^6.18.0",
-    "babel-preset-es2017": "^6.16.0",
-    "babel-preset-latest": "^6.16.0",
-    "babel-preset-stage-0": "^6.16.0",
+    "babel": "^6.23.0",
+    "babel-cli": "^6.24.0",
+    "babel-eslint": "^7.2.0",
+    "babel-jest": "^19.0.0",
+    "babel-plugin-transform-builtin-extend": "^1.1.2",
+    "babel-plugin-transform-flow-strip-types": "^6.22.0",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-es2015": "^6.24.0",
+    "babel-preset-es2017": "^6.22.0",
+    "babel-preset-latest": "^6.24.0",
+    "babel-preset-stage-0": "^6.22.0",
     "chalk": "^1.1.3",
-    "coveralls": "^2.11.15",
-    "eslint": "^3.12.2",
-    "eslint-config-airbnb-base": "^11.0.0",
-    "eslint-plugin-babel": "^4.0.0",
+    "coveralls": "^2.12.0",
+    "eslint": "^3.18.0",
+    "eslint-config-airbnb-base": "^11.1.1",
+    "eslint-plugin-babel": "^4.1.1",
     "eslint-plugin-import": "^2.2.0",
-    "flow-bin": "^0.37.4",
-    "flow-coverage-report": "^0.2.0",
-    "graphql": "^0.8.1",
-    "jest": "^18.1.0",
-    "jest-diff": "^18.1.0",
-    "jest-matcher-utils": "^18.1.0",
-    "pretty-format": "^18.1.0"
+    "flow-bin": "^0.42.0",
+    "flow-coverage-report": "^0.3.0",
+    "graphql": "^0.9.1",
+    "jest": "^19.0.2",
+    "jest-diff": "^19.0.0",
+    "jest-matcher-utils": "^19.0.0",
+    "pretty-format": "^19.0.0"
   },
   "jest": {
     "collectCoverageFrom": [
@@ -66,5 +66,6 @@
     ],
     "testEnvironment": "node",
     "testRegex": "__tests__/.*-test.js$"
-  }
+  },
+  "dependencies": {}
 }
