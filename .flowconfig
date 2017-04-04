@@ -3,6 +3,7 @@
 .*/resources/.*
 .*/npm/.*
 .*/node_modules/flow-coverage-report/.*
+.*/node_modules/fbjs/.*
 .*/src-old/.*
 
 [include]

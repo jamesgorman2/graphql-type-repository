@@ -11,3 +11,11 @@ export type GraphQLRepositoryObjectTypeConfig<TSource, TContext> = {
   description?: ?string;
   isIntrospection?: boolean;
 };
+
+export class GraphQLRepositoryObjectTypeBuilder<TSource, TContext> {
+  config: GraphQLRepositoryObjectTypeConfig<TSource, TContext>;
+
+  constructor(config: GraphQLRepositoryObjectTypeConfig<TSource, TContext>) {
+    this.config = config;
+  }
+}

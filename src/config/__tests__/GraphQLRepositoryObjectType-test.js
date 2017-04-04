@@ -1,7 +1,7 @@
 // @flow
 /* eslint-env jest */
 
-describe('ObjectBuilder', () => {
+describe('GraphQLRepositoryObjectTypeBuilder', () => {
   describe('constructor', () => {});
   describe('from', () => {});
   describe('withResolver', () => {});
