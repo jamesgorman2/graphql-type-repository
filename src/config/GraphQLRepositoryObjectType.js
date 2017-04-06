@@ -1,21 +1,30 @@
 // @flow
 
-import type { GraphQLInterfaceType, GraphQLIsTypeOfFn } from 'graphql';
-import type { GraphQLRepositoryFieldConfigMap, GraphQLRepositoryTypeName } from './definitions';
+import { GraphQLObjectType } from 'graphql';
+import type { GraphQLRepositoryObjectTypeConfig } from './definitions';
+import type { GraphQLTypeBuilder } from './GraphQLTypeBuilder';
 
-export type GraphQLRepositoryObjectTypeConfig<TSource, TContext> = {
-  name: string;
-  interfaces?: Array<GraphQLRepositoryTypeName<GraphQLInterfaceType>>;
-  fields: GraphQLRepositoryFieldConfigMap<TSource, TContext>;
-  isTypeOf?: ?GraphQLIsTypeOfFn<TSource, TContext>;
-  description?: ?string;
-  isIntrospection?: boolean;
-};
-
-export class GraphQLRepositoryObjectTypeBuilder<TSource, TContext> {
+export class GraphQLRepositoryObjectTypeBuilder<TSource, TContext>
+implements GraphQLTypeBuilder<
+  GraphQLObjectType,
+  GraphQLRepositoryObjectTypeBuilder<TSource, TContext>
+> {
   config: GraphQLRepositoryObjectTypeConfig<TSource, TContext>;
 
   constructor(config: GraphQLRepositoryObjectTypeConfig<TSource, TContext>) {
     this.config = config;
   }
+
+  build: () => GraphQLObjectType =
+    () =>
+      new GraphQLObjectType();
+
+  merge: (other: GraphQLRepositoryObjectTypeBuilder<TSource, TContext>)
+    => GraphQLRepositoryObjectTypeBuilder<TSource, TContext> =
+    (other: GraphQLRepositoryObjectTypeBuilder<TSource, TContext>) =>
+      other;
+
+  withResolver: () => GraphQLRepositoryObjectTypeBuilder<TSource, TContext> =
+    () =>
+      this;
 }
