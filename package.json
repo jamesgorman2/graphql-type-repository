@@ -35,7 +35,7 @@
   "devDependencies": {
     "babel": "^6.23.0",
     "babel-cli": "^6.24.0",
-    "babel-eslint": "^7.2.1",
+    "babel-eslint": "^10.0.1",
     "babel-jest": "^19.0.0",
     "babel-plugin-transform-builtin-extend": "^1.1.2",
     "babel-plugin-transform-flow-strip-types": "^6.22.0",
